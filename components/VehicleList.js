@@ -7,7 +7,10 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
+import I18n from './locales/languages';
+
+ 
 import {searchBox, button, buttonText, text} from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SideBar from './ui/SideBar';
@@ -15,6 +18,7 @@ import {setVehicle} from './functions/helper';
 
 const {width, height} = Dimensions.get('window');
 export default function VehicleList({navigation}) {
+  const translations=I18n.translations;
   const [listData, setListDate] = useState([
     'TRB8888A',
     'TCB9990X',
@@ -22,7 +26,6 @@ export default function VehicleList({navigation}) {
     'TLC1234S',
   ]);
   const [selectedVehicle, setselectedVehicle] = useState(null);
-
   const ItemView = ({item}) => {
     return (
       // FlatList Item
@@ -88,7 +91,11 @@ export default function VehicleList({navigation}) {
             style={[
               text,
               {marginTop: 20},
-            ]}>{`Please select a vehicle to proceed`}</Text>
+            ]}>{translations.en.homepage_message}</Text>
+            <Text style={[
+              text,
+              {marginTop: 20},
+            ]}>{translations.ch.homepage_message}</Text>
           {selectedVehicle && (
             <View
               style={{

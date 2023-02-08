@@ -9,10 +9,13 @@ import {
   ScrollView,
 } from 'react-native';
 import React, {useRef, useEffect, useState} from 'react';
+import * as ImagePicker from 'react-native-image-picker';
 import {searchBox, button, buttonText, remarks} from '../styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import I18n from '../locales/languages';
 import {TextInput} from 'react-native-paper';
 import {Image} from 'react-native-animatable';
+
 
 export default function RightDeliveryDetails({
   show,
@@ -21,6 +24,7 @@ export default function RightDeliveryDetails({
   hide,
   onSubmit,
 }) {
+  const translations=I18n.translations;
   const fadeAnim = useRef(new Animated.Value(-800)).current;
   const heightAnim = useRef(new Animated.Value(0)).current;
   const heightMeterAfAnim = useRef(new Animated.Value(0)).current;
@@ -30,6 +34,12 @@ export default function RightDeliveryDetails({
   const [more, setmore] = useState(false);
   const [moreMeterAf, setmoreMeterAf] = useState(false);
   const [moreMeterBe, setmoreMeterBe] = useState(false);
+  //after
+  const [previewImageUri,setpreviewImageUri]=useState('');
+  const [imagePreview,setimagePreview]=useState(false);
+  //before
+  const [previewImageUribefore,setpreviewImageUribefore]=useState('');
+  const [imagePreviewbefore,setimagePreviewbefore]=useState(false);
   useEffect(() => {
     if (show) {
       onShow(-400);
@@ -95,6 +105,29 @@ export default function RightDeliveryDetails({
       setcalVal(aVal);
     }
   };
+
+  const openGallery=async (type,section)=>{
+    const options={mediaType:'image',includeBase64: false,maxHeight: 800,maxWidth: 800};
+    try {
+      var response;
+      if(type){
+        response=await ImagePicker.launchImageLibrary(options);
+      }else{
+        response=await ImagePicker.launchCamera(options);
+      }
+      console.log("resp",response);
+      // setFile(response);
+      if(section==='after'){
+        setpreviewImageUri(response.assets[0].uri);
+        setimagePreview(true)
+      }else{
+        setpreviewImageUribefore(response.assets[0].uri)
+        setimagePreviewbefore(true);
+      }
+    }catch (error) {
+      console.log(error);
+    }
+  }
   return (
     <Animated.View
       style={{
@@ -176,9 +209,14 @@ export default function RightDeliveryDetails({
               alignItems: 'center',
               marginBottom: 10,
             }}>
-            <Text style={{fontSize: 25, color: '#01315C', marginRight: 40}}>
-              Liters of Diesel Sold
-            </Text>
+              <View>
+              <Text style={{fontSize: 25, color: '#01315C', marginRight: 40}}>
+              {translations.en.litres_of_diesel_sold}
+              </Text>
+              <Text style={{fontSize: 25, color: '#01315C', marginRight: 40}}>
+              {translations.ch.litres_of_diesel_sold}
+              </Text>
+            </View>
             <Icon
               onPress={() => onShow(0)}
               name="edit"
@@ -203,7 +241,7 @@ export default function RightDeliveryDetails({
               marginBottom: 10,
             }}>
             <Text style={{fontSize: 25, color: '#01315C', marginRight: 40}}>
-              Signature
+              {translations.en.signature} {translations.ch.signature}
             </Text>
             <Icon name="edit" color="#01315C" size={20} />
           </View>
@@ -221,9 +259,14 @@ export default function RightDeliveryDetails({
               justifyContent: 'space-between',
               marginBottom: 20,
             }}>
-            <Text style={{fontSize: 20, color: '#01315C', marginRight: 40}}>
-              Meter Reading (After)
-            </Text>
+            <View>
+              <Text style={{fontSize: 20, color: '#01315C', marginRight: 40}}>
+              {translations.en.metre_reading_after}
+              </Text>
+              <Text style={{fontSize: 20, color: '#01315C', marginRight: 40}}>
+              {translations.ch.metre_reading_after}
+              </Text>
+            </View>
             {moreMeterAf ? (
               <Icon
                 onPress={() => onToggleMoreAf(0)}
@@ -240,7 +283,96 @@ export default function RightDeliveryDetails({
               />
             )}
           </View>
-          <Animated.View
+          <View style={{marginBottom:20}}>
+              {
+                imagePreview ?
+                <>
+                <TouchableOpacity
+                onPress={()=>{
+                  setimagePreview(false);
+                  setpreviewImageUri('');
+                }}
+                 style={{
+                    position:'absolute',
+                    width:30,
+                    height:30,
+                    backgroundColor:'#404040',
+                    top:-10,
+                    left:70,
+                    zIndex:+2,
+                    borderRadius:25,
+                    justifyContent:'center',
+                    alignItems:'center'
+                  }}>
+                    <Icon
+                name="close"
+                color="#fff"
+                size={20}
+              />
+                  </TouchableOpacity>
+                  <View style={{
+              width:80,
+              height:80,
+              borderWidth:2,
+              borderColor:'navy',
+              marginLeft:10,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+                  <Image source={{uri:previewImageUri}} style={{width:'100%',height:'100%'}} />
+                  </View>   
+</>
+                
+                :
+                <View style={{flexDirection:'row'}}>
+                
+                <TouchableOpacity style={{
+                  width:80,
+                  height:80,
+                  borderWidth:2,
+                  borderColor:'navy',
+                  marginRight:10,
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }} 
+                onPress={()=>{
+                  openGallery(true,'after')
+                }}>
+                  <Icon
+                name="image"
+                color="navy"
+                size={20}
+              />
+                <Text style={{color:'navy'}}>Gallery</Text>
+                  
+                </TouchableOpacity>
+                <TouchableOpacity  style={{
+                  width:80,
+                  height:80,
+                  borderWidth:2,
+                  borderColor:'navy',
+                  marginRight:10,
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                 onPress={()=>{
+                  openGallery(false,'after')
+                }}>
+                  <Icon
+                name="camera"
+                color="navy"
+                size={20}
+              />
+                  <Text style={{color:'navy'}}>Camera</Text>
+                </TouchableOpacity>
+                </View>
+              }
+            
+          </View>
+          {/* <Animated.View
             style={{
               height: heightMeterAfAnim,
               flexDirection: 'row',
@@ -253,7 +385,7 @@ export default function RightDeliveryDetails({
               resizeMode="contain"
             />
             <Icon name="edit" color="#01315C" size={20} />
-          </Animated.View>
+          </Animated.View> */}
           <View
             style={{
               flexDirection: 'row',
@@ -261,9 +393,14 @@ export default function RightDeliveryDetails({
               marginBottom: 20,
               backgroundColor: '#EEF7FF',
             }}>
-            <Text style={{fontSize: 20, color: '#01315C', marginRight: 40}}>
-              Meter Reading (Before)
-            </Text>
+            <View>
+              <Text style={{fontSize: 20, color: '#01315C', marginRight: 40}}>
+              {translations.en.metre_reading_before}
+              </Text>
+              <Text style={{fontSize: 20, color: '#01315C', marginRight: 40}}>
+              {translations.ch.metre_reading_before}
+              </Text>
+            </View>
             {moreMeterBe ? (
               <Icon
                 onPress={() => onToggleMoreBe(0)}
@@ -280,7 +417,96 @@ export default function RightDeliveryDetails({
               />
             )}
           </View>
-          <Animated.View
+          <View style={{marginBottom:20}}>
+              {
+                imagePreviewbefore ?
+                <>
+                <TouchableOpacity
+                onPress={()=>{
+                  setimagePreviewbefore(false);
+                  setpreviewImageUribefore('');
+                }}
+                 style={{
+                    position:'absolute',
+                    width:30,
+                    height:30,
+                    backgroundColor:'#404040',
+                    top:-10,
+                    left:70,
+                    zIndex:+2,
+                    borderRadius:25,
+                    justifyContent:'center',
+                    alignItems:'center'
+                  }}>
+                    <Icon
+                name="close"
+                color="#fff"
+                size={20}
+              />
+                  </TouchableOpacity>
+                  <View style={{
+              width:80,
+              height:80,
+              borderWidth:2,
+              borderColor:'navy',
+              marginLeft:10,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+                  <Image source={{uri:previewImageUribefore}} style={{width:'100%',height:'100%'}} />
+                  </View>   
+</>
+                
+                :
+                <View style={{flexDirection:'row'}}>
+                
+                <TouchableOpacity  style={{
+                  width:80,
+                  height:80,
+                  borderWidth:2,
+                  borderColor:'navy',
+                  marginRight:10,
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }} 
+                onPress={()=>{
+                  openGallery(true,'before')
+                }}>
+                  <Icon
+                name="image"
+                color="navy"
+                size={20}
+              />
+                <Text style={{color:'navy'}}>Gallery</Text>
+                  
+                </TouchableOpacity>
+                <TouchableOpacity  style={{
+                  width:80,
+                  height:80,
+                  borderWidth:2,
+                  borderColor:'navy',
+                  marginRight:10,
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }} 
+                 onPress={()=>{
+                  openGallery(false,'before')
+                }}>
+                  <Icon
+                name="camera"
+                color="navy"
+                size={20}
+              />
+                  <Text style={{color:'navy'}}>Camera</Text>
+                </TouchableOpacity>
+                </View>
+              }
+            
+          </View>
+          {/* <Animated.View
             style={{
               height: heightMeterBeAnim,
               flexDirection: 'row',
@@ -293,7 +519,7 @@ export default function RightDeliveryDetails({
               resizeMode="contain"
             />
             <Icon name="edit" color="#01315C" size={20} />
-          </Animated.View>
+          </Animated.View> */}
           <Text
             style={{
               fontSize: 20,
@@ -301,7 +527,7 @@ export default function RightDeliveryDetails({
               marginRight: 40,
               backgroundColor: '#EEF7FF',
             }}>
-            Remarks
+            {translations.en.remarks} {translations.ch.remarks}
           </Text>
           <KeyboardAvoidingView
             style={{marginBottom: 50}}

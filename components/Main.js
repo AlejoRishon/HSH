@@ -18,10 +18,12 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SideBar from './ui/SideBar';
+import I18n from './locales/languages';
 import {getVehicle} from './functions/helper';
 
 const {width, height} = Dimensions.get('window');
 export default function Main({navigation, route}) {
+  const translations=I18n.translations;
   const parameter = getVehicle();
 
   return (
@@ -64,13 +66,15 @@ export default function Main({navigation, route}) {
             style={boxContainer}
             onPress={() => navigation.navigate('TankFill')}>
             <Icons name="truck-fast" color="#01315C" size={60} />
-            <Text style={[text, {fontSize: 30}]}>{`Tank Fill Up`}</Text>
+            <Text style={[text, {fontSize: 30}]}>{translations.en.tank_fill_up}</Text>
+            <Text style={[text, {fontSize: 30}]}>{translations.ch.tank_fill_up}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={boxContainer}
             onPress={() => navigation.navigate('DeliveryOrder')}>
             <Icons name="format-list-bulleted" color="#01315C" size={60} />
-            <Text style={[text, {fontSize: 30}]}>{`Delivery Order`}</Text>
+            <Text style={[text, {fontSize: 30}]}>{translations.en.delivery_order}</Text>
+            <Text style={[text, {fontSize: 30}]}>{translations.ch.delivery_order}</Text>
           </TouchableOpacity>
         </View>
         <View
@@ -82,13 +86,15 @@ export default function Main({navigation, route}) {
           }}>
           <TouchableOpacity style={boxContainer}>
             <Icon name="file-text" color="#01315C" size={60} />
-            <Text style={[text, {fontSize: 30}]}>{`Ad hoc Service`}</Text>
+            <Text style={[text, {fontSize: 30}]}>{translations.en.ad_hoc_service}</Text>
+            <Text style={[text, {fontSize: 30}]}>{translations.ch.ad_hoc_service}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={boxContainer}
             onPress={() => navigation.navigate('DieselTransfer')}>
             <Icon name="building" color="#01315C" size={60} />
-            <Text style={[text, {fontSize: 30}]}>{`Diesel Transfer`}</Text>
+            <Text style={[text, {fontSize: 30}]}>{translations.en.diesel_transfer}</Text>
+            <Text style={[text, {fontSize: 30}]}>{translations.ch.diesel_transfer}</Text>
           </TouchableOpacity>
         </View>
       </View>

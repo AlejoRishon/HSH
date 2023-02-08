@@ -66,7 +66,7 @@ export default function RightInputBar({
             fontWeight: 600,
             marginBottom: 10,
           }}>
-          {header}
+          Litres of Diesel Pumped
         </Text>
         <Text style={{fontSize: 20, color: '#fff', marginBottom: 40}}>
           {subHeader}

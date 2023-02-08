@@ -20,6 +20,7 @@ export const searchBox = {
 export const boxContainer = {
   flex: 1,
   backgroundColor: '#EEF7FF',
+  paddingBottom:20,
   borderRadius: 16,
   marginLeft: 20,
   justifyContent: 'center',

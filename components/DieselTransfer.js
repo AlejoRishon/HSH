@@ -18,12 +18,14 @@ import {
 } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
+import I18n from './locales/languages';
 import SideBar from './ui/SideBar';
 import {getVehicle} from './functions/helper';
 import RightInputBar from './ui/RightInputBar';
 import RightConfirm from './ui/RightConfirm';
 const {width, height} = Dimensions.get('window');
 export default function DieselTransfer({navigation, route}) {
+  const translations=I18n.translations;
   const parameter = getVehicle();
   const [selected, setSelected] = useState(null);
   const [showInput, setshowInput] = useState(false);
@@ -40,7 +42,10 @@ export default function DieselTransfer({navigation, route}) {
 
           <Text style={[text, {marginLeft: 10}]}>Change vehicle</Text>
         </TouchableOpacity>
-        <Text style={[text, {marginTop: 20}]}>{`Return`}</Text>
+        <View style={{flexDirection:'row',justifyContent:'flex-start'}}>
+          <Text style={[text, {marginTop: 20}]}>{translations.en.return}</Text>
+          <Text style={[text, {marginTop: 20,marginLeft:20,borderLeftWidth:2,borderLeftColor:'navy',paddingLeft:20}]}>{translations.ch.return}</Text>
+        </View>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <View
             style={{

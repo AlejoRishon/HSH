@@ -18,12 +18,15 @@ import {
 } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
+import I18n from './locales/languages';
+
 import SideBar from './ui/SideBar';
 import RightInputBar from './ui/RightInputBar';
 import RightConfirm from './ui/RightConfirm';
 import {getVehicle} from './functions/helper';
 const {width, height} = Dimensions.get('window');
 export default function TankFill({navigation, route}) {
+  const translations=I18n.translations;
   const rightBar = useRef(null);
 
   const parameter = getVehicle();
@@ -42,7 +45,10 @@ export default function TankFill({navigation, route}) {
 
           <Text style={[text, {marginLeft: 10}]}>Change vehicle</Text>
         </TouchableOpacity>
-        <Text style={[text, {marginTop: 20}]}>{`Brand`}</Text>
+        <View style={{flexDirection:'row',justifyContent:'flex-start'}}>
+          <Text style={[text, {marginTop: 20}]}>{translations.en.brand}</Text>
+          <Text style={[text, {marginTop: 20,marginLeft:20,borderLeftWidth:2,borderLeftColor:'navy',paddingLeft:20}]}>{translations.ch.brand}</Text>
+        </View>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <View
             style={{
