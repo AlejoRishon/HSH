@@ -23,9 +23,7 @@ const SideBar = props => {
       }}>
       {props.all && (
         <TouchableOpacity
-          onPress={() =>
-            props.navigation.navigate('Main', {vehicle: props.vehicle})
-          }
+          onPress={() => props.navigation.navigate('Main')}
           style={{
             backgroundColor: '#01315C',
             justifyContent: 'center',
@@ -39,9 +37,7 @@ const SideBar = props => {
       )}
       {props.all && (
         <TouchableOpacity
-          onPress={() =>
-            props.navigation.navigate('TankFill', {vehicle: props.vehicle})
-          }
+          onPress={() => props.navigation.navigate('TankFill')}
           style={{
             backgroundColor: '#01315C',
             justifyContent: 'center',
@@ -60,6 +56,7 @@ const SideBar = props => {
       )}
       {props.all && (
         <TouchableOpacity
+          onPress={() => props.navigation.navigate('DeliveryOrder')}
           style={{
             backgroundColor: '#01315C',
             justifyContent: 'center',

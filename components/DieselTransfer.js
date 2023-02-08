@@ -19,13 +19,18 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SideBar from './ui/SideBar';
+import {getVehicle} from './functions/helper';
+import RightInputBar from './ui/RightInputBar';
+import RightConfirm from './ui/RightConfirm';
 const {width, height} = Dimensions.get('window');
 export default function DieselTransfer({navigation, route}) {
-  const parameter = route.params;
+  const parameter = getVehicle();
   const [selected, setSelected] = useState(null);
+  const [showInput, setshowInput] = useState(false);
+  const [showConfirm, setshowConfirm] = useState(false);
   return (
     <View style={{flexDirection: 'row', flex: 1, backgroundColor: 'white'}}>
-      <SideBar all={true} navigation={navigation} vehicle={parameter.vehicle} />
+      <SideBar all={true} navigation={navigation} />
       <View style={{flex: 1, padding: 20}}>
         <Text style={text}>{parameter.vehicle}</Text>
         <TouchableOpacity
@@ -60,7 +65,10 @@ export default function DieselTransfer({navigation, route}) {
             marginRight: 20,
           }}>
           <TouchableOpacity
-            onPress={() => setSelected('jin')}
+            onPress={() => {
+              setshowInput(true);
+              setSelected('jin');
+            }}
             style={[
               boxContainer,
               {borderWidth: selected == 'jin' ? 3 : 0, borderColor: 'green'},
@@ -69,10 +77,13 @@ export default function DieselTransfer({navigation, route}) {
             <Text style={[text, {fontSize: 25}]}>{`Jin Besut`}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => setSelected('caltec')}
+            onPress={() => {
+              setshowInput(true);
+              setSelected('chin');
+            }}
             style={[
               boxContainer,
-              {borderWidth: selected == 'caltec' ? 3 : 0, borderColor: 'green'},
+              {borderWidth: selected == 'chin' ? 3 : 0, borderColor: 'green'},
             ]}>
             <Image source={require('../assets/chin.png')} />
 
@@ -109,6 +120,18 @@ export default function DieselTransfer({navigation, route}) {
             ]}>{`Select a module to continue`}</Text>
         </View>
       </View>
+      <RightInputBar
+        header="Liters of Diesel Pumped"
+        subHeader="Enter quantity of diesel pumped"
+        show={showInput}
+        hide={() => setshowInput(false)}
+        onSubmit={() => {
+          setSelected(null);
+          setshowInput(false);
+          setshowConfirm(true);
+        }}
+      />
+      <RightConfirm show={showConfirm} hide={() => setshowConfirm(false)} />
     </View>
   );
 }

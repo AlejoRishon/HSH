@@ -8,6 +8,7 @@ import VehicleList from './components/VehicleList';
 import Main from './components/Main';
 import TankFill from './components/TankFill';
 import DieselTransfer from './components/DieselTransfer';
+import DeliveryOrder from './components/DeliveryOrder';
 // create a component
 const Stack = createNativeStackNavigator();
 const App = () => {
@@ -19,6 +20,7 @@ const App = () => {
         <Stack.Screen name="Main" component={Main} />
         <Stack.Screen name="TankFill" component={TankFill} />
         <Stack.Screen name="DieselTransfer" component={DieselTransfer} />
+        <Stack.Screen name="DeliveryOrder" component={DeliveryOrder} />
       </Stack.Navigator>
     </NavigationContainer>
   );

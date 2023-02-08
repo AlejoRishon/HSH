@@ -41,3 +41,24 @@ export const buttonText = {
   color: 'white',
   textAlign: 'center',
 };
+
+export const tableHeader = {
+  borderBottomWidth: 1,
+  borderBottomColor: '#01315C',
+  paddingBottom: 20,
+};
+
+export const dataText = {
+  fontSize: 20,
+  color: '#01315C',
+  paddingVertical: 20,
+  backgroundColor: 'red',
+};
+
+export const remarks = {
+  borderColor: '#C4C4C4',
+  borderWidth: 1,
+  backgroundColor: 'white',
+  fontSize: 20,
+  marginTop: 20,
+};

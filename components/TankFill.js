@@ -4,11 +4,11 @@ import {
   View,
   Dimensions,
   FlatList,
-  TextInput,
+  Animated,
   TouchableOpacity,
   Image,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {
   searchBox,
   button,
@@ -19,13 +19,20 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SideBar from './ui/SideBar';
+import RightInputBar from './ui/RightInputBar';
+import RightConfirm from './ui/RightConfirm';
+import {getVehicle} from './functions/helper';
 const {width, height} = Dimensions.get('window');
 export default function TankFill({navigation, route}) {
-  const parameter = route.params;
+  const rightBar = useRef(null);
+
+  const parameter = getVehicle();
   const [selected, setSelected] = useState(null);
+  const [showInput, setshowInput] = useState(false);
+  const [showConfirm, setshowConfirm] = useState(false);
   return (
     <View style={{flexDirection: 'row', flex: 1, backgroundColor: 'white'}}>
-      <SideBar all={true} navigation={navigation} vehicle={parameter.vehicle} />
+      <SideBar all={true} navigation={navigation} />
       <View style={{flex: 1, padding: 20}}>
         <Text style={text}>{parameter.vehicle}</Text>
         <TouchableOpacity
@@ -60,7 +67,10 @@ export default function TankFill({navigation, route}) {
             marginRight: 20,
           }}>
           <TouchableOpacity
-            onPress={() => setSelected('shell')}
+            onPress={() => {
+              setshowInput(true);
+              setSelected('shell');
+            }}
             style={[
               boxContainer,
               {borderWidth: selected == 'shell' ? 3 : 0, borderColor: 'green'},
@@ -69,7 +79,10 @@ export default function TankFill({navigation, route}) {
             <Text style={[text, {fontSize: 25}]}>{`Shell`}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => setSelected('caltec')}
+            onPress={() => {
+              setshowInput(true);
+              setSelected('caltec');
+            }}
             style={[
               boxContainer,
               {borderWidth: selected == 'caltec' ? 3 : 0, borderColor: 'green'},
@@ -87,7 +100,10 @@ export default function TankFill({navigation, route}) {
             marginRight: 20,
           }}>
           <TouchableOpacity
-            onPress={() => setSelected('chevron')}
+            onPress={() => {
+              setshowInput(true);
+              setSelected('chevron');
+            }}
             style={[
               boxContainer,
               {
@@ -100,7 +116,10 @@ export default function TankFill({navigation, route}) {
             <Text style={[text, {fontSize: 25}]}>{`Chevron`}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => setSelected('spec')}
+            onPress={() => {
+              setshowInput(true);
+              setSelected('spec');
+            }}
             style={[
               boxContainer,
               {borderWidth: selected == 'spec' ? 3 : 0, borderColor: 'green'},
@@ -133,6 +152,19 @@ export default function TankFill({navigation, route}) {
             ]}>{`Select a module to continue`}</Text>
         </View>
       </View>
+
+      <RightInputBar
+        header="Liters of Diesel Pumped"
+        subHeader="Enter quantity of diesel pumped"
+        show={showInput}
+        hide={() => setshowInput(false)}
+        onSubmit={() => {
+          setSelected(null);
+          setshowInput(false);
+          setshowConfirm(true);
+        }}
+      />
+      <RightConfirm show={showConfirm} hide={() => setshowConfirm(false)} />
     </View>
   );
 }

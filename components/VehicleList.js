@@ -11,6 +11,8 @@ import React, {useState} from 'react';
 import {searchBox, button, buttonText, text} from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SideBar from './ui/SideBar';
+import {setVehicle} from './functions/helper';
+
 const {width, height} = Dimensions.get('window');
 export default function VehicleList({navigation}) {
   const [listData, setListDate] = useState([
@@ -102,9 +104,10 @@ export default function VehicleList({navigation}) {
         {selectedVehicle && (
           <TouchableOpacity
             style={button}
-            onPress={() =>
-              navigation.navigate('Main', {vehicle: selectedVehicle})
-            }>
+            onPress={() => {
+              setVehicle(selectedVehicle);
+              navigation.navigate('Main');
+            }}>
             <Text style={buttonText}>Proceed</Text>
           </TouchableOpacity>
         )}

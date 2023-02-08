@@ -18,13 +18,15 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SideBar from './ui/SideBar';
+import {getVehicle} from './functions/helper';
+
 const {width, height} = Dimensions.get('window');
 export default function Main({navigation, route}) {
-  const parameter = route.params;
+  const parameter = getVehicle();
 
   return (
     <View style={{flexDirection: 'row', flex: 1, backgroundColor: 'white'}}>
-      <SideBar all={true} navigation={navigation} vehicle={parameter.vehicle} />
+      <SideBar all={true} navigation={navigation} />
       <View style={{flex: 1, padding: 20}}>
         <Text style={text}>{parameter.vehicle}</Text>
         <TouchableOpacity
@@ -60,13 +62,13 @@ export default function Main({navigation, route}) {
           }}>
           <TouchableOpacity
             style={boxContainer}
-            onPress={() =>
-              navigation.navigate('TankFill', {vehicle: parameter.vehicle})
-            }>
+            onPress={() => navigation.navigate('TankFill')}>
             <Icons name="truck-fast" color="#01315C" size={60} />
             <Text style={[text, {fontSize: 30}]}>{`Tank Fill Up`}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={boxContainer}>
+          <TouchableOpacity
+            style={boxContainer}
+            onPress={() => navigation.navigate('DeliveryOrder')}>
             <Icons name="format-list-bulleted" color="#01315C" size={60} />
             <Text style={[text, {fontSize: 30}]}>{`Delivery Order`}</Text>
           </TouchableOpacity>
@@ -84,11 +86,7 @@ export default function Main({navigation, route}) {
           </TouchableOpacity>
           <TouchableOpacity
             style={boxContainer}
-            onPress={() =>
-              navigation.navigate('DieselTransfer', {
-                vehicle: parameter.vehicle,
-              })
-            }>
+            onPress={() => navigation.navigate('DieselTransfer')}>
             <Icon name="building" color="#01315C" size={60} />
             <Text style={[text, {fontSize: 30}]}>{`Diesel Transfer`}</Text>
           </TouchableOpacity>
