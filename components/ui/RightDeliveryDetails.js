@@ -12,7 +12,7 @@ import React, {useRef, useEffect, useState} from 'react';
 import * as ImagePicker from 'react-native-image-picker';
 import {searchBox, button, buttonText, remarks} from '../styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import I18n from '../locales/languages';
+import { useTranslation } from 'react-i18next';
 import {TextInput} from 'react-native-paper';
 import {Image} from 'react-native-animatable';
 
@@ -24,7 +24,7 @@ export default function RightDeliveryDetails({
   hide,
   onSubmit,
 }) {
-  const translations=I18n.translations;
+  const {t,i18n}=useTranslation();
   const fadeAnim = useRef(new Animated.Value(-800)).current;
   const heightAnim = useRef(new Animated.Value(0)).current;
   const heightMeterAfAnim = useRef(new Animated.Value(0)).current;
@@ -211,10 +211,7 @@ export default function RightDeliveryDetails({
             }}>
               <View>
               <Text style={{fontSize: 25, color: '#01315C', marginRight: 40}}>
-              {translations.en.litres_of_diesel_sold}
-              </Text>
-              <Text style={{fontSize: 25, color: '#01315C', marginRight: 40}}>
-              {translations.ch.litres_of_diesel_sold}
+              {t('litres_of_diesel_sold')}
               </Text>
             </View>
             <Icon
@@ -241,7 +238,7 @@ export default function RightDeliveryDetails({
               marginBottom: 10,
             }}>
             <Text style={{fontSize: 25, color: '#01315C', marginRight: 40}}>
-              {translations.en.signature} {translations.ch.signature}
+              {t('signature')}
             </Text>
             <Icon name="edit" color="#01315C" size={20} />
           </View>
@@ -261,10 +258,7 @@ export default function RightDeliveryDetails({
             }}>
             <View>
               <Text style={{fontSize: 20, color: '#01315C', marginRight: 40}}>
-              {translations.en.metre_reading_after}
-              </Text>
-              <Text style={{fontSize: 20, color: '#01315C', marginRight: 40}}>
-              {translations.ch.metre_reading_after}
+              {t('metre_reading_after')}
               </Text>
             </View>
             {moreMeterAf ? (
@@ -395,10 +389,7 @@ export default function RightDeliveryDetails({
             }}>
             <View>
               <Text style={{fontSize: 20, color: '#01315C', marginRight: 40}}>
-              {translations.en.metre_reading_before}
-              </Text>
-              <Text style={{fontSize: 20, color: '#01315C', marginRight: 40}}>
-              {translations.ch.metre_reading_before}
+              {t('metre_reading_before')}
               </Text>
             </View>
             {moreMeterBe ? (
@@ -527,7 +518,7 @@ export default function RightDeliveryDetails({
               marginRight: 40,
               backgroundColor: '#EEF7FF',
             }}>
-            {translations.en.remarks} {translations.ch.remarks}
+            {t('remarks')}
           </Text>
           <KeyboardAvoidingView
             style={{marginBottom: 50}}

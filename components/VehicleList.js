@@ -8,17 +8,19 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
-import I18n from './locales/languages';
+
 
  
 import {searchBox, button, buttonText, text} from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SideBar from './ui/SideBar';
 import {setVehicle} from './functions/helper';
+import { useTranslation } from 'react-i18next';
 
 const {width, height} = Dimensions.get('window');
 export default function VehicleList({navigation}) {
-  const translations=I18n.translations;
+  const {t,i18n}=useTranslation();
+
   const [listData, setListDate] = useState([
     'TRB8888A',
     'TCB9990X',
@@ -91,11 +93,8 @@ export default function VehicleList({navigation}) {
             style={[
               text,
               {marginTop: 20},
-            ]}>{translations.en.homepage_message}</Text>
-            <Text style={[
-              text,
-              {marginTop: 20},
-            ]}>{translations.ch.homepage_message}</Text>
+            ]}>{t('homepage_message')}</Text>
+
           {selectedVehicle && (
             <View
               style={{

@@ -1,12 +1,15 @@
-import I18n from 'react-native-i18n';
-import en from './en';
-import ch from './ch';
- 
-I18n.fallbacks = true;
- 
-I18n.translations = {
-  en,
-  ch
-};
+import i18next from 'i18next';
+import en from './english.json';
+import ch from './chinese.json';
+import {initReactI18next} from 'react-i18next';
 
-export default I18n;
+i18next.use(initReactI18next).init({
+  lng:'en',
+  resources:{
+    en,ch
+  },
+  react:{
+    useSuspense:false
+  }
+})
+export default i18next;
