@@ -1,6 +1,7 @@
 import {
   StyleSheet,
   Text,
+  Modal,
   View,
   Animated,
   TouchableOpacity,
@@ -24,6 +25,7 @@ export default function RightDeliveryDetails({
   hide,
   onSubmit,
 }) {
+  const [modalVisible, setModalVisible] = useState(false);
   const {t,i18n}=useTranslation();
   const fadeAnim = useRef(new Animated.Value(-800)).current;
   const heightAnim = useRef(new Animated.Value(0)).current;
@@ -34,6 +36,9 @@ export default function RightDeliveryDetails({
   const [more, setmore] = useState(false);
   const [moreMeterAf, setmoreMeterAf] = useState(false);
   const [moreMeterBe, setmoreMeterBe] = useState(false);
+
+  const [uploadtype,setuploadtype]=useState('after');
+
   //after
   const [previewImageUri,setpreviewImageUri]=useState('');
   const [imagePreview,setimagePreview]=useState(false);
@@ -127,6 +132,7 @@ export default function RightDeliveryDetails({
     }catch (error) {
       console.log(error);
     }
+    setModalVisible(!modalVisible)
   }
   return (
     <Animated.View
@@ -320,8 +326,30 @@ export default function RightDeliveryDetails({
                 
                 :
                 <View style={{flexDirection:'row'}}>
+                  <TouchableOpacity  style={{
+                  width:110,
+                  height:40,
+                  borderWidth:2,
+                  borderColor:'navy',
+                  marginRight:10,
+                  flexDirection: 'row',
+                  justifyContent: 'space-around',
+                  alignItems: 'center',
+                }} 
+                 onPress={()=>{
+                  //openGallery(false,'before')
+                  setuploadtype('after');
+                  setModalVisible(true)
+                }}>
+                  <Icon
+                name="plus"
+                color="navy"
+                size={18}
+              />
+                  <Text style={{color:'navy',fontWeight:'bold'}}>Add Image</Text>
+                </TouchableOpacity>
                 
-                <TouchableOpacity style={{
+                {/* <TouchableOpacity style={{
                   width:80,
                   height:80,
                   borderWidth:2,
@@ -332,7 +360,8 @@ export default function RightDeliveryDetails({
                   alignItems: 'center',
                 }} 
                 onPress={()=>{
-                  openGallery(true,'after')
+                  //openGallery(true,'after')
+                  setModalVisible(true)
                 }}>
                   <Icon
                 name="image"
@@ -361,7 +390,7 @@ export default function RightDeliveryDetails({
                 size={20}
               />
                   <Text style={{color:'navy'}}>Camera</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 </View>
               }
             
@@ -451,8 +480,29 @@ export default function RightDeliveryDetails({
                 
                 :
                 <View style={{flexDirection:'row'}}>
-                
                 <TouchableOpacity  style={{
+                  width:110,
+                  height:40,
+                  borderWidth:2,
+                  borderColor:'navy',
+                  marginRight:10,
+                  flexDirection: 'row',
+                  justifyContent: 'space-around',
+                  alignItems: 'center',
+                }} 
+                 onPress={()=>{
+                  //openGallery(false,'before')
+                  setuploadtype('before');
+                  setModalVisible(true)
+                }}>
+                  <Icon
+                name="plus"
+                color="navy"
+                size={18}
+              />
+                  <Text style={{color:'navy',fontWeight:'bold'}}>Add Image</Text>
+                </TouchableOpacity>
+                {/* <TouchableOpacity  style={{
                   width:80,
                   height:80,
                   borderWidth:2,
@@ -492,7 +542,7 @@ export default function RightDeliveryDetails({
                 size={20}
               />
                   <Text style={{color:'navy'}}>Camera</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 </View>
               }
             
@@ -643,8 +693,130 @@ export default function RightDeliveryDetails({
           </TouchableOpacity>
         </View>
       </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setModalVisible(!modalVisible);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={[styles.modalView]}>
+            <View style={{flexDirection:'row'}}>
+              <View style={{width:'80%',height:50,backgroundColor:'#d3d3d370'}}>
+                <Text style={[{fontSize:22,color:"#000",fontWeight:'600',paddingLeft:10,paddingVertical:8}]}>{t('Metre Reading After')}</Text>
+              </View>
+              <View style={{width:'20%',height:50,backgroundColor:'#d3d3d370',alignItems:'center',justifyContent:'center'}}>
+                <TouchableOpacity onPress={() => setModalVisible(!modalVisible)} style={{
+                  width:50,
+                  height:50,
+                  justifyContent:'center',
+                  alignItems:'center'
+                }}>
+                <Text style={[{fontSize:22,color:"#000",paddingLeft:20,fontWeight:'600'}]}>
+                <Icon
+                    name="close"
+                    color="#000"
+                    size={20}
+                  />
+                </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={{flexDirection:'row',paddingTop:20,paddingLeft:20}}>
+                          <TouchableOpacity  style={{
+                                width:80,
+                                height:80,
+                                borderWidth:2,
+                                borderColor:'navy',
+                                marginRight:50,
+                                flexDirection: 'column',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                              }} 
+                              onPress={()=>{
+                                openGallery(true,uploadtype)
+                                
+                              }}>
+                                <Icon
+                              name="image"
+                              color="navy"
+                              size={20}
+                            />
+                              <Text style={{color:'navy'}}>Gallery</Text>
+                                
+                              </TouchableOpacity>
+                              <TouchableOpacity  style={{
+                                width:80,
+                                height:80,
+                                borderWidth:2,
+                                borderColor:'navy',
+                                marginRight:10,
+                                flexDirection: 'column',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                              }} 
+                              onPress={()=>{
+                                openGallery(false,uploadtype)
+                              }}>
+                                <Icon
+                              name="camera"
+                              color="navy"
+                              size={20}
+                            />
+                                <Text style={{color:'navy'}}>Camera</Text>
+                              </TouchableOpacity>
+                
+            </View>
+          </View>
+        </View>
+      </Modal>
     </Animated.View>
   );
 }
 
-const styles = StyleSheet.create({});
+//const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    width:400,
+    height:200,
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 0,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  modalText: {
+    marginBottom: 15,
+    color:'#000'
+  },
+});

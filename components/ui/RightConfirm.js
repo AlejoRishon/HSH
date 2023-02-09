@@ -1,5 +1,5 @@
-import {StyleSheet, Text, View, Animated, TouchableOpacity} from 'react-native';
 import React, {useRef, useEffect, useState} from 'react';
+import {StyleSheet,Modal, Text, View, Animated, TouchableOpacity} from 'react-native';
 import {searchBox, button, buttonText, text} from '../styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -11,6 +11,7 @@ export default function RightConfirm({
   onSubmit,
 }) {
   const fadeAnim = useRef(new Animated.Value(-500)).current;
+  const [modalVisible, setModalVisible] = useState(false);
   useEffect(() => {
     if (show) {
       onShow();
