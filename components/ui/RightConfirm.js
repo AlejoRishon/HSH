@@ -1,7 +1,8 @@
 import React, {useRef, useEffect, useState} from 'react';
-import {StyleSheet,Modal, Text, View, Animated, TouchableOpacity} from 'react-native';
+import {StyleSheet,Dimensions, Text, View, Animated, TouchableOpacity} from 'react-native';
 import {searchBox, button, buttonText, text} from '../styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
+const {width,height}=Dimensions.get('window');
 
 export default function RightConfirm({
   show,
@@ -42,7 +43,7 @@ export default function RightConfirm({
       }}>
       <View
         style={{
-          width: 500,
+          width: (width/2.8),
           flex: 1,
           borderTopLeftRadius: 15,
           borderBottomLeftRadius: 15,

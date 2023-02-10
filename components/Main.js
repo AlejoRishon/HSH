@@ -67,14 +67,14 @@ export default function Main({navigation, route}) {
           <TouchableOpacity
             style={boxContainer}
             onPress={() => navigation.navigate('TankFill')}>
-            <Icons name="truck-fast" color="#01315C" size={60} />
-            <Text style={[text, {fontSize: 30}]}>{t('tank_fill_up')}</Text>
+            <Icons name="truck-fast" color="#01315C" size={width/20} />
+            <Text style={[text, {fontSize: width/40}]}>{t('tank_fill_up')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={boxContainer}
             onPress={() => navigation.navigate('DeliveryOrder')}>
-            <Icons name="format-list-bulleted" color="#01315C" size={60} />
-            <Text style={[text, {fontSize: 30}]}>{t('delivery_order')}</Text>
+            <Icons name="format-list-bulleted" color="#01315C" size={width/20} />
+            <Text style={[text, {fontSize: width/40}]}>{t('delivery_order')}</Text>
           </TouchableOpacity>
         </View>
         <View
@@ -85,14 +85,14 @@ export default function Main({navigation, route}) {
             marginRight: 20,
           }}>
           <TouchableOpacity style={boxContainer}>
-            <Icon name="file-text" color="#01315C" size={60} />
-            <Text style={[text, {fontSize: 30}]}>{t('ad_hoc_service')}</Text>
+            <Icon name="file-text" color="#01315C" size={width/20} />
+            <Text style={[text, {fontSize: width/40}]}>{t('ad_hoc_service')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={boxContainer}
             onPress={() => navigation.navigate('DieselTransfer')}>
-            <Icon name="building" color="#01315C" size={60} />
-            <Text style={[text, {fontSize: 30}]}>{t('diesel_transfer')}</Text>
+            <Icon name="building" color="#01315C" size={width/20} />
+            <Text style={[text, {fontSize: width/40}]}>{t('diesel_transfer')}</Text>
           </TouchableOpacity>
         </View>
       </View>

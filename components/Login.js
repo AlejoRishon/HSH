@@ -8,12 +8,16 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
 } from 'react-native';
-import React from 'react';
+import React,{useState} from 'react';
 import {inputBox, button, buttonText, text} from './styles/MainStyle';
 const {width, height} = Dimensions.get('window');
 import { useTranslation } from 'react-i18next';
 export default function Login({navigation}) {
+  const [lang,setlang]=useState('en');
   const {t,i18n}=useTranslation();
+  useState(()=>{
+    console.log(lang);
+  },[lang])
   return (
     <KeyboardAvoidingView style={{flex: 1}} behavior="height">
       <View style={{flexDirection: 'row', flex: 1}}>
@@ -26,25 +30,35 @@ export default function Login({navigation}) {
             source={require('../assets/bgtext.png')}
             resizeMode="contain"
             style={{flex: 1, width: '80%'}}>
-              <View style={{width:200,justifyContent:'flex-start',alignSelf:'flex-end'}}>
+              <View style={{width:200,justifyContent:'flex-start',alignSelf:'flex-start'}}>
               <View style={{flexDirection:'row',justifyContent:'space-between'}}>
               <TouchableOpacity onPress={()=>{
-i18n.changeLanguage('en')
-              }}>
-                <Text style={{
+                  i18n.changeLanguage('en')
+                  setlang('en');
+                }}>
+                <Text style={[lang==='en' && {
+                  borderWidth:1,
+                  borderColor:"cornflowerblue",
+                },{
                 color:'#000',
                 fontSize:22,
+                padding:10,
                 fontWeight:'bold'
-              }}>English</Text>
+              }]}>English</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={()=>{
                 i18n.changeLanguage('ch')
+                setlang('ch');
               }}>
-                <Text style={{
+                <Text style={[lang==='ch' && {
+                  borderWidth:1,
+                  borderColor:"cornflowerblue",
+                },{
                 color:'#000',
                 fontSize:22,
+                padding:10,
                 fontWeight:'bold'
-              }}>Chinese</Text>
+              }]}>Chinese</Text>
               </TouchableOpacity>
             </View>
             </View>

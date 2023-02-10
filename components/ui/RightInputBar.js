@@ -1,6 +1,7 @@
-import {StyleSheet, Text, View, Animated, TouchableOpacity} from 'react-native';
+import {StyleSheet, Dimensions, Text, View, Animated, TouchableOpacity} from 'react-native';
 import React, {useRef, useEffect, useState} from 'react';
 import {searchBox, button, buttonText, text} from '../styles/MainStyle';
+const {width,height}=Dimensions.get('window');
 
 export default function RightInputBar({
   show,
@@ -48,11 +49,11 @@ export default function RightInputBar({
         position: 'absolute',
         right: fadeAnim,
         height: '100%',
-        backgroundColor: '#01315C',
+        backgroundColor: '#01315C'
       }}>
       <View
         style={{
-          width: 500,
+          width: (width/2.8),
           flex: 1,
           borderTopLeftRadius: 15,
           borderBottomLeftRadius: 15,
@@ -61,14 +62,14 @@ export default function RightInputBar({
         }}>
         <Text
           style={{
-            fontSize: 30,
+            fontSize: width/40,
             color: '#fff',
             fontWeight: 600,
             marginBottom: 10,
           }}>
           Litres of Diesel Pumped
         </Text>
-        <Text style={{fontSize: 20, color: '#fff', marginBottom: 40}}>
+        <Text style={{fontSize: width/60, color: '#fff', marginBottom: 40}}>
           {subHeader}
         </Text>
         <View
@@ -76,8 +77,9 @@ export default function RightInputBar({
             borderColor: '#C4C4C4',
             borderWidth: 1,
             backgroundColor: '#E8E8E8',
-            padding: 20,
+            padding: 10,
             borderRadius: 8,
+            height:width/15
           }}>
           <Text style={{fontSize: 30, color: '#01315C'}}>
             {calVal.join('')}
@@ -88,21 +90,23 @@ export default function RightInputBar({
             flexDirection: 'row',
             flexWrap: 'wrap',
             justifyContent: 'space-between',
-            marginTop: 20,
+            marginTop:10,
           }}>
           {numPad.map(val => {
             return (
               <TouchableOpacity
                 onPress={() => add(val)}
                 style={{
-                  padding: 10,
+                  padding: 5,
                   backgroundColor: '#EAF5FF',
                   width: '30%',
+                  height:width/20,
                   borderRadius: 8,
                   marginTop: 10,
+                  justifyContent:'center'
                 }}>
                 <Text
-                  style={{fontSize: 40, color: '#01315C', textAlign: 'center'}}>
+                  style={{fontSize: 30, color: '#01315C', textAlign: 'center'}}>
                   {val}
                 </Text>
               </TouchableOpacity>

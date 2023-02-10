@@ -1,5 +1,6 @@
 import {
   StyleSheet,
+  Dimensions,
   Text,
   Modal,
   View,
@@ -16,7 +17,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { useTranslation } from 'react-i18next';
 import {TextInput} from 'react-native-paper';
 import {Image} from 'react-native-animatable';
-
+const {width,height}=Dimensions.get('window');
 
 export default function RightDeliveryDetails({
   show,
@@ -125,10 +126,13 @@ export default function RightDeliveryDetails({
       if(section==='after'){
         setpreviewImageUri(response.assets[0].uri);
         setimagePreview(true)
+        onToggleMoreAf(80);
       }else{
         setpreviewImageUribefore(response.assets[0].uri)
         setimagePreviewbefore(true);
+        onToggleMoreBe(80);
       }
+       
     }catch (error) {
       console.log(error);
     }
@@ -149,7 +153,7 @@ export default function RightDeliveryDetails({
           backgroundColor: '#EEF7FF',
           borderTopLeftRadius: 15,
           borderBottomLeftRadius: 15,
-          width: 400,
+          width: (width/2.8),
         }}>
         <ScrollView
           style={{
@@ -158,23 +162,23 @@ export default function RightDeliveryDetails({
           }}>
           <Text
             style={{
-              fontSize: 30,
+              fontSize: width/40,
               color: '#01315C',
               fontWeight: 600,
-              marginBottom: 10,
+              marginBottom: 5,
             }}>
             Eddie Ang
           </Text>
-          <Text style={{fontSize: 20, color: '#01315C', marginBottom: 10}}>
+          <Text style={{fontSize: width/60, color: '#01315C', marginBottom: 10}}>
             DO-12345678A
           </Text>
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
-              marginBottom: 20,
+              marginBottom:10,
             }}>
-            <Text style={{fontSize: 20, color: '#01315C', marginRight: 40}}>
+            <Text style={{fontSize: width/60, color: '#01315C', marginRight: 40}}>
               BDP Global Project Logistics Pte Ltd
             </Text>
             {more ? (
@@ -193,7 +197,7 @@ export default function RightDeliveryDetails({
               />
             )}
           </View>
-          <Animated.View style={{height: heightAnim}}>
+          <Animated.View style={{height: heightAnim,marginBottom:10}}>
             <Text style={{fontSize: 18, color: '#01315C'}}>
               101 Jln Bahar, Civil Defence Academy Complex, Singapore 649734
             </Text>
@@ -229,7 +233,7 @@ export default function RightDeliveryDetails({
           </View>
           <Text
             style={{
-              fontSize: 30,
+              fontSize: width/45,
               color: '#01315C',
               fontWeight: 600,
               marginBottom: 20,
@@ -243,14 +247,14 @@ export default function RightDeliveryDetails({
               alignItems: 'center',
               marginBottom: 10,
             }}>
-            <Text style={{fontSize: 25, color: '#01315C', marginRight: 40}}>
+            <Text style={{fontSize:width/45, color: '#01315C', marginRight: 40}}>
               {t('signature')}
             </Text>
             <Icon name="edit" color="#01315C" size={20} />
           </View>
           <Text
             style={{
-              fontSize: 16,
+              fontSize: width/60,
               color: '#3DB792',
               marginBottom: 20,
             }}>
@@ -267,7 +271,17 @@ export default function RightDeliveryDetails({
               {t('metre_reading_after')}
               </Text>
             </View>
-            {moreMeterAf ? (
+            
+            <Icon
+              onPress={() =>{
+                setuploadtype('after');
+                  setModalVisible(true);
+              }}
+              name="edit"
+              color="#01315C"
+              size={20}
+            />
+            {/* {moreMeterAf ? (
               <Icon
                 onPress={() => onToggleMoreAf(0)}
                 name="chevron-up"
@@ -281,10 +295,10 @@ export default function RightDeliveryDetails({
                 color="#01315C"
                 size={20}
               />
-            )}
+            )} */}
           </View>
-          <View style={{marginBottom:20}}>
-              {
+          {/* <View style={{marginBottom:20}}> */}
+              {/* {
                 imagePreview ?
                 <>
                 <TouchableOpacity
@@ -349,7 +363,7 @@ export default function RightDeliveryDetails({
                   <Text style={{color:'navy',fontWeight:'bold'}}>Add Image</Text>
                 </TouchableOpacity>
                 
-                {/* <TouchableOpacity style={{
+                <TouchableOpacity style={{
                   width:80,
                   height:80,
                   borderWidth:2,
@@ -390,25 +404,30 @@ export default function RightDeliveryDetails({
                 size={20}
               />
                   <Text style={{color:'navy'}}>Camera</Text>
-                </TouchableOpacity> */}
+                </TouchableOpacity>
                 </View>
               }
             
-          </View>
-          {/* <Animated.View
+          </View> */}
+          <Animated.View
             style={{
               height: heightMeterAfAnim,
               flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
             }}>
-            <Image
-              style={{height: '100%', flex: 1}}
-              source={require('../../assets/fuel.jpeg')}
-              resizeMode="contain"
-            />
-            <Icon name="edit" color="#01315C" size={20} />
-          </Animated.View> */}
+              {
+                previewImageUri.length==0 ?
+                null
+                :
+                <Image
+                  style={{height: '100%', flex: 1}}
+                  source={{uri:previewImageUri}}
+                  resizeMode="contain"
+                />
+              }
+            
+          </Animated.View>
           <View
             style={{
               flexDirection: 'row',
@@ -421,23 +440,18 @@ export default function RightDeliveryDetails({
               {t('metre_reading_before')}
               </Text>
             </View>
-            {moreMeterBe ? (
-              <Icon
-                onPress={() => onToggleMoreBe(0)}
-                name="chevron-up"
-                color="#01315C"
-                size={20}
-              />
-            ) : (
-              <Icon
-                onPress={() => onToggleMoreBe(80)}
-                name="chevron-down"
-                color="#01315C"
-                size={20}
-              />
-            )}
+            <Icon
+              onPress={() =>{
+                setuploadtype('before');
+                  setModalVisible(true);
+              }}
+              name="edit"
+              color="#01315C"
+              size={20}
+            />
           </View>
-          <View style={{marginBottom:20}}>
+          
+{/* <View style={{marginBottom:20}}>
               {
                 imagePreviewbefore ?
                 <>
@@ -502,7 +516,7 @@ export default function RightDeliveryDetails({
               />
                   <Text style={{color:'navy',fontWeight:'bold'}}>Add Image</Text>
                 </TouchableOpacity>
-                {/* <TouchableOpacity  style={{
+                 <TouchableOpacity  style={{
                   width:80,
                   height:80,
                   borderWidth:2,
@@ -542,25 +556,31 @@ export default function RightDeliveryDetails({
                 size={20}
               />
                   <Text style={{color:'navy'}}>Camera</Text>
-                </TouchableOpacity> */}
+                </TouchableOpacity> *
                 </View>
               }
             
-          </View>
-          {/* <Animated.View
+          </View> */}
+
+          <Animated.View
             style={{
               height: heightMeterBeAnim,
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'center',
             }}>
-            <Image
+              {previewImageUribefore.length==0 ?
+              null
+              :
+              <Image
               style={{height: '100%', flex: 1}}
-              source={require('../../assets/fuel.jpeg')}
+              source={{uri:previewImageUribefore}}
               resizeMode="contain"
             />
-            <Icon name="edit" color="#01315C" size={20} />
-          </Animated.View> */}
+              }
+            
+            
+          </Animated.View>
           <Text
             style={{
               fontSize: 20,
