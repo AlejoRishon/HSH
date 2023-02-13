@@ -154,7 +154,10 @@ export default function DeliveryOrder({navigation, route}) {
               flexGrow: 1,
             }}>
             {detailData.map((rowData, index) => (
-              <TouchableOpacity onPress={() => setshowInput(true)}>
+              <TouchableOpacity onPress={() => {
+                //setshowInput(true)
+                navigation.navigate('EditTrip');
+                }}>
                 <TableWrapper key={index} style={{flexDirection: 'row'}}>
                   {rowData.map((cellData, cellIndex) => (
                     <Cell

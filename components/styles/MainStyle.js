@@ -59,6 +59,7 @@ export const dataText = {
 export const remarks = {
   borderColor: '#C4C4C4',
   borderWidth: 1,
+  color:"#000",
   backgroundColor: 'white',
   fontSize: 20,
   marginTop: 20,

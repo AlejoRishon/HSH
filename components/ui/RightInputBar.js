@@ -7,6 +7,7 @@ export default function RightInputBar({
   show,
   header,
   subHeader,
+  keepinView=false,
   hide,
   onSubmit,
 }) {
@@ -67,7 +68,7 @@ export default function RightInputBar({
             fontWeight: 600,
             marginBottom: 10,
           }}>
-          Litres of Diesel Pumped
+          {header}
         </Text>
         <Text style={{fontSize: width/60, color: '#fff', marginBottom: 40}}>
           {subHeader}
@@ -116,7 +117,10 @@ export default function RightInputBar({
       </View>
 
       <View style={{flexDirection: 'row', padding: 20}}>
-        <TouchableOpacity
+        {
+          keepinView ? null 
+          :
+          <TouchableOpacity
           onPress={onHide}
           style={{
             backgroundColor: '#EAF5FF',
@@ -134,8 +138,14 @@ export default function RightInputBar({
             Back
           </Text>
         </TouchableOpacity>
+
+
+        }
         <TouchableOpacity
           onPress={() => {
+          if(keepinView){
+            return;
+          }
             Animated.timing(fadeAnim, {
               toValue: -500,
               duration: 500,

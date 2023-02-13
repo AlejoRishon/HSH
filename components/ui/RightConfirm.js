@@ -33,6 +33,7 @@ export default function RightConfirm({
       useNativeDriver: false,
     }).start();
   };
+  
   return (
     <Animated.View
       style={{
