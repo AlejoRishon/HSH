@@ -28,11 +28,11 @@ const SideBar = props => {
             backgroundColor: '#01315C',
             justifyContent: 'center',
             alignItems: 'center',
-            padding: 15,
+            padding: 10,
             marginHorizontal: 20,
             borderRadius: 8,
           }}>
-          <Icon name="home" color="white" style={{padding: 5}} size={30} />
+          <Icon name="home" color="white" style={{padding: 5}} size={20} />
         </TouchableOpacity>
       )}
       {props.all && (
@@ -42,7 +42,7 @@ const SideBar = props => {
             backgroundColor: '#01315C',
             justifyContent: 'center',
             alignItems: 'center',
-            padding: 15,
+            padding: 10,
             marginHorizontal: 20,
             borderRadius: 8,
           }}>
@@ -50,7 +50,7 @@ const SideBar = props => {
             name="truck-fast"
             color="white"
             style={{padding: 5}}
-            size={30}
+            size={20}
           />
         </TouchableOpacity>
       )}
@@ -61,7 +61,7 @@ const SideBar = props => {
             backgroundColor: '#01315C',
             justifyContent: 'center',
             alignItems: 'center',
-            padding: 15,
+            padding: 10,
             marginHorizontal: 20,
             borderRadius: 8,
           }}>
@@ -69,7 +69,7 @@ const SideBar = props => {
             name="format-list-bulleted"
             color="white"
             style={{padding: 5}}
-            size={30}
+            size={20}
           />
         </TouchableOpacity>
       )}
@@ -79,7 +79,7 @@ const SideBar = props => {
             backgroundColor: '#01315C',
             justifyContent: 'center',
             alignItems: 'center',
-            padding: 15,
+            padding: 10,
             marginHorizontal: 20,
             borderRadius: 8,
           }}>
@@ -87,7 +87,7 @@ const SideBar = props => {
             name="file-text"
             color="white"
             style={{padding: 5}}
-            size={30}
+            size={20}
           />
         </TouchableOpacity>
       )}
@@ -102,11 +102,11 @@ const SideBar = props => {
             backgroundColor: '#01315C',
             justifyContent: 'center',
             alignItems: 'center',
-            padding: 15,
+            padding: 10,
             marginHorizontal: 20,
             borderRadius: 8,
           }}>
-          <Icons name="building" color="white" style={{padding: 5}} size={30} />
+          <Icons name="building" color="white" style={{padding: 5}} size={20} />
         </TouchableOpacity>
       )}
       <TouchableOpacity
@@ -115,11 +115,11 @@ const SideBar = props => {
           backgroundColor: '#01315C',
           justifyContent: 'center',
           alignItems: 'center',
-          padding: 15,
+          padding: 10,
           marginHorizontal: 20,
           borderRadius: 8,
         }}>
-        <Icon name="power" color="white" style={{padding: 5}} size={30} />
+        <Icon name="power" color="white" style={{padding: 5}} size={20} />
       </TouchableOpacity>
     </View>
   );
