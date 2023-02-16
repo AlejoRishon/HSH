@@ -18,8 +18,7 @@ import {
 } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTranslation } from 'react-i18next';
-  
+import {useTranslation} from 'react-i18next';
 
 import SideBar from './ui/SideBar';
 import RightInputBar from './ui/RightInputBar';
@@ -27,7 +26,7 @@ import RightConfirm from './ui/RightConfirm';
 import {getVehicle} from './functions/helper';
 const {width, height} = Dimensions.get('window');
 export default function TankFill({navigation, route}) {
-  const {t,i18n}=useTranslation();
+  const {t, i18n} = useTranslation();
   const rightBar = useRef(null);
 
   const parameter = getVehicle();
@@ -46,7 +45,7 @@ export default function TankFill({navigation, route}) {
 
           <Text style={[text, {marginLeft: 10}]}>Change vehicle</Text>
         </TouchableOpacity>
-        <View style={{flexDirection:'row',justifyContent:'flex-start'}}>
+        <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
           <Text style={[text, {marginTop: 20}]}>{t('brand')}</Text>
         </View>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -82,7 +81,7 @@ export default function TankFill({navigation, route}) {
               {borderWidth: selected == 'shell' ? 3 : 0, borderColor: 'green'},
             ]}>
             <Image source={require('../assets/shell.png')} />
-            <Text style={[text, {fontSize: 25}]}>{`Shell`}</Text>
+            {/* <Text style={[text, {fontSize: 25}]}>{`Shell`}</Text> */}
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -95,7 +94,7 @@ export default function TankFill({navigation, route}) {
             ]}>
             <Image source={require('../assets/caltex.png')} />
 
-            <Text style={[text, {fontSize: 25}]}>{`Caltec`}</Text>
+            {/* <Text style={[text, {fontSize: 25}]}>{`Caltec`}</Text> */}
           </TouchableOpacity>
         </View>
         <View
@@ -119,7 +118,7 @@ export default function TankFill({navigation, route}) {
             ]}>
             <Image source={require('../assets/chevron.png')} />
 
-            <Text style={[text, {fontSize: 25}]}>{`Chevron`}</Text>
+            {/* <Text style={[text, {fontSize: 25}]}>{`Chevron`}</Text> */}
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -132,7 +131,7 @@ export default function TankFill({navigation, route}) {
             ]}>
             <Image source={require('../assets/spc.png')} />
 
-            <Text style={[text, {fontSize: 25}]}>{`Spec`}</Text>
+            {/* <Text style={[text, {fontSize: 25}]}>{`Spec`}</Text> */}
           </TouchableOpacity>
         </View>
       </View>

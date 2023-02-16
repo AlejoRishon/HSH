@@ -18,14 +18,14 @@ import {
 } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 import SideBar from './ui/SideBar';
 import {getVehicle} from './functions/helper';
 import RightInputBar from './ui/RightInputBar';
 import RightConfirm from './ui/RightConfirm';
 const {width, height} = Dimensions.get('window');
 export default function DieselTransfer({navigation, route}) {
-  const {t,i18n}=useTranslation();
+  const {t, i18n} = useTranslation();
   const parameter = getVehicle();
   const [selected, setSelected] = useState(null);
   const [showInput, setshowInput] = useState(false);
@@ -42,7 +42,7 @@ export default function DieselTransfer({navigation, route}) {
 
           <Text style={[text, {marginLeft: 10}]}>Change vehicle</Text>
         </TouchableOpacity>
-        <View style={{flexDirection:'row',justifyContent:'flex-start'}}>
+        <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
           <Text style={[text, {marginTop: 20}]}>{t('return')}</Text>
         </View>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -77,7 +77,16 @@ export default function DieselTransfer({navigation, route}) {
               boxContainer,
               {borderWidth: selected == 'jin' ? 3 : 0, borderColor: 'green'},
             ]}>
-            <Image source={require('../assets/jin.png')} />
+            <Image
+              source={require('../assets/jin.png')}
+              style={{
+                flex: 1,
+                height: undefined,
+                width: undefined,
+                alignSelf: 'stretch',
+              }}
+              resizeMode="contain"
+            />
             <Text style={[text, {fontSize: 25}]}>{`Jin Besut`}</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -89,7 +98,11 @@ export default function DieselTransfer({navigation, route}) {
               boxContainer,
               {borderWidth: selected == 'chin' ? 3 : 0, borderColor: 'green'},
             ]}>
-            <Image source={require('../assets/chin.png')} />
+            <Image
+              source={require('../assets/chin.png')}
+              resizeMode="contain"
+              style={{flex: 1}}
+            />
 
             <Text style={[text, {fontSize: 25}]}>{`Chin Bee`}</Text>
           </TouchableOpacity>
