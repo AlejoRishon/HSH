@@ -10,6 +10,7 @@ import TankFill from './components/TankFill';
 import DieselTransfer from './components/DieselTransfer';
 import DeliveryOrder from './components/DeliveryOrder';
 import EditTrip from './components/editTrip';
+import AdHocService from './components/adHocService';
 // create a component
 const Stack = createNativeStackNavigator();
 const App = () => {
@@ -23,6 +24,7 @@ const App = () => {
         <Stack.Screen name="DieselTransfer" component={DieselTransfer} />
         <Stack.Screen name="DeliveryOrder" component={DeliveryOrder} />
         <Stack.Screen name="EditTrip" component={EditTrip} />
+        <Stack.Screen name="AdHocService" component={AdHocService} />
       </Stack.Navigator>
     </NavigationContainer>
   );

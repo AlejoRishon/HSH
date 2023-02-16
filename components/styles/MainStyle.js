@@ -27,7 +27,7 @@ export const boxContainer = {
   alignItems: 'center',
 };
 export const text = {
-  fontSize: 20,
+  fontSize: 16,
   color: '#01315C',
   fontWeight: 600,
 };

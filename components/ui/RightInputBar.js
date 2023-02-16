@@ -8,15 +8,21 @@ export default function RightInputBar({
   header,
   subHeader,
   keepinView=false,
+  defaultValue=false,
+  getInputDiesel,
   hide,
   onSubmit,
 }) {
   const fadeAnim = useRef(new Animated.Value(-500)).current;
   const numPad = [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, '<'];
   const [calVal, setcalVal] = useState([]);
+  const [dval,setdval]=useState(true);
   useEffect(() => {
     if (show) {
       onShow();
+      if(defaultValue){
+        setcalVal([8,0,0,0])
+      }
     }
   }, [show]);
   const onShow = () => {
@@ -35,6 +41,7 @@ export default function RightInputBar({
     }).start();
   };
   const add = val => {
+    setdval(false);
     var aVal = [...calVal];
     if (val == '<') {
       aVal.pop(val);
@@ -44,6 +51,7 @@ export default function RightInputBar({
       setcalVal(aVal);
     }
   };
+
   return (
     <Animated.View
       style={{
@@ -144,14 +152,13 @@ export default function RightInputBar({
         <TouchableOpacity
           onPress={() => {
           if(keepinView){
-            return;
+            return onSubmit(calVal.join(''));
           }
             Animated.timing(fadeAnim, {
               toValue: -500,
               duration: 500,
               useNativeDriver: false,
             }).start();
-            onSubmit();
           }}
           style={{backgroundColor: '#EAF5FF', flex: 1, borderRadius: 8}}>
           <Text

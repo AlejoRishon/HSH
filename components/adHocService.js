@@ -33,7 +33,7 @@ import {
   import {getVehicle} from './functions/helper';
   
   const {width, height} = Dimensions.get('window');
-  export default function DeliveryOrder({navigation, route}) {
+  export default function AdHocService({navigation, route}) {
     const {t,i18n}=useTranslation();
     const parameter = getVehicle();
     const [showInput, setshowInput] = useState(!true);
@@ -51,6 +51,12 @@ import {
     //before
     const [previewImageUribefore,setpreviewImageUribefore]=useState('');
     const [imagePreviewbefore,setimagePreviewbefore]=useState(false);
+
+    const [diesel,setdiesel]=useState(0);
+
+    const getInputDiesel=(diesel)=>{
+        return setdiesel(diesel);
+    }
 
 
     const openGallery=async (type,section)=>{
@@ -226,17 +232,19 @@ import {
             </Text>
             
           </View>
-          <Animated.View style={{height: 150,marginBottom:10}}>
-            <Text style={{fontSize: 18, color: '#01315C'}}>
-              101 Jln Bahar, Civil Defence Academy Complex, Singapore 649734
-            </Text>
-            <Text style={{fontSize: 18, color: '#01315C', marginVertical: 10}}>
+          <View style={{height: 150,marginBottom:10}}>
+          <Text style={{fontSize: 18, color: '#01315C', marginVertical: 10}}>Business Name</Text>
+            <TextInput numberOfLines={2} style={{fontSize: 18, color: '#01315C',borderWidth:1,borderColor:"#2196F3",marginBottom:20}} />
+            <Text style={{fontSize: 18, color: '#01315C', marginVertical: 10}}>Business Address</Text>
+            <TextInput  numberOfLines={2} style={{fontSize: 18, color: '#01315C',borderWidth:1,borderColor:"#2196F3",marginBottom:20}} />
+            {/* <Text style={{fontSize: 18, color: '#01315C', marginVertical: 10}}>
               BDP Global Project Logistics Pte LtdContact Person: Bill Gates
               (+6598765432)
-            </Text>
-          </Animated.View>
+            </Text> */}
+          </View>
           <View
             style={{
+                marginTop:120,
               borderBottomWidth: 1,
               borderBottomColor: '#01315C',
               marginBottom: 20,
@@ -267,7 +275,7 @@ import {
               fontWeight: 600,
               marginBottom: 20,
             }}>
-            8000
+            {diesel}
           </Text>
           <View
             style={{
@@ -332,6 +340,7 @@ import {
               flexDirection: 'row',
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
+              marginBottom:20
             }}>
               {
                 previewImageUri.length==0 ?
@@ -390,7 +399,6 @@ import {
               fontSize: 20,
               color: '#01315C',
               marginRight: 40,
-              backgroundColor: '#EEF7FF',
             }}>
             {t('remarks')}
           </Text>
@@ -475,13 +483,14 @@ import {
         header="Liters of Diesel Sold"
         subHeader="Enter quantity of diesel sold"
         show={showInput}
-        defaultValue={true}
+        getInputDiesel={getInputDiesel}
         keepinView={true}
         hide={() => setshowInput(false)}
-        onSubmit={() => {
-          setSelected(null);
+        onSubmit={(val) => {
           setshowInput(false);
-          setshowConfirm(true);
+          getInputDiesel(val);
+          //setSelected(null);
+          //setshowConfirm(true);
         }}
       />
         <Modal

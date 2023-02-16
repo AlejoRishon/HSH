@@ -32,57 +32,66 @@ export default function DeliveryOrder({navigation, route}) {
   const parameter = getVehicle();
   const [showInput, setshowInput] = useState(false);
   const [headerData, setheaderData] = useState([
+    'Transfer',
     'DO No.',
     'Delivery Address',
     'Liters',
     'Status',
   ]);
   const [detailData, setdetailData] = useState([
-    ['DO-12345678A', '2 Adam Rd, Singapore 289876', '800,000', 'Pending'],
+    ['Transfer','DO-12345678A', '2 Adam Rd, Singapore 289876', '800,000', 'Pending'],
     [
+      'Transfer',
       'DO-90485729B',
       '21 Hillcrest Rd, Singapore 289072',
       '1,000,000',
       'Completed',
     ],
     [
+      'Transfer',
       'DO-93877463V',
       '131 Rifle Range Rd, Singapore 588406',
       '800',
       'Completed',
     ],
     [
+      'Transfer',
       'DO-11038479K',
       '21 Choa Chu Kang North 6, Singapore 689578',
       '100,000',
       'Completed',
     ],
     [
+      'Transfer',
       'DO-35493831S',
       '101 Jln Bahar, Civil Defence Academy Complex, Singapore 649734',
       '20,000',
       'Completed',
     ],
-    ['DO-12345678A', '2 Adam Rd, Singapore 289876', '800,000', 'Pending'],
+    ['Transfer','DO-12345678A', '2 Adam Rd, Singapore 289876', '800,000', 'Pending'],
     [
+      'Transfer',
       'DO-90485729B',
       '21 Hillcrest Rd, Singapore 289072',
       '1,000,000',
       'Completed',
     ],
     [
+      'Transfer',
       'DO-93877463V',
       '131 Rifle Range Rd, Singapore 588406',
       '800',
       'Completed',
     ],
     [
+      'Transfer',
       'DO-11038479K',
       '21 Choa Chu Kang North 6, Singapore 689578',
       '100,000',
       'Completed',
     ],
     [
+      'Transfer',
       'DO-35493831S',
       '101 Jln Bahar, Civil Defence Academy Complex, Singapore 649734',
       '20,000',
@@ -94,22 +103,38 @@ export default function DeliveryOrder({navigation, route}) {
     Completed: {text: '#3DB792', button: 'rgba(107, 226, 190, 0.24)'},
   };
 
+  const elementTransfer=(data,index)=>{
+    return(
+      <Icon name="plus" color="#2196F3" size={'large'} />
+    )
+  }
+
   const element = (data, index) => {
-    return (
-      <TouchableOpacity
-        style={{
-          padding: 10,
-          borderRadius: 15,
-          backgroundColor: statusColor[data]
-            ? statusColor[data].button
-            : 'white',
-        }}>
-        <Text
-          style={{color: statusColor[data] ? statusColor[data].text : 'black'}}>
-          {data}
+    if(data==="Transfer"){
+      return(
+        <Text style={{color: statusColor[data] ? statusColor[data].text : 'black',paddingLeft:20}}>
+          <Icon name="refresh" color="#2196F3" size={22} />
         </Text>
-      </TouchableOpacity>
-    );
+      )
+    }else{
+
+    
+      return (
+        <TouchableOpacity
+          style={{
+            padding: 10,
+            borderRadius: 15,
+            backgroundColor: statusColor[data]
+              ? statusColor[data].button
+              : 'white',
+          }}>
+          <Text
+            style={{color: statusColor[data] ? statusColor[data].text : 'black'}}>
+            {data}
+          </Text>
+        </TouchableOpacity>
+      );
+    }
   };
   return (
     <View style={{flexDirection: 'row', flex: 1, backgroundColor: 'white'}}>
@@ -145,7 +170,7 @@ export default function DeliveryOrder({navigation, route}) {
         <Table style={{flex: 1}}>
           <Row
             data={headerData}
-            flexArr={[1, 2, 1, 1]}
+            flexArr={[0.5, 1,2, 1, 1]}
             style={tableHeader}
             textStyle={text}
           />
@@ -161,14 +186,15 @@ export default function DeliveryOrder({navigation, route}) {
                 <TableWrapper key={index} style={{flexDirection: 'row'}}>
                   {rowData.map((cellData, cellIndex) => (
                     <Cell
-                      flex={cellIndex == 1 ? 2 : 1}
+                      flex={cellIndex == 0 ? 0.5 : cellIndex==2 ? 2 : 1}
+                      
                       key={cellIndex}
                       data={
-                        cellIndex === 3 ? element(cellData, index) : cellData
+                        cellIndex===0 ? element(cellData,index) : cellIndex === 4 ? element(cellData, index) :  cellData
                       }
                       textStyle={[
                         {
-                          fontSize: 20,
+                          fontSize: 18,
                           color: '#01315C',
                           paddingVertical: 20,
                           backgroundColor: 'red',
