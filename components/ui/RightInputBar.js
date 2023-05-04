@@ -1,8 +1,15 @@
-import { StyleSheet, Dimensions, Text, View, Animated, TouchableOpacity } from 'react-native';
-import React, { useRef, useEffect, useState } from 'react';
-import { searchBox, button, buttonText, text } from '../styles/MainStyle';
-import { horizontalScale, moderateScale, verticalScale } from '../styles/Metrics';
-const { width, height } = Dimensions.get('window');
+import {
+  StyleSheet,
+  Dimensions,
+  Text,
+  View,
+  Animated,
+  TouchableOpacity,
+} from 'react-native';
+import React, {useRef, useEffect, useState} from 'react';
+import {searchBox, button, buttonText, text} from '../styles/MainStyle';
+import {horizontalScale, moderateScale, verticalScale} from '../styles/Metrics';
+const {width, height} = Dimensions.get('window');
 
 export default function RightInputBar({
   show,
@@ -22,7 +29,7 @@ export default function RightInputBar({
     if (show) {
       onShow();
       if (defaultValue) {
-        setcalVal([8, 0, 0, 0])
+        setcalVal([8, 0, 0, 0]);
       }
     }
   }, [show]);
@@ -59,11 +66,11 @@ export default function RightInputBar({
         position: 'absolute',
         right: fadeAnim,
         height: '100%',
-        backgroundColor: '#01315C'
+        backgroundColor: '#01315C',
       }}>
       <View
         style={{
-          width: (width / 2.8),
+          width: width / 2.8,
           flex: 1,
           borderTopLeftRadius: 15,
           borderBottomLeftRadius: 15,
@@ -79,7 +86,12 @@ export default function RightInputBar({
           }}>
           {header}
         </Text>
-        <Text style={{ fontSize: moderateScale(8), color: '#fff', marginBottom: verticalScale(40) }}>
+        <Text
+          style={{
+            fontSize: moderateScale(8),
+            color: '#fff',
+            marginBottom: verticalScale(40),
+          }}>
           {subHeader}
         </Text>
         <View
@@ -89,9 +101,9 @@ export default function RightInputBar({
             backgroundColor: '#E8E8E8',
             paddingLeft: horizontalScale(4),
             borderRadius: 8,
-            height: verticalScale(70)
+            height: verticalScale(70),
           }}>
-          <Text style={{ fontSize: moderateScale(15), color: '#01315C' }}>
+          <Text style={{fontSize: moderateScale(15), color: '#01315C'}}>
             {calVal.join('')}
           </Text>
         </View>
@@ -102,9 +114,10 @@ export default function RightInputBar({
             justifyContent: 'space-between',
             margin: verticalScale(15),
           }}>
-          {numPad.map(val => {
+          {numPad.map((val, index) => {
             return (
               <TouchableOpacity
+                key={index}
                 onPress={() => add(val)}
                 style={{
                   backgroundColor: '#EAF5FF',
@@ -112,10 +125,14 @@ export default function RightInputBar({
                   height: verticalScale(65),
                   borderRadius: 8,
                   marginTop: verticalScale(24),
-                  justifyContent: 'center'
+                  justifyContent: 'center',
                 }}>
                 <Text
-                  style={{ fontSize: moderateScale(15), color: '#01315C', textAlign: 'center' }}>
+                  style={{
+                    fontSize: moderateScale(15),
+                    color: '#01315C',
+                    textAlign: 'center',
+                  }}>
                   {val}
                 </Text>
               </TouchableOpacity>
@@ -124,39 +141,35 @@ export default function RightInputBar({
         </View>
       </View>
 
-      <View style={{ flexDirection: 'row', padding: moderateScale(8) }}>
-        {
-          keepinView ? null
-            :
-            <TouchableOpacity
-              onPress={onHide}
+      <View style={{flexDirection: 'row', padding: moderateScale(8)}}>
+        {keepinView ? null : (
+          <TouchableOpacity
+            onPress={onHide}
+            style={{
+              backgroundColor: '#EAF5FF',
+              flex: 1,
+              borderRadius: 8,
+              marginRight: 10,
+            }}>
+            <Text
               style={{
-                backgroundColor: '#EAF5FF',
-                flex: 1,
-                borderRadius: 8,
-                marginRight: 10,
+                color: '#01315C',
+                textAlign: 'center',
+                fontSize: 20,
+                padding: 10,
               }}>
-              <Text
-                style={{
-                  color: '#01315C',
-                  textAlign: 'center',
-                  fontSize: 20,
-                  padding: 10,
-                }}>
-                Back
-              </Text>
-            </TouchableOpacity>
-
-
-        }
+              Back
+            </Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           onPress={() => {
-            if (keepinView) {
-              return onSubmit(calVal.join(''));
+            onSubmit(calVal.join(''));
+            if (!keepinView) {
+              onHide();
             }
-            onHide()
           }}
-          style={{ backgroundColor: '#EAF5FF', flex: 1, borderRadius: 8 }}>
+          style={{backgroundColor: '#EAF5FF', flex: 1, borderRadius: 8}}>
           <Text
             style={{
               color: '#01315C',

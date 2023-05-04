@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import React, { useState, useRef } from 'react';
+import React, {useState, useRef} from 'react';
 import {
   searchBox,
   button,
@@ -18,16 +18,16 @@ import {
 } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 
 import SideBar from './ui/SideBar';
 import RightInputBar from './ui/RightInputBar';
 import RightConfirm from './ui/RightConfirm';
-import { getVehicle } from './functions/helper';
-import { verticalScale, horizontalScale } from './styles/Metrics';
-const { width, height } = Dimensions.get('window');
-export default function TankFill({ navigation, route }) {
-  const { t, i18n } = useTranslation();
+import {getVehicle} from './functions/helper';
+import {verticalScale, horizontalScale} from './styles/Metrics';
+const {width, height} = Dimensions.get('window');
+export default function TankFill({navigation, route}) {
+  const {t, i18n} = useTranslation();
   const rightBar = useRef(null);
 
   const parameter = getVehicle();
@@ -35,35 +35,39 @@ export default function TankFill({ navigation, route }) {
   const [showInput, setshowInput] = useState(false);
   const [showConfirm, setshowConfirm] = useState(false);
   return (
-    <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
+    <View style={{flexDirection: 'row', flex: 1, backgroundColor: 'white'}}>
       <SideBar all={true} navigation={navigation} />
-      <View style={{ flex: 1, padding: 20 }}>
+      <View style={{flex: 1, padding: 20}}>
         <Text style={text}>{parameter.vehicle}</Text>
         <TouchableOpacity
           style={searchBox}
           onPress={() => navigation.navigate('VehicleList')}>
           <Icon name="exchange" color="#01315C" size={20} />
 
-          <Text style={[text, { marginLeft: 10 }]}>Change vehicle</Text>
+          <Text style={[text, {marginLeft: 10}]}>Change vehicle</Text>
         </TouchableOpacity>
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-          <Text style={[text, { marginTop: verticalScale(20) }]}>{t('brand')}</Text>
+        <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
+          <Text style={[text, {marginTop: verticalScale(20)}]}>
+            {t('brand')}
+          </Text>
         </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <View
             style={{
               borderBottomWidth: 3,
               borderBottomColor: '#01315C',
               marginVertical: verticalScale(10),
               width: 40,
-            }} />
+            }}
+          />
           <View
             style={{
               borderBottomWidth: 1,
               borderBottomColor: '#01315C',
               marginVertical: verticalScale(20),
               flex: 1,
-            }} />
+            }}
+          />
         </View>
         <View
           style={{
@@ -79,7 +83,7 @@ export default function TankFill({ navigation, route }) {
             }}
             style={[
               boxContainer,
-              { borderWidth: selected == 'shell' ? 3 : 0, borderColor: 'green' },
+              {borderWidth: selected == 'shell' ? 3 : 0, borderColor: 'green'},
             ]}>
             <Image source={require('../assets/shell.png')} style={styles.img} />
             {/* <Text style={[text, {fontSize: 25}]}>{`Shell`}</Text> */}
@@ -91,9 +95,12 @@ export default function TankFill({ navigation, route }) {
             }}
             style={[
               boxContainer,
-              { borderWidth: selected == 'caltec' ? 3 : 0, borderColor: 'green' },
+              {borderWidth: selected == 'caltec' ? 3 : 0, borderColor: 'green'},
             ]}>
-            <Image source={require('../assets/caltex.png')} style={styles.img} />
+            <Image
+              source={require('../assets/caltex.png')}
+              style={styles.img}
+            />
 
             {/* <Text style={[text, {fontSize: 25}]}>{`Caltec`}</Text> */}
           </TouchableOpacity>
@@ -117,7 +124,10 @@ export default function TankFill({ navigation, route }) {
                 borderColor: 'green',
               },
             ]}>
-            <Image source={require('../assets/chevron.png')} style={styles.img} />
+            <Image
+              source={require('../assets/chevron.png')}
+              style={styles.img}
+            />
 
             {/* <Text style={[text, {fontSize: 25}]}>{`Chevron`}</Text> */}
           </TouchableOpacity>
@@ -128,7 +138,7 @@ export default function TankFill({ navigation, route }) {
             }}
             style={[
               boxContainer,
-              { borderWidth: selected == 'spec' ? 3 : 0, borderColor: 'green' },
+              {borderWidth: selected == 'spec' ? 3 : 0, borderColor: 'green'},
             ]}>
             <Image source={require('../assets/spc.png')} style={styles.img} />
 
@@ -143,18 +153,19 @@ export default function TankFill({ navigation, route }) {
           padding: 50,
           justifyContent: 'space-between',
         }}>
-        <View style={{ marginTop: verticalScale(40) }}>
+        <View style={{marginTop: verticalScale(40)}}>
           <Text style={text}>{`Welcome back,`}</Text>
           <View
             style={{
               borderBottomWidth: 1,
               borderBottomColor: '#01315C',
               marginVertical: 20,
-            }} />
+            }}
+          />
           <Text
             style={[
               text,
-              { marginTop: verticalScale(18) },
+              {marginTop: verticalScale(18)},
             ]}>{`Select a module to continue`}</Text>
         </View>
       </View>
@@ -167,6 +178,7 @@ export default function TankFill({ navigation, route }) {
         onSubmit={() => {
           setSelected(null);
           setshowInput(false);
+          console.log('Submit clicked');
           setshowConfirm(true);
         }}
       />
@@ -178,6 +190,6 @@ export default function TankFill({ navigation, route }) {
 const styles = StyleSheet.create({
   img: {
     width: horizontalScale(60),
-    resizeMode: 'contain'
-  }
-})
+    resizeMode: 'contain',
+  },
+});
