@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   searchBox,
   button,
@@ -18,34 +18,35 @@ import {
 } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import SideBar from './ui/SideBar';
-import {getVehicle} from './functions/helper';
+import { getVehicle } from './functions/helper';
 import RightInputBar from './ui/RightInputBar';
 import RightConfirm from './ui/RightConfirm';
-const {width, height} = Dimensions.get('window');
-export default function DieselTransfer({navigation, route}) {
-  const {t, i18n} = useTranslation();
+import { moderateScale, verticalScale } from './styles/Metrics';
+const { width, height } = Dimensions.get('window');
+export default function DieselTransfer({ navigation, route }) {
+  const { t, i18n } = useTranslation();
   const parameter = getVehicle();
   const [selected, setSelected] = useState(null);
   const [showInput, setshowInput] = useState(false);
   const [showConfirm, setshowConfirm] = useState(false);
   return (
-    <View style={{flexDirection: 'row', flex: 1, backgroundColor: 'white'}}>
+    <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
       <SideBar all={true} navigation={navigation} />
-      <View style={{flex: 1, padding: 20}}>
+      <View style={{ flex: 1, padding: 20 }}>
         <Text style={text}>{parameter.vehicle}</Text>
         <TouchableOpacity
           style={searchBox}
           onPress={() => navigation.navigate('VehicleList')}>
           <Icon name="exchange" color="#01315C" size={20} />
 
-          <Text style={[text, {marginLeft: 10}]}>Change vehicle</Text>
+          <Text style={[text, { marginLeft: 10 }]}>Change vehicle</Text>
         </TouchableOpacity>
-        <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
-          <Text style={[text, {marginTop: 20}]}>{t('return')}</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+          <Text style={[text, { marginTop: 20 }]}>{t('return')}</Text>
         </View>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View
             style={{
               borderBottomWidth: 3,
@@ -65,7 +66,7 @@ export default function DieselTransfer({navigation, route}) {
           style={{
             flex: 1,
             flexDirection: 'row',
-            marginVertical: 20,
+            // marginVertical: 20,
             marginRight: 20,
           }}>
           <TouchableOpacity
@@ -75,7 +76,7 @@ export default function DieselTransfer({navigation, route}) {
             }}
             style={[
               boxContainer,
-              {borderWidth: selected == 'jin' ? 3 : 0, borderColor: 'green'},
+              { borderWidth: selected == 'jin' ? 3 : 0, borderColor: 'green' },
             ]}>
             <Image
               source={require('../assets/jin.png')}
@@ -87,7 +88,7 @@ export default function DieselTransfer({navigation, route}) {
               }}
               resizeMode="contain"
             />
-            <Text style={[text, {fontSize: 25}]}>{`Jin Besut`}</Text>
+            <Text style={[text, { fontSize: moderateScale(15) }]}>{`Jin Besut`}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -96,15 +97,15 @@ export default function DieselTransfer({navigation, route}) {
             }}
             style={[
               boxContainer,
-              {borderWidth: selected == 'chin' ? 3 : 0, borderColor: 'green'},
+              { borderWidth: selected == 'chin' ? 3 : 0, borderColor: 'green' },
             ]}>
             <Image
               source={require('../assets/chin.png')}
               resizeMode="contain"
-              style={{flex: 1}}
+              style={{ flex: 1 }}
             />
 
-            <Text style={[text, {fontSize: 25}]}>{`Chin Bee`}</Text>
+            <Text style={[text, { fontSize: moderateScale(15) }]}>{`Chin Bee`}</Text>
           </TouchableOpacity>
         </View>
         <View
@@ -122,18 +123,18 @@ export default function DieselTransfer({navigation, route}) {
           padding: 50,
           justifyContent: 'space-between',
         }}>
-        <View style={{marginTop: 80}}>
+        <View style={{ marginTop: verticalScale(40) }}>
           <Text style={text}>{`Welcome back,`}</Text>
           <View
             style={{
               borderBottomWidth: 1,
               borderBottomColor: '#01315C',
               marginVertical: 20,
-            }}></View>
+            }} />
           <Text
             style={[
               text,
-              {marginTop: 20},
+              { marginTop: verticalScale(18) },
             ]}>{`Select a module to continue`}</Text>
         </View>
       </View>

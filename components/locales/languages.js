@@ -1,15 +1,16 @@
 import i18next from 'i18next';
 import en from './english.json';
 import ch from './chinese.json';
-import {initReactI18next} from 'react-i18next';
+import { initReactI18next } from 'react-i18next';
 
 i18next.use(initReactI18next).init({
-  lng:'en',
-  resources:{
-    en,ch
+  compatibilityJSON: 'v3',
+  lng: 'en',
+  resources: {
+    en, ch
   },
-  react:{
-    useSuspense:false
+  react: {
+    useSuspense: false
   }
 })
 export default i18next;

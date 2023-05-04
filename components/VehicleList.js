@@ -7,19 +7,22 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 
 
- 
-import {searchBox, button, buttonText, text} from './styles/MainStyle';
+
+import { searchBox, button, buttonText, text } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SideBar from './ui/SideBar';
-import {setVehicle} from './functions/helper';
+import { setVehicle } from './functions/helper';
 import { useTranslation } from 'react-i18next';
+import { horizontalScale, moderateScale, verticalScale } from './styles/Metrics';
 
-const {width, height} = Dimensions.get('window');
-export default function VehicleList({navigation}) {
-  const {t,i18n}=useTranslation();
+const { width, height } = Dimensions.get('window');
+
+export default function VehicleList({ navigation }) {
+
+  const { t, i18n } = useTranslation();
 
   const [listData, setListDate] = useState([
     'TRB8888A',
@@ -28,44 +31,46 @@ export default function VehicleList({navigation}) {
     'TLC1234S',
   ]);
   const [selectedVehicle, setselectedVehicle] = useState(null);
-  const ItemView = ({item}) => {
+
+  const ItemView = ({ item }) => {
     return (
       // FlatList Item
       <TouchableOpacity
-        style={{marginVertical: 20}}
+        style={{ marginVertical: verticalScale(20) }}
         onPress={() => setselectedVehicle(item)}>
-        <Text style={[text, {fontSize: 25}]}>{item}</Text>
+        <Text style={[text, { fontSize: moderateScale(18) }]}>{item}</Text>
       </TouchableOpacity>
     );
   };
+
   return (
-    <View style={{flexDirection: 'row', flex: 1, backgroundColor: 'white'}}>
+    <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
       <SideBar all={false} navigation={navigation} />
-      <View style={{flex: 1, padding: 20}}>
+      <View style={{ flex: 1, padding: moderateScale(15) }}>
         <View style={searchBox}>
           <Icon name="search" color="#01315C" size={20} />
           <TextInput
-            style={{marginLeft: 10}}
+            style={{ marginLeft: horizontalScale(5) }}
             placeholderTextColor={'#01315C'}
             placeholder="Search for vehicle number"
           />
         </View>
-        <Text style={[text, {marginTop: 20}]}>{`Vehicle List`}</Text>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <Text style={[text, { marginTop: 20 }]}>{`Vehicle List`}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View
             style={{
               borderBottomWidth: 3,
               borderBottomColor: '#01315C',
-              marginVertical: 20,
+              marginVertical: verticalScale(25),
               width: 40,
-            }}></View>
+            }} />
           <View
             style={{
               borderBottomWidth: 1,
               borderBottomColor: '#01315C',
-              marginVertical: 20,
+              marginVertical: verticalScale(15),
               flex: 1,
-            }}></View>
+            }} />
         </View>
         <FlatList
           data={listData}
@@ -81,18 +86,18 @@ export default function VehicleList({navigation}) {
           padding: 50,
           justifyContent: 'space-between',
         }}>
-        <View style={{marginTop: 80}}>
+        <View style={{ marginTop: verticalScale(40) }}>
           <Text style={text}>{`Welcome back,`}</Text>
           <View
             style={{
               borderBottomWidth: 1,
               borderBottomColor: '#01315C',
-              marginVertical: 20,
-            }}></View>
+              marginVertical: verticalScale(30),
+            }} />
           <Text
             style={[
               text,
-              {marginTop: 20},
+              { marginTop: verticalScale(18) },
             ]}>{t('homepage_message')}</Text>
 
           {selectedVehicle && (
@@ -100,10 +105,10 @@ export default function VehicleList({navigation}) {
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                marginTop: 20,
+                marginTop: verticalScale(45),
               }}>
-              <Icon name="md-checkmark-sharp" color="green" size={30} />
-              <Text style={[text, {fontSize: 25}]}>{selectedVehicle}</Text>
+              <Icon name="md-checkmark-sharp" color="green" size={28} />
+              <Text style={[text, { fontSize: moderateScale(15) }]}>{selectedVehicle}</Text>
             </View>
           )}
         </View>

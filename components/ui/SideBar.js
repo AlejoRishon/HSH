@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icons from 'react-native-vector-icons/FontAwesome';
+import { verticalScale } from '../styles/Metrics';
 
 const SideBar = props => {
   return (
@@ -18,8 +19,8 @@ const SideBar = props => {
       style={{
         backgroundColor: '#EEF7FF',
         justifyContent: 'space-between',
-        paddingBottom: 30,
-        paddingTop: 60,
+        paddingBottom: verticalScale(10),
+        paddingTop: verticalScale(25),
       }}>
       {props.all && (
         <TouchableOpacity

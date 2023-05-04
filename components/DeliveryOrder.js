@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import React, {useState} from 'react';
-import {searchBox, tableHeader, text, dataText} from './styles/MainStyle';
+import React, { useState } from 'react';
+import { searchBox, tableHeader, text, dataText } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTranslation } from 'react-i18next';
@@ -24,11 +24,12 @@ import {
   Cols,
   Cell,
 } from 'react-native-table-component';
-import {getVehicle} from './functions/helper';
+import { getVehicle } from './functions/helper';
+import { moderateScale, verticalScale } from './styles/Metrics';
 
-const {width, height} = Dimensions.get('window');
-export default function DeliveryOrder({navigation, route}) {
-  const {t,i18n}=useTranslation();
+const { width, height } = Dimensions.get('window');
+export default function DeliveryOrder({ navigation, route }) {
+  const { t, i18n } = useTranslation();
   const parameter = getVehicle();
   const [showInput, setshowInput] = useState(false);
   const [headerData, setheaderData] = useState([
@@ -39,7 +40,7 @@ export default function DeliveryOrder({navigation, route}) {
     'Status',
   ]);
   const [detailData, setdetailData] = useState([
-    ['Transfer','DO-12345678A', '2 Adam Rd, Singapore 289876', '800,000', 'Pending'],
+    ['Transfer', 'DO-12345678A', '2 Adam Rd, Singapore 289876', '800,000', 'Pending'],
     [
       'Transfer',
       'DO-90485729B',
@@ -68,7 +69,7 @@ export default function DeliveryOrder({navigation, route}) {
       '20,000',
       'Completed',
     ],
-    ['Transfer','DO-12345678A', '2 Adam Rd, Singapore 289876', '800,000', 'Pending'],
+    ['Transfer', 'DO-12345678A', '2 Adam Rd, Singapore 289876', '800,000', 'Pending'],
     [
       'Transfer',
       'DO-90485729B',
@@ -99,37 +100,37 @@ export default function DeliveryOrder({navigation, route}) {
     ],
   ]);
   const statusColor = {
-    Pending: {text: '#EA631D', button: 'rgba(255, 181, 114, 0.47)'},
-    Completed: {text: '#3DB792', button: 'rgba(107, 226, 190, 0.24)'},
+    Pending: { text: '#EA631D', button: 'rgba(255, 181, 114, 0.47)' },
+    Completed: { text: '#3DB792', button: 'rgba(107, 226, 190, 0.24)' },
   };
 
-  const elementTransfer=(data,index)=>{
-    return(
+  const elementTransfer = (data, index) => {
+    return (
       <Icon name="plus" color="#2196F3" size={'large'} />
     )
   }
 
   const element = (data, index) => {
-    if(data==="Transfer"){
-      return(
-        <Text style={{color: statusColor[data] ? statusColor[data].text : 'black',paddingLeft:20}}>
+    if (data === "Transfer") {
+      return (
+        <Text style={{ color: statusColor[data] ? statusColor[data].text : 'black', alignSelf: 'center' }}>
           <Icon name="refresh" color="#2196F3" size={22} />
         </Text>
       )
-    }else{
+    } else {
 
-    
+
       return (
         <TouchableOpacity
           style={{
-            padding: 10,
+            padding: moderateScale(7),
             borderRadius: 15,
             backgroundColor: statusColor[data]
               ? statusColor[data].button
               : 'white',
           }}>
           <Text
-            style={{color: statusColor[data] ? statusColor[data].text : 'black'}}>
+            style={{ color: statusColor[data] ? statusColor[data].text : 'black', alignSelf: 'center' }}>
             {data}
           </Text>
         </TouchableOpacity>
@@ -137,40 +138,40 @@ export default function DeliveryOrder({navigation, route}) {
     }
   };
   return (
-    <View style={{flexDirection: 'row', flex: 1, backgroundColor: 'white'}}>
+    <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
       <SideBar all={true} navigation={navigation} />
-      <View style={{flex: 1, padding: 20}}>
+      <View style={{ flex: 1, margin: moderateScale(10) }}>
         <Text style={text}>{parameter.vehicle}</Text>
         <TouchableOpacity
           style={searchBox}
           onPress={() => navigation.navigate('VehicleList')}>
           <Icon name="exchange" color="#01315C" size={20} />
 
-          <Text style={[text, {marginLeft: 10}]}>Change vehicle</Text>
+          <Text style={[text, { marginLeft: 10 }]}>Change vehicle</Text>
         </TouchableOpacity>
-        <View style={{flexDirection:'row',justifyContent:'flex-start'}}>
-          <Text style={[text, {marginTop: 20}]}>{t('trips')}</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+          <Text style={[text, { marginTop: verticalScale(15) }]}>{t('trips')}</Text>
         </View>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View
             style={{
               borderBottomWidth: 3,
               borderBottomColor: '#01315C',
-              marginVertical: 20,
+              marginVertical: verticalScale(10),
               width: 40,
-            }}></View>
+            }} />
           <View
             style={{
               borderBottomWidth: 1,
               borderBottomColor: '#01315C',
-              marginVertical: 20,
+              marginVertical: verticalScale(15),
               flex: 1,
-            }}></View>
+            }} />
         </View>
-        <Table style={{flex: 1}}>
+        <Table style={{ flex: 1 }}>
           <Row
             data={headerData}
-            flexArr={[0.5, 1,2, 1, 1]}
+            flexArr={[0.5, 1, 2, 1, 1]}
             style={tableHeader}
             textStyle={text}
           />
@@ -182,15 +183,15 @@ export default function DeliveryOrder({navigation, route}) {
               <TouchableOpacity onPress={() => {
                 //setshowInput(true)
                 navigation.navigate('EditTrip');
-                }}>
-                <TableWrapper key={index} style={{flexDirection: 'row'}}>
+              }}>
+                <TableWrapper key={index} style={{ flexDirection: 'row' }}>
                   {rowData.map((cellData, cellIndex) => (
                     <Cell
-                      flex={cellIndex == 0 ? 0.5 : cellIndex==2 ? 2 : 1}
-                      
+                      flex={cellIndex == 0 ? 0.5 : cellIndex == 2 ? 2 : 1}
+
                       key={cellIndex}
                       data={
-                        cellIndex===0 ? element(cellData,index) : cellIndex === 4 ? element(cellData, index) :  cellData
+                        cellIndex === 0 ? element(cellData, index) : cellIndex === 4 ? element(cellData, index) : cellData
                       }
                       textStyle={[
                         {

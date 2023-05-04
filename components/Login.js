@@ -1,41 +1,44 @@
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
   View,
-  Dimensions,
   ImageBackground,
   TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
 } from 'react-native';
-import React, {useState} from 'react';
-import {inputBox, button, buttonText, text} from './styles/MainStyle';
-const {width, height} = Dimensions.get('window');
-import {useTranslation} from 'react-i18next';
-export default function Login({navigation}) {
+import { inputBox, button, buttonText, text } from './styles/MainStyle';
+import { useTranslation } from 'react-i18next';
+import { horizontalScale, moderateScale, verticalScale } from './styles/Metrics';
+
+export default function Login({ navigation }) {
+
   const [lang, setlang] = useState('en');
-  const {t, i18n} = useTranslation();
+  const { t, i18n } = useTranslation();
+
   useState(() => {
     console.log(lang);
   }, [lang]);
+
   return (
-    <KeyboardAvoidingView style={{flex: 1}} behavior="height">
-      <View style={{flexDirection: 'row', flex: 1}}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior="height">
+      <View style={{ flexDirection: 'row', flex: 1 }}>
         <ImageBackground
           source={require('../assets/bg.png')}
-          style={{flex: 1, backgroundColor: 'white', alignItems: 'center'}}>
+          style={{ flex: 1, backgroundColor: 'white', alignItems: 'center' }}>
           <ImageBackground
             source={require('../assets/bgtext.png')}
             resizeMode="contain"
-            style={{flex: 1, width: '80%'}}>
+            style={{ flex: 1, width: '80%' }}>
             <View
               style={{
-                width: 200,
+                width: horizontalScale(100),
                 justifyContent: 'flex-start',
                 alignSelf: 'flex-start',
               }}>
               <View
-                style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <TouchableOpacity
                   onPress={() => {
                     i18n.changeLanguage('en');
@@ -49,8 +52,8 @@ export default function Login({navigation}) {
                       },
                       {
                         color: '#000',
-                        fontSize: 22,
-                        padding: 10,
+                        fontSize: moderateScale(16),
+                        padding: moderateScale(8),
                         fontWeight: 'bold',
                       },
                     ]}>
@@ -70,8 +73,8 @@ export default function Login({navigation}) {
                       },
                       {
                         color: '#000',
-                        fontSize: 22,
-                        padding: 10,
+                        fontSize: moderateScale(16),
+                        padding: moderateScale(8),
                         fontWeight: 'bold',
                       },
                     ]}>
@@ -84,23 +87,24 @@ export default function Login({navigation}) {
         </ImageBackground>
         <View
           style={{
-            width: width * 0.4,
+            width: horizontalScale(150),
             backgroundColor: '#EEF7FF',
-            padding: 50,
-            justifyContent: 'space-between',
+            padding: moderateScale(25),
+            justifyContent: 'space-around',
           }}>
-          <View style={{marginTop: 80}}>
+          <View style={{ marginTop: verticalScale(20) }}>
             <Text style={text}>{`Welcome back,\n${t('login_message')}`}</Text>
             <View
               style={{
                 borderBottomWidth: 1,
                 borderBottomColor: '#01315C',
-                marginVertical: 20,
-              }}></View>
-            <TextInput style={inputBox} placeholder="username" />
+                marginVertical: verticalScale(15),
+              }} />
+            <TextInput style={inputBox} placeholder="username" placeholderTextColor='#000' />
             <TextInput
               style={inputBox}
               placeholder="password"
+              placeholderTextColor='#000'
               textContentType="password"
               secureTextEntry={true}
             />
