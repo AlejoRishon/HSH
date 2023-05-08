@@ -1,242 +1,300 @@
 import {
-    StyleSheet,
-    Text,
-    View,
-    Modal,
-    Animated,
-    Dimensions,
-    FlatList,
-    Image,
-    TextInput,
-    TouchableOpacity,
-    ScrollView,
-    KeyboardAvoidingView,
-  } from 'react-native';
-  import React, {useEffect, useRef, useState} from 'react';
-  import {searchBox, tableHeader, text, dataText,remarks} from './styles/MainStyle';
-  import Icon from 'react-native-vector-icons/FontAwesome';
-  import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
-  import * as ImagePicker from 'react-native-image-picker';
-  import { useTranslation } from 'react-i18next';
-  import SideBar from './ui/SideBar';
-  import RightDeliveryDetails from './ui/RightDeliveryDetails';
-  import RightInputBar from './ui/RightInputBar';
-  import {
-    Table,
-    TableWrapper,
-    Row,
-    Rows,
-    Col,
-    Cols,
-    Cell,
-  } from 'react-native-table-component';
-  import {getVehicle} from './functions/helper';
-  
-  const {width, height} = Dimensions.get('window');
-  export default function AdHocService({navigation, route}) {
-    const {t,i18n}=useTranslation();
-    const parameter = getVehicle();
-    const [showInput, setshowInput] = useState(!true);
-    const heightAnim = useRef(new Animated.Value(0)).current;
-    const heightMeterAfAnim = useRef(new Animated.Value(0)).current;
-    const heightMeterBeAnim = useRef(new Animated.Value(0)).current;
-    const [uploadtype,setuploadtype]=useState('after');
-    const [moreMeterAf, setmoreMeterAf] = useState(false);
-    const [moreMeterBe, setmoreMeterBe] = useState(false);
+  StyleSheet,
+  Text,
+  View,
+  Modal,
+  Animated,
+  Dimensions,
+  FlatList,
+  Image,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {
+  searchBox,
+  tableHeader,
+  text,
+  dataText,
+  remarks,
+} from './styles/MainStyle';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
+import * as ImagePicker from 'react-native-image-picker';
+import {useTranslation} from 'react-i18next';
+import SideBar from './ui/SideBar';
+import RightDeliveryDetails from './ui/RightDeliveryDetails';
+import RightInputBar from './ui/RightInputBar';
+import {
+  Table,
+  TableWrapper,
+  Row,
+  Rows,
+  Col,
+  Cols,
+  Cell,
+} from 'react-native-table-component';
+import {getVehicle} from './functions/helper';
 
-    const [modalVisible, setModalVisible] = useState(false);
-    //after
-    const [previewImageUri,setpreviewImageUri]=useState('');
-    const [imagePreview,setimagePreview]=useState(false);
-    //before
-    const [previewImageUribefore,setpreviewImageUribefore]=useState('');
-    const [imagePreviewbefore,setimagePreviewbefore]=useState(false);
+const {width, height} = Dimensions.get('window');
+export default function AdHocService({navigation, route}) {
+  const {t, i18n} = useTranslation();
+  const parameter = getVehicle();
+  const [showInput, setshowInput] = useState(!true);
+  const heightAnim = useRef(new Animated.Value(0)).current;
+  const heightMeterAfAnim = useRef(new Animated.Value(0)).current;
+  const heightMeterBeAnim = useRef(new Animated.Value(0)).current;
+  const [uploadtype, setuploadtype] = useState('after');
+  const [moreMeterAf, setmoreMeterAf] = useState(false);
+  const [moreMeterBe, setmoreMeterBe] = useState(false);
 
-    const [diesel,setdiesel]=useState(0);
+  const [modalVisible, setModalVisible] = useState(false);
+  //after
+  const [previewImageUri, setpreviewImageUri] = useState('');
+  const [imagePreview, setimagePreview] = useState(false);
+  //before
+  const [previewImageUribefore, setpreviewImageUribefore] = useState('');
+  const [imagePreviewbefore, setimagePreviewbefore] = useState(false);
 
-    const getInputDiesel=(diesel)=>{
-        return setdiesel(diesel);
-    }
+  const [diesel, setdiesel] = useState(0);
 
+  const getInputDiesel = diesel => {
+    return setdiesel(diesel);
+  };
 
-    const openGallery=async (type,section)=>{
-        const options={mediaType:'image',includeBase64: false,maxHeight: 800,maxWidth: 800};
-        try {
-          var response;
-          if(type){
-            response=await ImagePicker.launchImageLibrary(options);
-          }else{
-            response=await ImagePicker.launchCamera(options);
-          }
-          console.log("resp",response);
-          // setFile(response);
-          if(section==='after'){
-            setpreviewImageUri(response.assets[0].uri);
-            setimagePreview(true)
-            onToggleMoreAf(80);
-          }else{
-            setpreviewImageUribefore(response.assets[0].uri)
-            setimagePreviewbefore(true);
-            onToggleMoreBe(80);
-          }
-           
-        }catch (error) {
-          console.log(error);
-        }
-        setModalVisible(!modalVisible)
+  const openGallery = async (type, section) => {
+    const options = {
+      mediaType: 'image',
+      includeBase64: false,
+      maxHeight: 800,
+      maxWidth: 800,
+    };
+    try {
+      var response;
+      if (type) {
+        response = await ImagePicker.launchImageLibrary(options);
+      } else {
+        response = await ImagePicker.launchCamera(options);
       }
+      console.log('resp', response);
+      // setFile(response);
+      if (section === 'after') {
+        setpreviewImageUri(response.assets[0].uri);
+        setimagePreview(true);
+        onToggleMoreAf(80);
+      } else {
+        setpreviewImageUribefore(response.assets[0].uri);
+        setimagePreviewbefore(true);
+        onToggleMoreBe(80);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    setModalVisible(!modalVisible);
+  };
 
+  const [headerData, setheaderData] = useState([
+    'DO No.',
+    'Delivery Address',
+    'Liters',
+    'Status',
+  ]);
+  const [detailData, setdetailData] = useState([
+    ['DO-12345678A', '2 Adam Rd, Singapore 289876', '800,000', 'Pending'],
+    [
+      'DO-90485729B',
+      '21 Hillcrest Rd, Singapore 289072',
+      '1,000,000',
+      'Completed',
+    ],
+    [
+      'DO-93877463V',
+      '131 Rifle Range Rd, Singapore 588406',
+      '800',
+      'Completed',
+    ],
+    [
+      'DO-11038479K',
+      '21 Choa Chu Kang North 6, Singapore 689578',
+      '100,000',
+      'Completed',
+    ],
+    [
+      'DO-35493831S',
+      '101 Jln Bahar, Civil Defence Academy Complex, Singapore 649734',
+      '20,000',
+      'Completed',
+    ],
+    ['DO-12345678A', '2 Adam Rd, Singapore 289876', '800,000', 'Pending'],
+    [
+      'DO-90485729B',
+      '21 Hillcrest Rd, Singapore 289072',
+      '1,000,000',
+      'Completed',
+    ],
+    [
+      'DO-93877463V',
+      '131 Rifle Range Rd, Singapore 588406',
+      '800',
+      'Completed',
+    ],
+    [
+      'DO-11038479K',
+      '21 Choa Chu Kang North 6, Singapore 689578',
+      '100,000',
+      'Completed',
+    ],
+    [
+      'DO-35493831S',
+      '101 Jln Bahar, Civil Defence Academy Complex, Singapore 649734',
+      '20,000',
+      'Completed',
+    ],
+  ]);
+  const statusColor = {
+    Pending: {text: '#EA631D', button: 'rgba(255, 181, 114, 0.47)'},
+    Completed: {text: '#3DB792', button: 'rgba(107, 226, 190, 0.24)'},
+  };
 
-    const [headerData, setheaderData] = useState([
-      'DO No.',
-      'Delivery Address',
-      'Liters',
-      'Status',
-    ]);
-    const [detailData, setdetailData] = useState([
-      ['DO-12345678A', '2 Adam Rd, Singapore 289876', '800,000', 'Pending'],
-      [
-        'DO-90485729B',
-        '21 Hillcrest Rd, Singapore 289072',
-        '1,000,000',
-        'Completed',
-      ],
-      [
-        'DO-93877463V',
-        '131 Rifle Range Rd, Singapore 588406',
-        '800',
-        'Completed',
-      ],
-      [
-        'DO-11038479K',
-        '21 Choa Chu Kang North 6, Singapore 689578',
-        '100,000',
-        'Completed',
-      ],
-      [
-        'DO-35493831S',
-        '101 Jln Bahar, Civil Defence Academy Complex, Singapore 649734',
-        '20,000',
-        'Completed',
-      ],
-      ['DO-12345678A', '2 Adam Rd, Singapore 289876', '800,000', 'Pending'],
-      [
-        'DO-90485729B',
-        '21 Hillcrest Rd, Singapore 289072',
-        '1,000,000',
-        'Completed',
-      ],
-      [
-        'DO-93877463V',
-        '131 Rifle Range Rd, Singapore 588406',
-        '800',
-        'Completed',
-      ],
-      [
-        'DO-11038479K',
-        '21 Choa Chu Kang North 6, Singapore 689578',
-        '100,000',
-        'Completed',
-      ],
-      [
-        'DO-35493831S',
-        '101 Jln Bahar, Civil Defence Academy Complex, Singapore 649734',
-        '20,000',
-        'Completed',
-      ],
-    ]);
-    const statusColor = {
-      Pending: {text: '#EA631D', button: 'rgba(255, 181, 114, 0.47)'},
-      Completed: {text: '#3DB792', button: 'rgba(107, 226, 190, 0.24)'},
-    };
-  
-
-    
-    const element = (data, index) => {
-      return (
-        <TouchableOpacity
-          style={{
-            padding: 10,
-            borderRadius: 15,
-            backgroundColor: statusColor[data]
-              ? statusColor[data].button
-              : 'white',
-          }}>
-          <Text
-            style={{color: statusColor[data] ? statusColor[data].text : 'black'}}>
-            {data}
-          </Text>
-        </TouchableOpacity>
-      );
-    };
-
-    const onToggleMore = height => {
-        Animated.timing(heightAnim, {
-          toValue: height,
-          duration: 500,
-          useNativeDriver: false,
-        }).start();
-        setmore(!more);
-      };
-
-      const onToggleMoreAf = height => {
-        Animated.timing(heightMeterAfAnim, {
-          toValue: height,
-          duration: 500,
-          useNativeDriver: false,
-        }).start();
-        setmoreMeterAf(!moreMeterAf);
-      };
-    
-      const onToggleMoreBe = height => {
-        Animated.timing(heightMeterBeAnim, {
-          toValue: height,
-          duration: 500,
-          useNativeDriver: false,
-        }).start();
-        setmoreMeterBe(!moreMeterBe);
-      };
-
-    useEffect(()=>{
-        setshowInput(true)
-    },[])
-
-    const [more,setmore]=useState(false);
+  const element = (data, index) => {
     return (
-        <Animated.View  style={{flexDirection: 'row',flex: 1, backgroundColor: 'white'}}>
-        <SideBar all={true} navigation={navigation} />
-        <View style={{flex: 1, padding: 20}}>
-            <ScrollView style={{width:'55%'}}>
-            <View>
+      <TouchableOpacity
+        style={{
+          padding: 10,
+          borderRadius: 15,
+          backgroundColor: statusColor[data]
+            ? statusColor[data].button
+            : 'white',
+        }}>
+        <Text
+          style={{color: statusColor[data] ? statusColor[data].text : 'black'}}>
+          {data}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const onToggleMore = height => {
+    Animated.timing(heightAnim, {
+      toValue: height,
+      duration: 500,
+      useNativeDriver: false,
+    }).start();
+    setmore(!more);
+  };
+
+  const onToggleMoreAf = height => {
+    Animated.timing(heightMeterAfAnim, {
+      toValue: height,
+      duration: 500,
+      useNativeDriver: false,
+    }).start();
+    setmoreMeterAf(!moreMeterAf);
+  };
+
+  const onToggleMoreBe = height => {
+    Animated.timing(heightMeterBeAnim, {
+      toValue: height,
+      duration: 500,
+      useNativeDriver: false,
+    }).start();
+    setmoreMeterBe(!moreMeterBe);
+  };
+
+  useEffect(() => {
+    setshowInput(true);
+  }, []);
+
+  const [more, setmore] = useState(false);
+  return (
+    <Animated.View
+      style={{flexDirection: 'row', flex: 1, backgroundColor: 'white'}}>
+      <SideBar all={true} navigation={navigation} />
+
+      <View style={{flex: 1, padding: 20}}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('Main');
+          }}>
+          <Icon
+            name="chevron-left"
+            color="#01315C"
+            size={30}
+            style={{marginBottom: 10}}
+          />
+        </TouchableOpacity>
+        <ScrollView style={{width: '55%'}}>
+          <View>
             <Text
-            style={{
-              fontSize: width/40,
-              color: '#01315C',
-              fontWeight: 600,
-              marginBottom: 5,
-            }}>
-            Eddie Ang
-          </Text>
-            <Text style={{fontSize: width/60, color: '#01315C', marginBottom: 10}}>
-                DO-12345678A
+              style={{
+                fontSize: width / 40,
+                color: '#01315C',
+                fontWeight: 600,
+                marginBottom: 5,
+              }}>
+              Eddie Ang
             </Text>
-            </View>
-            <View
+            <Text
+              style={{
+                fontSize: width / 60,
+                color: '#01315C',
+                marginBottom: 10,
+              }}>
+              DO-12345678A
+            </Text>
+          </View>
+          <View
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
-              marginBottom:10,
+              marginBottom: 10,
             }}>
-            <Text style={{fontSize: width/60, color: '#01315C', marginRight: 40}}>
+            <Text
+              style={{fontSize: width / 60, color: '#01315C', marginRight: 40}}>
               BDP Global Project Logistics Pte Ltd
             </Text>
-            
           </View>
-          <View style={{height: 150,marginBottom:10}}>
-          <Text style={{fontSize: 18, color: '#01315C', marginVertical: 10}}>Business Name</Text>
-            <TextInput numberOfLines={2} style={{fontSize: 18, color: '#01315C',borderWidth:1,borderColor:"#2196F3",marginBottom:20}} />
-            <Text style={{fontSize: 18, color: '#01315C', marginVertical: 10}}>Business Address</Text>
-            <TextInput  numberOfLines={2} style={{fontSize: 18, color: '#01315C',borderWidth:1,borderColor:"#2196F3",marginBottom:20}} />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginBottom: 10,
+            }}>
+            <Text
+              style={{fontSize: width / 60, color: '#01315C', marginRight: 40}}>
+              ADO/10PPM/MGO
+            </Text>
+          </View>
+
+          <View style={{height: 150, marginBottom: 10}}>
+            <Text style={{fontSize: 18, color: '#01315C', marginVertical: 10}}>
+              Business Name
+            </Text>
+            <TextInput
+              numberOfLines={2}
+              style={{
+                fontSize: 18,
+                color: '#01315C',
+                borderWidth: 1,
+                borderColor: '#2196F3',
+                marginBottom: 20,
+              }}
+            />
+            <Text style={{fontSize: 18, color: '#01315C', marginVertical: 10}}>
+              Business Address
+            </Text>
+            <TextInput
+              numberOfLines={2}
+              style={{
+                fontSize: 18,
+                color: '#01315C',
+                borderWidth: 1,
+                borderColor: '#2196F3',
+                marginBottom: 20,
+              }}
+            />
             {/* <Text style={{fontSize: 18, color: '#01315C', marginVertical: 10}}>
               BDP Global Project Logistics Pte LtdContact Person: Bill Gates
               (+6598765432)
@@ -244,7 +302,7 @@ import {
           </View>
           <View
             style={{
-                marginTop:120,
+              marginTop: 120,
               borderBottomWidth: 1,
               borderBottomColor: '#01315C',
               marginBottom: 20,
@@ -256,9 +314,9 @@ import {
               alignItems: 'center',
               marginBottom: 10,
             }}>
-              <View>
+            <View>
               <Text style={{fontSize: 25, color: '#01315C', marginRight: 40}}>
-              {t('litres_of_diesel_sold')}
+                {t('litres_of_diesel_sold')}
               </Text>
             </View>
             {/* <Icon
@@ -270,7 +328,7 @@ import {
           </View>
           <Text
             style={{
-              fontSize: width/45,
+              fontSize: width / 45,
               color: '#01315C',
               fontWeight: 600,
               marginBottom: 20,
@@ -284,14 +342,15 @@ import {
               alignItems: 'center',
               marginBottom: 10,
             }}>
-            <Text style={{fontSize:width/45, color: '#01315C', marginRight: 40}}>
+            <Text
+              style={{fontSize: width / 45, color: '#01315C', marginRight: 40}}>
               {t('signature')}
             </Text>
             <Icon name="edit" color="#01315C" size={20} />
           </View>
           <Text
             style={{
-              fontSize: width/60,
+              fontSize: width / 60,
               color: '#3DB792',
               marginBottom: 20,
             }}>
@@ -305,14 +364,14 @@ import {
             }}>
             <View>
               <Text style={{fontSize: 20, color: '#01315C', marginRight: 40}}>
-              {t('metre_reading_after')}
+                {t('metre_reading_after')}
               </Text>
             </View>
-            
+
             <Icon
-              onPress={() =>{
+              onPress={() => {
                 setuploadtype('after');
-                  setModalVisible(true);
+                setModalVisible(true);
               }}
               name="edit"
               color="#01315C"
@@ -340,19 +399,15 @@ import {
               flexDirection: 'row',
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
-              marginBottom:20
+              marginBottom: 20,
             }}>
-              {
-                previewImageUri.length==0 ?
-                null
-                :
-                <Image
-                  style={{height: '100%', flex: 1}}
-                  source={{uri:previewImageUri}}
-                  resizeMode="contain"
-                />
-              }
-            
+            {previewImageUri.length == 0 ? null : (
+              <Image
+                style={{height: '100%', flex: 1}}
+                source={{uri: previewImageUri}}
+                resizeMode="contain"
+              />
+            )}
           </Animated.View>
           <View
             style={{
@@ -362,11 +417,11 @@ import {
             }}>
             <View>
               <Text style={{fontSize: 20, color: '#01315C', marginRight: 40}}>
-              {t('metre_reading_before')}
+                {t('metre_reading_before')}
               </Text>
             </View>
             <Icon
-              onPress={() =>{
+              onPress={() => {
                 setuploadtype('before');
                 setModalVisible(true);
               }}
@@ -382,17 +437,13 @@ import {
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
             }}>
-              {
-                previewImageUribefore.length==0 ?
-                null
-                :
-                <Image
-                  style={{height: '100%', flex: 1}}
-                  source={{uri:previewImageUribefore}}
-                  resizeMode="contain"
-                />
-              }
-            
+            {previewImageUribefore.length == 0 ? null : (
+              <Image
+                style={{height: '100%', flex: 1}}
+                source={{uri: previewImageUribefore}}
+                resizeMode="contain"
+              />
+            )}
           </Animated.View>
           <Text
             style={{
@@ -407,10 +458,10 @@ import {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <TextInput style={[remarks]} multiline={true} numberOfLines={4} />
           </KeyboardAvoidingView>
-          </ScrollView>
-        </View>
-        
-        {/* <View style={{flex: 1, padding: 20}}>
+        </ScrollView>
+      </View>
+
+      {/* <View style={{flex: 1, padding: 20}}>
           <Text style={text}>{parameter.vehicle}</Text>
           <TouchableOpacity
             style={searchBox}
@@ -479,21 +530,21 @@ import {
             </ScrollView>
           </Table>
         </View> */}
-        <RightInputBar
+      <RightInputBar
         header="Liters of Diesel Sold"
         subHeader="Enter quantity of diesel sold"
         show={showInput}
         getInputDiesel={getInputDiesel}
         keepinView={true}
         hide={() => setshowInput(false)}
-        onSubmit={(val) => {
+        onSubmit={val => {
           setshowInput(false);
           getInputDiesel(val);
           //setSelected(null);
           //setshowConfirm(true);
         }}
       />
-        <Modal
+      <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
@@ -503,119 +554,140 @@ import {
         }}>
         <View style={styles.centeredView}>
           <View style={[styles.modalView]}>
-            <View style={{flexDirection:'row'}}>
-              <View style={{width:'80%',height:50,backgroundColor:'#d3d3d370'}}>
-                <Text style={[{fontSize:22,color:"#000",fontWeight:'600',paddingLeft:10,paddingVertical:8}]}>{t('Metre Reading After')}</Text>
-              </View>
-              <View style={{width:'20%',height:50,backgroundColor:'#d3d3d370',alignItems:'center',justifyContent:'center'}}>
-                <TouchableOpacity onPress={() => setModalVisible(!modalVisible)} style={{
-                  width:50,
-                  height:50,
-                  justifyContent:'center',
-                  alignItems:'center'
+            <View style={{flexDirection: 'row'}}>
+              <View
+                style={{
+                  width: '80%',
+                  height: 50,
+                  backgroundColor: '#d3d3d370',
                 }}>
-                <Text style={[{fontSize:22,color:"#000",paddingLeft:20,fontWeight:'600'}]}>
-                <Icon
-                    name="close"
-                    color="#000"
-                    size={20}
-                  />
+                <Text
+                  style={[
+                    {
+                      fontSize: 22,
+                      color: '#000',
+                      fontWeight: '600',
+                      paddingLeft: 10,
+                      paddingVertical: 8,
+                    },
+                  ]}>
+                  {t('Metre Reading After')}
                 </Text>
+              </View>
+              <View
+                style={{
+                  width: '20%',
+                  height: 50,
+                  backgroundColor: '#d3d3d370',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <TouchableOpacity
+                  onPress={() => setModalVisible(!modalVisible)}
+                  style={{
+                    width: 50,
+                    height: 50,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <Text
+                    style={[
+                      {
+                        fontSize: 22,
+                        color: '#000',
+                        paddingLeft: 20,
+                        fontWeight: '600',
+                      },
+                    ]}>
+                    <Icon name="close" color="#000" size={20} />
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
-            <View style={{flexDirection:'row',paddingTop:20,paddingLeft:20}}>
-                          <TouchableOpacity  style={{
-                                width:80,
-                                height:80,
-                                borderWidth:2,
-                                borderColor:'navy',
-                                marginRight:50,
-                                flexDirection: 'column',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                              }} 
-                              onPress={()=>{
-                                openGallery(true,uploadtype)
-                                
-                              }}>
-                                <Icon
-                              name="image"
-                              color="navy"
-                              size={20}
-                            />
-                              <Text style={{color:'navy'}}>Gallery</Text>
-                                
-                              </TouchableOpacity>
-                              <TouchableOpacity  style={{
-                                width:80,
-                                height:80,
-                                borderWidth:2,
-                                borderColor:'navy',
-                                marginRight:10,
-                                flexDirection: 'column',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                              }} 
-                              onPress={()=>{
-                                openGallery(false,uploadtype)
-                              }}>
-                                <Icon
-                              name="camera"
-                              color="navy"
-                              size={20}
-                            />
-                                <Text style={{color:'navy'}}>Camera</Text>
-                              </TouchableOpacity>
-                
+            <View
+              style={{flexDirection: 'row', paddingTop: 20, paddingLeft: 20}}>
+              <TouchableOpacity
+                style={{
+                  width: 80,
+                  height: 80,
+                  borderWidth: 2,
+                  borderColor: 'navy',
+                  marginRight: 50,
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                onPress={() => {
+                  openGallery(true, uploadtype);
+                }}>
+                <Icon name="image" color="navy" size={20} />
+                <Text style={{color: 'navy'}}>Gallery</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  width: 80,
+                  height: 80,
+                  borderWidth: 2,
+                  borderColor: 'navy',
+                  marginRight: 10,
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                onPress={() => {
+                  openGallery(false, uploadtype);
+                }}>
+                <Icon name="camera" color="navy" size={20} />
+                <Text style={{color: 'navy'}}>Camera</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
-      </Animated.View>
-    );
-  }
-  
-  const styles = StyleSheet.create({
-    centeredView: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginTop: 22,
+    </Animated.View>
+  );
+}
+
+const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    width: 400,
+    height: 200,
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 0,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
     },
-    modalView: {
-      width:400,
-      height:200,
-      margin: 20,
-      backgroundColor: 'white',
-      borderRadius: 20,
-      padding: 0,
-      shadowColor: '#000',
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 4,
-      elevation: 5,
-    },
-    button: {
-      borderRadius: 20,
-      padding: 10,
-      elevation: 2,
-    },
-    buttonOpen: {
-      backgroundColor: '#F194FF',
-    },
-    buttonClose: {
-      backgroundColor: '#2196F3',
-    },
-    textStyle: {
-      color: 'white',
-      fontWeight: 'bold',
-    },
-    modalText: {
-      marginBottom: 15,
-      color:'#000'
-    },
-  });
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  modalText: {
+    marginBottom: 15,
+    color: '#000',
+  },
+});

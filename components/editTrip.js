@@ -207,6 +207,17 @@ export default function DeliveryOrder({navigation, route}) {
       style={{flexDirection: 'row', flex: 1, backgroundColor: 'white'}}>
       <SideBar all={true} navigation={navigation} />
       <View style={{flex: 1, padding: 20}}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('DeliveryOrder');
+          }}>
+          <Icon
+            name="chevron-left"
+            color="#01315C"
+            size={30}
+            style={{marginBottom: 10}}
+          />
+        </TouchableOpacity>
         <ScrollView style={{width: '55%'}}>
           <View>
             <Text
