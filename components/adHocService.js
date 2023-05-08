@@ -2,7 +2,6 @@ import {
   StyleSheet,
   Text,
   View,
-  Modal,
   Animated,
   Dimensions,
   FlatList,
@@ -12,7 +11,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
 } from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   searchBox,
   tableHeader,
@@ -23,7 +22,7 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as ImagePicker from 'react-native-image-picker';
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import SideBar from './ui/SideBar';
 import RightDeliveryDetails from './ui/RightDeliveryDetails';
 import RightInputBar from './ui/RightInputBar';
@@ -36,11 +35,13 @@ import {
   Cols,
   Cell,
 } from 'react-native-table-component';
-import {getVehicle} from './functions/helper';
+import { getVehicle } from './functions/helper';
+import { Portal, Provider, Modal } from 'react-native-paper';
+import { horizontalScale, verticalScale, moderateScale } from './styles/Metrics';
 
-const {width, height} = Dimensions.get('window');
-export default function AdHocService({navigation, route}) {
-  const {t, i18n} = useTranslation();
+const { width, height } = Dimensions.get('window');
+export default function AdHocService({ navigation, route }) {
+  const { t, i18n } = useTranslation();
   const parameter = getVehicle();
   const [showInput, setshowInput] = useState(!true);
   const heightAnim = useRef(new Animated.Value(0)).current;
@@ -57,6 +58,16 @@ export default function AdHocService({navigation, route}) {
   //before
   const [previewImageUribefore, setpreviewImageUribefore] = useState('');
   const [imagePreviewbefore, setimagePreviewbefore] = useState(false);
+  const [listData, setListDate] = useState([
+    'MGO01',
+    '10PPM01',
+    'MGO01',
+    '10PPM01',
+  ])
+  const [visible, setVisible] = React.useState(false);
+
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false)
 
   const [diesel, setdiesel] = useState(0);
 
@@ -154,8 +165,8 @@ export default function AdHocService({navigation, route}) {
     ],
   ]);
   const statusColor = {
-    Pending: {text: '#EA631D', button: 'rgba(255, 181, 114, 0.47)'},
-    Completed: {text: '#3DB792', button: 'rgba(107, 226, 190, 0.24)'},
+    Pending: { text: '#EA631D', button: 'rgba(255, 181, 114, 0.47)' },
+    Completed: { text: '#3DB792', button: 'rgba(107, 226, 190, 0.24)' },
   };
 
   const element = (data, index) => {
@@ -169,7 +180,7 @@ export default function AdHocService({navigation, route}) {
             : 'white',
         }}>
         <Text
-          style={{color: statusColor[data] ? statusColor[data].text : 'black'}}>
+          style={{ color: statusColor[data] ? statusColor[data].text : 'black' }}>
           {data}
         </Text>
       </TouchableOpacity>
@@ -207,177 +218,198 @@ export default function AdHocService({navigation, route}) {
     setshowInput(true);
   }, []);
 
+  const ItemView = ({ item }) => {
+    return (
+      // FlatList Item
+      <View style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#01315C' }}>
+        <Text style={[text, { fontSize: moderateScale(10), alignSelf: 'center' }]}>{item}</Text>
+      </View>
+    );
+  }
+
   const [more, setmore] = useState(false);
   return (
-    <Animated.View
-      style={{flexDirection: 'row', flex: 1, backgroundColor: 'white'}}>
-      <SideBar all={true} navigation={navigation} />
+    <Provider>
+      <Portal>
+        <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={styles.dragDown}>
+          <FlatList
+            data={listData}
+            renderItem={ItemView}
+            keyExtractor={(item, index) => index.toString()}
 
-      <View style={{flex: 1, padding: 20}}>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate('Main');
-          }}>
-          <Icon
-            name="chevron-left"
-            color="#01315C"
-            size={30}
-            style={{marginBottom: 10}}
           />
-        </TouchableOpacity>
-        <ScrollView style={{width: '55%'}}>
-          <View>
-            <Text
+        </Modal>
+      </Portal>
+      <Animated.View
+        style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
+        <SideBar all={true} navigation={navigation} />
+
+        <View style={{ flex: 1, padding: 20 }}>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('Main');
+            }}>
+            <Icon
+              name="chevron-left"
+              color="#01315C"
+              size={30}
+              style={{ marginBottom: 10 }}
+            />
+          </TouchableOpacity>
+          <ScrollView style={{ width: '55%' }}>
+            <View>
+              <Text
+                style={{
+                  fontSize: width / 40,
+                  color: '#01315C',
+                  fontWeight: 600,
+                  marginBottom: 5,
+                }}>
+                Eddie Ang
+              </Text>
+              <Text
+                style={{
+                  fontSize: width / 60,
+                  color: '#01315C',
+                  marginBottom: 10,
+                }}>
+                DO-12345678A
+              </Text>
+            </View>
+            <View
               style={{
-                fontSize: width / 40,
-                color: '#01315C',
-                fontWeight: 600,
-                marginBottom: 5,
-              }}>
-              Eddie Ang
-            </Text>
-            <Text
-              style={{
-                fontSize: width / 60,
-                color: '#01315C',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
                 marginBottom: 10,
               }}>
-              DO-12345678A
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginBottom: 10,
-            }}>
-            <Text
-              style={{fontSize: width / 60, color: '#01315C', marginRight: 40}}>
-              BDP Global Project Logistics Pte Ltd
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginBottom: 10,
-            }}>
-            <Text
-              style={{fontSize: width / 60, color: '#01315C', marginRight: 40}}>
-              ADO/10PPM/MGO
-            </Text>
-          </View>
+              <Text
+                style={{ fontSize: width / 60, color: '#01315C', marginRight: 40 }}>
+                BDP Global Project Logistics Pte Ltd
+              </Text>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginBottom: 10,
+              }}>
+              <Text
+                onPress={showModal}
+                style={{ fontSize: width / 60, color: '#01315C', marginRight: 40, justifyContent: 'center' }}>
+                Products <Icon name='angle-down' size={12} style={{ alignSelf: 'center' }} />
+              </Text>
+            </View>
 
-          <View style={{height: 150, marginBottom: 10}}>
-            <Text style={{fontSize: 18, color: '#01315C', marginVertical: 10}}>
-              Business Name
-            </Text>
-            <TextInput
-              numberOfLines={2}
-              style={{
-                fontSize: 18,
-                color: '#01315C',
-                borderWidth: 1,
-                borderColor: '#2196F3',
-                marginBottom: 20,
-              }}
-            />
-            <Text style={{fontSize: 18, color: '#01315C', marginVertical: 10}}>
-              Business Address
-            </Text>
-            <TextInput
-              numberOfLines={2}
-              style={{
-                fontSize: 18,
-                color: '#01315C',
-                borderWidth: 1,
-                borderColor: '#2196F3',
-                marginBottom: 20,
-              }}
-            />
-            {/* <Text style={{fontSize: 18, color: '#01315C', marginVertical: 10}}>
+            <View style={{ height: 150, marginBottom: 10 }}>
+              <Text style={{ fontSize: 18, color: '#01315C', marginVertical: 10 }}>
+                Business Name
+              </Text>
+              <TextInput
+                numberOfLines={2}
+                style={{
+                  fontSize: 18,
+                  color: '#01315C',
+                  borderWidth: 1,
+                  borderColor: '#2196F3',
+                  marginBottom: 20,
+                }}
+              />
+              <Text style={{ fontSize: 18, color: '#01315C', marginVertical: 10 }}>
+                Business Address
+              </Text>
+              <TextInput
+                numberOfLines={2}
+                style={{
+                  fontSize: 18,
+                  color: '#01315C',
+                  borderWidth: 1,
+                  borderColor: '#2196F3',
+                  marginBottom: 20,
+                }}
+              />
+              {/* <Text style={{fontSize: 18, color: '#01315C', marginVertical: 10}}>
               BDP Global Project Logistics Pte LtdContact Person: Bill Gates
               (+6598765432)
             </Text> */}
-          </View>
-          <View
-            style={{
-              marginTop: 120,
-              borderBottomWidth: 1,
-              borderBottomColor: '#01315C',
-              marginBottom: 20,
-            }}></View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: 10,
-            }}>
-            <View>
-              <Text style={{fontSize: 25, color: '#01315C', marginRight: 40}}>
-                {t('litres_of_diesel_sold')}
-              </Text>
             </View>
-            {/* <Icon
+            <View
+              style={{
+                marginTop: 120,
+                borderBottomWidth: 1,
+                borderBottomColor: '#01315C',
+                marginBottom: 20,
+              }}></View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 10,
+              }}>
+              <View>
+                <Text style={{ fontSize: 25, color: '#01315C', marginRight: 40 }}>
+                  {t('litres_of_diesel_sold')}
+                </Text>
+              </View>
+              {/* <Icon
               onPress={() => onShow(0)}
               name="edit"
               color="#01315C"
               size={20}
             /> */}
-          </View>
-          <Text
-            style={{
-              fontSize: width / 45,
-              color: '#01315C',
-              fontWeight: 600,
-              marginBottom: 20,
-            }}>
-            {diesel}
-          </Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: 10,
-            }}>
-            <Text
-              style={{fontSize: width / 45, color: '#01315C', marginRight: 40}}>
-              {t('signature')}
-            </Text>
-            <Icon name="edit" color="#01315C" size={20} />
-          </View>
-          <Text
-            style={{
-              fontSize: width / 60,
-              color: '#3DB792',
-              marginBottom: 20,
-            }}>
-            Uploaded
-          </Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginBottom: 20,
-            }}>
-            <View>
-              <Text style={{fontSize: 20, color: '#01315C', marginRight: 40}}>
-                {t('metre_reading_after')}
-              </Text>
             </View>
+            <Text
+              style={{
+                fontSize: width / 45,
+                color: '#01315C',
+                fontWeight: 600,
+                marginBottom: 20,
+              }}>
+              {diesel}
+            </Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 10,
+              }}>
+              <Text
+                style={{ fontSize: width / 45, color: '#01315C', marginRight: 40 }}>
+                {t('signature')}
+              </Text>
+              <Icon name="edit" color="#01315C" size={20} />
+            </View>
+            <Text
+              style={{
+                fontSize: width / 60,
+                color: '#3DB792',
+                marginBottom: 20,
+              }}>
+              Uploaded
+            </Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginBottom: 20,
+              }}>
+              <View>
+                <Text style={{ fontSize: 20, color: '#01315C', marginRight: 40 }}>
+                  {t('metre_reading_after')}
+                </Text>
+              </View>
 
-            <Icon
-              onPress={() => {
-                setuploadtype('after');
-                setModalVisible(true);
-              }}
-              name="edit"
-              color="#01315C"
-              size={20}
-            />
-            {/* {moreMeterAf ? (
+              <Icon
+                onPress={() => {
+                  setuploadtype('after');
+                  setModalVisible(true);
+                }}
+                name="edit"
+                color="#01315C"
+                size={20}
+              />
+              {/* {moreMeterAf ? (
               <Icon
                 onPress={() => onToggleMoreAf(0)}
                 name="chevron-up"
@@ -392,76 +424,76 @@ export default function AdHocService({navigation, route}) {
                 size={20}
               />
             )} */}
-          </View>
-          <Animated.View
-            style={{
-              height: heightMeterAfAnim,
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              alignItems: 'flex-start',
-              marginBottom: 20,
-            }}>
-            {previewImageUri.length == 0 ? null : (
-              <Image
-                style={{height: '100%', flex: 1}}
-                source={{uri: previewImageUri}}
-                resizeMode="contain"
-              />
-            )}
-          </Animated.View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginBottom: 20,
-            }}>
-            <View>
-              <Text style={{fontSize: 20, color: '#01315C', marginRight: 40}}>
-                {t('metre_reading_before')}
-              </Text>
             </View>
-            <Icon
-              onPress={() => {
-                setuploadtype('before');
-                setModalVisible(true);
-              }}
-              name="edit"
-              color="#01315C"
-              size={20}
-            />
-          </View>
-          <Animated.View
-            style={{
-              height: heightMeterBeAnim,
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              alignItems: 'flex-start',
-            }}>
-            {previewImageUribefore.length == 0 ? null : (
-              <Image
-                style={{height: '100%', flex: 1}}
-                source={{uri: previewImageUribefore}}
-                resizeMode="contain"
+            <Animated.View
+              style={{
+                height: heightMeterAfAnim,
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+                alignItems: 'flex-start',
+                marginBottom: 20,
+              }}>
+              {previewImageUri.length == 0 ? null : (
+                <Image
+                  style={{ height: '100%', flex: 1 }}
+                  source={{ uri: previewImageUri }}
+                  resizeMode="contain"
+                />
+              )}
+            </Animated.View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginBottom: 20,
+              }}>
+              <View>
+                <Text style={{ fontSize: 20, color: '#01315C', marginRight: 40 }}>
+                  {t('metre_reading_before')}
+                </Text>
+              </View>
+              <Icon
+                onPress={() => {
+                  setuploadtype('before');
+                  setModalVisible(true);
+                }}
+                name="edit"
+                color="#01315C"
+                size={20}
               />
-            )}
-          </Animated.View>
-          <Text
-            style={{
-              fontSize: 20,
-              color: '#01315C',
-              marginRight: 40,
-            }}>
-            {t('remarks')}
-          </Text>
-          <KeyboardAvoidingView
-            style={{marginBottom: 50}}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-            <TextInput style={[remarks]} multiline={true} numberOfLines={4} />
-          </KeyboardAvoidingView>
-        </ScrollView>
-      </View>
+            </View>
+            <Animated.View
+              style={{
+                height: heightMeterBeAnim,
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+                alignItems: 'flex-start',
+              }}>
+              {previewImageUribefore.length == 0 ? null : (
+                <Image
+                  style={{ height: '100%', flex: 1 }}
+                  source={{ uri: previewImageUribefore }}
+                  resizeMode="contain"
+                />
+              )}
+            </Animated.View>
+            <Text
+              style={{
+                fontSize: 20,
+                color: '#01315C',
+                marginRight: 40,
+              }}>
+              {t('remarks')}
+            </Text>
+            <KeyboardAvoidingView
+              style={{ marginBottom: 50 }}
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+              <TextInput style={[remarks]} multiline={true} numberOfLines={4} />
+            </KeyboardAvoidingView>
+          </ScrollView>
+        </View>
 
-      {/* <View style={{flex: 1, padding: 20}}>
+        {/* <View style={{flex: 1, padding: 20}}>
           <Text style={text}>{parameter.vehicle}</Text>
           <TouchableOpacity
             style={searchBox}
@@ -530,121 +562,122 @@ export default function AdHocService({navigation, route}) {
             </ScrollView>
           </Table>
         </View> */}
-      <RightInputBar
-        header="Liters of Diesel Sold"
-        subHeader="Enter quantity of diesel sold"
-        show={showInput}
-        getInputDiesel={getInputDiesel}
-        keepinView={true}
-        hide={() => setshowInput(false)}
-        onSubmit={val => {
-          setshowInput(false);
-          getInputDiesel(val);
-          //setSelected(null);
-          //setshowConfirm(true);
-        }}
-      />
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          Alert.alert('Modal has been closed.');
-          setModalVisible(!modalVisible);
-        }}>
-        <View style={styles.centeredView}>
-          <View style={[styles.modalView]}>
-            <View style={{flexDirection: 'row'}}>
-              <View
-                style={{
-                  width: '80%',
-                  height: 50,
-                  backgroundColor: '#d3d3d370',
-                }}>
-                <Text
-                  style={[
-                    {
-                      fontSize: 22,
-                      color: '#000',
-                      fontWeight: '600',
-                      paddingLeft: 10,
-                      paddingVertical: 8,
-                    },
-                  ]}>
-                  {t('Metre Reading After')}
-                </Text>
-              </View>
-              <View
-                style={{
-                  width: '20%',
-                  height: 50,
-                  backgroundColor: '#d3d3d370',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <TouchableOpacity
-                  onPress={() => setModalVisible(!modalVisible)}
+        <RightInputBar
+          header="Liters of Diesel Sold"
+          subHeader="Enter quantity of diesel sold"
+          show={showInput}
+          getInputDiesel={getInputDiesel}
+          keepinView={true}
+          hide={() => setshowInput(false)}
+          onSubmit={val => {
+            setshowInput(false);
+            getInputDiesel(val);
+            //setSelected(null);
+            //setshowConfirm(true);
+          }}
+        />
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+            setModalVisible(!modalVisible);
+          }}>
+          <View style={styles.centeredView}>
+            <View style={[styles.modalView]}>
+              <View style={{ flexDirection: 'row' }}>
+                <View
                   style={{
-                    width: 50,
+                    width: '80%',
                     height: 50,
-                    justifyContent: 'center',
-                    alignItems: 'center',
+                    backgroundColor: '#d3d3d370',
                   }}>
                   <Text
                     style={[
                       {
                         fontSize: 22,
                         color: '#000',
-                        paddingLeft: 20,
                         fontWeight: '600',
+                        paddingLeft: 10,
+                        paddingVertical: 8,
                       },
                     ]}>
-                    <Icon name="close" color="#000" size={20} />
+                    {t('Metre Reading After')}
                   </Text>
+                </View>
+                <View
+                  style={{
+                    width: '20%',
+                    height: 50,
+                    backgroundColor: '#d3d3d370',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <TouchableOpacity
+                    onPress={() => setModalVisible(!modalVisible)}
+                    style={{
+                      width: 50,
+                      height: 50,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text
+                      style={[
+                        {
+                          fontSize: 22,
+                          color: '#000',
+                          paddingLeft: 20,
+                          fontWeight: '600',
+                        },
+                      ]}>
+                      <Icon name="close" color="#000" size={20} />
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View
+                style={{ flexDirection: 'row', paddingTop: 20, paddingLeft: 20 }}>
+                <TouchableOpacity
+                  style={{
+                    width: 80,
+                    height: 80,
+                    borderWidth: 2,
+                    borderColor: 'navy',
+                    marginRight: 50,
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                  onPress={() => {
+                    openGallery(true, uploadtype);
+                  }}>
+                  <Icon name="image" color="navy" size={20} />
+                  <Text style={{ color: 'navy' }}>Gallery</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    width: 80,
+                    height: 80,
+                    borderWidth: 2,
+                    borderColor: 'navy',
+                    marginRight: 10,
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                  onPress={() => {
+                    openGallery(false, uploadtype);
+                  }}>
+                  <Icon name="camera" color="navy" size={20} />
+                  <Text style={{ color: 'navy' }}>Camera</Text>
                 </TouchableOpacity>
               </View>
             </View>
-            <View
-              style={{flexDirection: 'row', paddingTop: 20, paddingLeft: 20}}>
-              <TouchableOpacity
-                style={{
-                  width: 80,
-                  height: 80,
-                  borderWidth: 2,
-                  borderColor: 'navy',
-                  marginRight: 50,
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-                onPress={() => {
-                  openGallery(true, uploadtype);
-                }}>
-                <Icon name="image" color="navy" size={20} />
-                <Text style={{color: 'navy'}}>Gallery</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  width: 80,
-                  height: 80,
-                  borderWidth: 2,
-                  borderColor: 'navy',
-                  marginRight: 10,
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-                onPress={() => {
-                  openGallery(false, uploadtype);
-                }}>
-                <Icon name="camera" color="navy" size={20} />
-                <Text style={{color: 'navy'}}>Camera</Text>
-              </TouchableOpacity>
-            </View>
           </View>
-        </View>
-      </Modal>
-    </Animated.View>
+        </Modal>
+      </Animated.View>
+    </Provider>
   );
 }
 
@@ -690,4 +723,11 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     color: '#000',
   },
+  dragDown: {
+    backgroundColor: 'white',
+    left: horizontalScale(65),
+    top: verticalScale(7),
+    // height: verticalScale(100),
+    width: horizontalScale(70)
+  }
 });

@@ -7,8 +7,9 @@ import {
   Animated,
   TouchableOpacity,
   Image,
+  TextInput
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, { useState, useRef } from 'react';
 import {
   searchBox,
   button,
@@ -18,26 +19,55 @@ import {
 } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTranslation} from 'react-i18next';
+import Check from 'react-native-vector-icons/Ionicons'
+import { useTranslation } from 'react-i18next';
 
 import SideBar from './ui/SideBar';
 import RightInputBar from './ui/RightInputBar';
 import RightConfirm from './ui/RightConfirm';
-import {getVehicle} from './functions/helper';
-import {verticalScale, horizontalScale} from './styles/Metrics';
-const {width, height} = Dimensions.get('window');
-export default function TankFill({navigation, route}) {
-  const {t, i18n} = useTranslation();
+import { getVehicle } from './functions/helper';
+import { verticalScale, horizontalScale, moderateScale } from './styles/Metrics';
+const { width, height } = Dimensions.get('window');
+export default function TankFill({ navigation, route }) {
+  const { t, i18n } = useTranslation();
   const rightBar = useRef(null);
 
   const parameter = getVehicle();
   const [selected, setSelected] = useState(null);
   const [showInput, setshowInput] = useState(false);
   const [showConfirm, setshowConfirm] = useState(false);
+  const [showList, setShowList] = useState(false)
+  const [checked, setChecked] = useState([])
+  const [listData, setListDate] = useState([
+    'MGO01',
+    '10PPM01',
+  ])
+
+  const onClick = (index) => {
+    if (checked.includes(index)) {
+      setChecked(checked.filter((i) => i !== index))
+    } else {
+      setChecked([...checked, index])
+    }
+  }
+
+  const ItemView = ({ item, index }) => {
+    return (
+      // FlatList Item
+      <TouchableOpacity
+        style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
+        onPress={() => onClick(index)}
+      >
+        <Text style={[text, { fontSize: moderateScale(18) }]}>{item}</Text>
+        {checked.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>}
+      </TouchableOpacity>
+    );
+  }
+
   return (
-    <View style={{flexDirection: 'row', flex: 1, backgroundColor: 'white'}}>
+    <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
       <SideBar all={true} navigation={navigation} />
-      <View style={{flex: 1, padding: 20}}>
+      {!showList ? <View style={{ flex: 1, padding: 20 }}>
         <View
           style={{
             display: 'flex',
@@ -60,7 +90,7 @@ export default function TankFill({navigation, route}) {
                 name="chevron-left"
                 color="#01315C"
                 size={30}
-                style={{marginRight: 10}}
+                style={{ marginRight: 10 }}
               />
             </TouchableOpacity>
             <Text style={text}>{parameter.vehicle}</Text>
@@ -77,15 +107,15 @@ export default function TankFill({navigation, route}) {
             onPress={() => navigation.navigate('VehicleList')}>
             <Icon name="exchange" color="#01315C" size={20} />
 
-            <Text style={[text, {marginLeft: 10}]}>Change vehicle</Text>
+            <Text style={[text, { marginLeft: 10 }]}>Change vehicle</Text>
           </TouchableOpacity>
         </View>
-        <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
-          <Text style={[text, {marginTop: verticalScale(20)}]}>
+        <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+          <Text style={[text, { marginTop: verticalScale(20) }]}>
             {t('brand')}
           </Text>
         </View>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View
             style={{
               borderBottomWidth: 3,
@@ -114,10 +144,11 @@ export default function TankFill({navigation, route}) {
             onPress={() => {
               setshowInput(true);
               setSelected('shell');
+              setShowList(true)
             }}
             style={[
               boxContainer,
-              {borderWidth: selected == 'shell' ? 3 : 0, borderColor: 'green'},
+              { borderWidth: selected == 'shell' ? 3 : 0, borderColor: 'green' },
             ]}>
             <Image source={require('../assets/shell.png')} style={styles.img} />
             {/* <Text style={[text, {fontSize: 25}]}>{`Shell`}</Text> */}
@@ -126,10 +157,11 @@ export default function TankFill({navigation, route}) {
             onPress={() => {
               setshowInput(true);
               setSelected('caltec');
+              setShowList(true)
             }}
             style={[
               boxContainer,
-              {borderWidth: selected == 'caltec' ? 3 : 0, borderColor: 'green'},
+              { borderWidth: selected == 'caltec' ? 3 : 0, borderColor: 'green' },
             ]}>
             <Image
               source={require('../assets/caltex.png')}
@@ -150,6 +182,7 @@ export default function TankFill({navigation, route}) {
             onPress={() => {
               setshowInput(true);
               setSelected('chevron');
+              setShowList(true)
             }}
             style={[
               boxContainer,
@@ -169,17 +202,53 @@ export default function TankFill({navigation, route}) {
             onPress={() => {
               setshowInput(true);
               setSelected('spec');
+              setShowList(true)
             }}
             style={[
               boxContainer,
-              {borderWidth: selected == 'spec' ? 3 : 0, borderColor: 'green'},
+              { borderWidth: selected == 'spec' ? 3 : 0, borderColor: 'green' },
             ]}>
             <Image source={require('../assets/spc.png')} style={styles.img} />
 
             {/* <Text style={[text, {fontSize: 25}]}>{`Spec`}</Text> */}
           </TouchableOpacity>
         </View>
-      </View>
+      </View> :
+        <View style={{ flex: 1, padding: moderateScale(15) }}>
+          <View style={searchBox}>
+            <Icon name="search" color="#01315C" size={20} />
+            <TextInput
+              style={{ marginLeft: horizontalScale(5) }}
+              placeholderTextColor={'#01315C'}
+              placeholder="Search for Product"
+            />
+          </View>
+          <Text style={[text, { marginTop: 20 }]}>{`Product List`}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View
+              style={{
+                borderBottomWidth: 3,
+                borderBottomColor: '#01315C',
+                marginVertical: verticalScale(25),
+                width: 40,
+              }} />
+            <View
+              style={{
+                borderBottomWidth: 1,
+                borderBottomColor: '#01315C',
+                marginVertical: verticalScale(15),
+                flex: 1,
+              }} />
+          </View>
+          <FlatList
+            data={listData}
+            showsVerticalScrollIndicator={true}
+            renderItem={ItemView}
+            keyExtractor={(item, index) => index.toString()}
+          />
+        </View>
+      }
+
       <View
         style={{
           width: width * 0.35,
@@ -187,7 +256,7 @@ export default function TankFill({navigation, route}) {
           padding: 50,
           justifyContent: 'space-between',
         }}>
-        <View style={{marginTop: verticalScale(40)}}>
+        <View style={{ marginTop: verticalScale(40) }}>
           <Text style={text}>{`Welcome back,`}</Text>
           <View
             style={{
@@ -199,7 +268,7 @@ export default function TankFill({navigation, route}) {
           <Text
             style={[
               text,
-              {marginTop: verticalScale(18)},
+              { marginTop: verticalScale(18) },
             ]}>{`Select a module to continue`}</Text>
         </View>
       </View>
@@ -208,7 +277,7 @@ export default function TankFill({navigation, route}) {
         header="Liters of Diesel Pumped"
         subHeader="Enter quantity of diesel pumped"
         show={showInput}
-        hide={() => setshowInput(false)}
+        hide={() => { setshowInput(false), setShowList(false) }}
         onSubmit={() => {
           setSelected(null);
           setshowInput(false);

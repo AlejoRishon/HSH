@@ -33,14 +33,31 @@ export default function Main({ navigation, route }) {
     <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
       <SideBar all={true} navigation={navigation} />
       <View style={{ flex: 1, padding: 20 }}>
-        <Text style={text}>{parameter.vehicle}</Text>
-        <TouchableOpacity
-          style={searchBox}
-          onPress={() => navigation.navigate('VehicleList')}>
-          <Icon name="exchange" color="#01315C" size={20} />
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}>
 
-          <Text style={[text, { marginLeft: 10 }]}>Change vehicle</Text>
-        </TouchableOpacity>
+          <Text style={text}>{parameter.vehicle}</Text>
+          <TouchableOpacity
+            style={{
+              borderWidth: 1,
+              borderColor: '#01315C',
+              borderRadius: 8,
+              flexDirection: 'row',
+              alignItems: 'center',
+              padding: 10,
+            }}
+            onPress={() => navigation.navigate('VehicleList')}>
+            <Icon name="exchange" color="#01315C" size={20} />
+
+            <Text style={[text, { marginLeft: 10 }]}>Change vehicle</Text>
+          </TouchableOpacity>
+        </View>
+
         <Text style={[text, { marginTop: verticalScale(25) }]}>{`Main`}</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View

@@ -8,11 +8,11 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import React, {useState} from 'react';
-import {searchBox, tableHeader, text, dataText} from './styles/MainStyle';
+import React, { useState } from 'react';
+import { searchBox, tableHeader, text, dataText } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import SideBar from './ui/SideBar';
 import RightDeliveryDetails from './ui/RightDeliveryDetails';
 import {
@@ -24,16 +24,18 @@ import {
   Cols,
   Cell,
 } from 'react-native-table-component';
-import {getVehicle} from './functions/helper';
-import {moderateScale, verticalScale} from './styles/Metrics';
+import { getVehicle } from './functions/helper';
+import { moderateScale, verticalScale } from './styles/Metrics';
+import { Checkbox } from 'react-native-paper';
 
-const {width, height} = Dimensions.get('window');
-export default function DeliveryOrder({navigation, route}) {
-  const {t, i18n} = useTranslation();
+const { width, height } = Dimensions.get('window');
+export default function DeliveryOrder({ navigation, route }) {
+  const { t, i18n } = useTranslation();
   const parameter = getVehicle();
   const [showInput, setshowInput] = useState(false);
+  const [checked, setChecked] = useState([])
   const [headerData, setheaderData] = useState([
-    'Transfer',
+    '     ',
     'DO No.',
     'Delivery Address',
     'Liters',
@@ -112,23 +114,36 @@ export default function DeliveryOrder({navigation, route}) {
     ],
   ]);
   const statusColor = {
-    Pending: {text: '#EA631D', button: 'rgba(255, 181, 114, 0.47)'},
-    Completed: {text: '#3DB792', button: 'rgba(107, 226, 190, 0.24)'},
+    Pending: { text: '#EA631D', button: 'rgba(255, 181, 114, 0.47)' },
+    Completed: { text: '#3DB792', button: 'rgba(107, 226, 190, 0.24)' },
   };
 
   const elementTransfer = (data, index) => {
     return <Icon name="plus" color="#2196F3" size={'large'} />;
   };
 
+  const onPressCheckbox = (index) => {
+    if (checked.includes(index)) {
+      setChecked(checked.filter((i) => i !== index))
+    } else {
+      setChecked([...checked, index])
+    }
+  }
+
   const element = (data, index) => {
     if (data === 'Transfer') {
       return (
         <Text
           style={{
-            color: statusColor[data] ? statusColor[data].text : 'black',
+            color: '#fff',
             alignSelf: 'center',
           }}>
-          <Icon name="refresh" color="#2196F3" size={22} />
+          {/* <Icon name="refresh" color="#2196F3" size={22} /> */}
+          < Checkbox
+            status={checked.includes(index) ? 'checked' : 'unchecked'}
+            onPress={() => onPressCheckbox(index)
+            }
+          />
         </Text>
       );
     } else {
@@ -153,9 +168,9 @@ export default function DeliveryOrder({navigation, route}) {
     }
   };
   return (
-    <View style={{flexDirection: 'row', flex: 1, backgroundColor: 'white'}}>
+    <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
       <SideBar all={true} navigation={navigation} />
-      <View style={{flex: 1, margin: moderateScale(10)}}>
+      <View style={{ flex: 1, margin: moderateScale(10) }}>
         <View
           style={{
             display: 'flex',
@@ -178,7 +193,7 @@ export default function DeliveryOrder({navigation, route}) {
                 name="chevron-left"
                 color="#01315C"
                 size={30}
-                style={{marginRight: 10}}
+                style={{ marginRight: 10 }}
               />
             </TouchableOpacity>
             <Text style={text}>{parameter.vehicle}</Text>
@@ -192,18 +207,18 @@ export default function DeliveryOrder({navigation, route}) {
               alignItems: 'center',
               padding: 10,
             }}
-            onPress={() => navigation.navigate('VehicleList')}>
+            onPress={() => navigation.navigate('TransferList')}>
             <Icon name="exchange" color="#01315C" size={20} />
 
-            <Text style={[text, {marginLeft: 10}]}>Change vehicle</Text>
+            <Text style={[text, { marginLeft: 10 }]}>Transfer</Text>
           </TouchableOpacity>
         </View>
-        <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
-          <Text style={[text, {marginTop: verticalScale(15)}]}>
+        <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+          <Text style={[text, { marginTop: verticalScale(15) }]}>
             {t('trips')}
           </Text>
         </View>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View
             style={{
               borderBottomWidth: 3,
@@ -221,7 +236,7 @@ export default function DeliveryOrder({navigation, route}) {
             }}
           />
         </View>
-        <Table style={{flex: 1}}>
+        <Table style={{ flex: 1 }}>
           <Row
             data={headerData}
             flexArr={[0.5, 1, 2, 1, 1]}
@@ -238,7 +253,7 @@ export default function DeliveryOrder({navigation, route}) {
                   //setshowInput(true)
                   navigation.navigate('EditTrip');
                 }}>
-                <TableWrapper key={index} style={{flexDirection: 'row'}}>
+                <TableWrapper key={index} style={{ flexDirection: 'row' }}>
                   {rowData.map((cellData, cellIndex) => (
                     <Cell
                       flex={cellIndex == 0 ? 0.5 : cellIndex == 2 ? 2 : 1}
@@ -247,8 +262,8 @@ export default function DeliveryOrder({navigation, route}) {
                         cellIndex === 0
                           ? element(cellData, index)
                           : cellIndex === 4
-                          ? element(cellData, index)
-                          : cellData
+                            ? element(cellData, index)
+                            : cellData
                       }
                       textStyle={[
                         {

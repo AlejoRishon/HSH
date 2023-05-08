@@ -1,8 +1,8 @@
 //import liraries
-import React, {Component} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import React, { Component } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './components/Login';
 import VehicleList from './components/VehicleList';
 import Main from './components/Main';
@@ -11,12 +11,13 @@ import DieselTransfer from './components/DieselTransfer';
 import DeliveryOrder from './components/DeliveryOrder';
 import EditTrip from './components/editTrip';
 import AdHocService from './components/adHocService';
+import TransferList from './components/TransferList';
 // create a component
 const Stack = createNativeStackNavigator();
 const App = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="VehicleList" component={VehicleList} />
         <Stack.Screen name="Main" component={Main} />
@@ -25,6 +26,7 @@ const App = () => {
         <Stack.Screen name="DeliveryOrder" component={DeliveryOrder} />
         <Stack.Screen name="EditTrip" component={EditTrip} />
         <Stack.Screen name="AdHocService" component={AdHocService} />
+        <Stack.Screen name='TransferList' component={TransferList} />
       </Stack.Navigator>
     </NavigationContainer>
   );
