@@ -43,20 +43,12 @@ export default function TankFill({ navigation, route }) {
     '10PPM01',
   ])
 
-  const onClick = (index) => {
-    if (checked.includes(index)) {
-      setChecked(checked.filter((i) => i !== index))
-    } else {
-      setChecked([...checked, index])
-    }
-  }
-
   const ItemView = ({ item, index }) => {
     return (
       // FlatList Item
       <TouchableOpacity
         style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
-        onPress={() => onClick(index)}
+        onPress={() => setChecked([index])}
       >
         <Text style={[text, { fontSize: moderateScale(18) }]}>{item}</Text>
         {checked.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>}
@@ -215,13 +207,24 @@ export default function TankFill({ navigation, route }) {
         </View>
       </View> :
         <View style={{ flex: 1, padding: moderateScale(15) }}>
-          <View style={searchBox}>
-            <Icon name="search" color="#01315C" size={20} />
-            <TextInput
-              style={{ marginLeft: horizontalScale(5) }}
-              placeholderTextColor={'#01315C'}
-              placeholder="Search for Product"
-            />
+          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+            <TouchableOpacity style={{ alignSelf: 'center' }}
+              onPress={() => { setShowList(false), setshowInput(false) }}>
+              <Icon
+                name="chevron-left"
+                color="#01315C"
+                size={30}
+                style={{ marginRight: 10 }}
+              />
+            </TouchableOpacity>
+            <View style={[searchBox, { width: horizontalScale(150) }]}>
+              <Icon name="search" color="#01315C" size={20} />
+              <TextInput
+                style={{ marginLeft: horizontalScale(5) }}
+                placeholderTextColor={'#01315C'}
+                placeholder="Search for Product"
+              />
+            </View>
           </View>
           <Text style={[text, { marginTop: 20 }]}>{`Product List`}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -281,12 +284,12 @@ export default function TankFill({ navigation, route }) {
         onSubmit={() => {
           setSelected(null);
           setshowInput(false);
-          console.log('Submit clicked');
           setshowConfirm(true);
+          setChecked([])
         }}
       />
       <RightConfirm show={showConfirm} hide={() => setshowConfirm(false)} />
-    </View>
+    </View >
   );
 }
 

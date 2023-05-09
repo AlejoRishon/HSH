@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   ScrollView,
   KeyboardAvoidingView,
+  SectionList
 } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -59,10 +60,18 @@ export default function AdHocService({ navigation, route }) {
   const [previewImageUribefore, setpreviewImageUribefore] = useState('');
   const [imagePreviewbefore, setimagePreviewbefore] = useState(false);
   const [listData, setListDate] = useState([
-    'MGO01',
-    '10PPM01',
-    'MGO01',
-    '10PPM01',
+    {
+      title: 'Shell',
+      data: ['MGO01', '10PPM01'],
+    },
+    {
+      title: 'Mobil',
+      data: ['EDE01', 'MGO03', 'ADO01'],
+    },
+    {
+      title: 'Caltex',
+      data: ['MGO05', '10PPM05', 'ADO03'],
+    },
   ])
   const [visible, setVisible] = useState(false);
   const [product, setProduct] = useState('')
@@ -222,23 +231,29 @@ export default function AdHocService({ navigation, route }) {
   const ItemView = ({ item }) => {
     return (
       // FlatList Item
-      <TouchableOpacity style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#01315C' }}
+      <TouchableOpacity style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#0465bd' }}
         onPress={() => { setProduct(item), hideModal() }}
       >
-        <Text style={[text, { fontSize: moderateScale(10), alignSelf: 'center' }]}>{item}</Text>
+        <Text style={[text, { fontSize: moderateScale(12), alignSelf: 'center', color: '#0465bd' }]}>{item}</Text>
       </TouchableOpacity>
     );
   }
+
+  const headerView = (({ section: { title } }) => (
+    <Text style={{ fontSize: moderateScale(15), color: '#01315C', left: 5 }}>{title}</Text>
+  ))
 
   const [more, setmore] = useState(false);
   return (
     <Provider>
       <Portal>
         <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={styles.dragDown}>
-          <FlatList
-            data={listData}
+          <SectionList
+            sections={listData}
+            keyExtractor={(index) => index.toString()}
+            renderSectionHeader={headerView}
             renderItem={ItemView}
-            keyExtractor={(item, index) => index.toString()}
+            showsVerticalScrollIndicator={true}
           />
         </Modal>
       </Portal>
@@ -289,18 +304,7 @@ export default function AdHocService({ navigation, route }) {
                 BDP Global Project Logistics Pte Ltd
               </Text>
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                marginBottom: 10,
-              }}>
-              <Text
-                onPress={showModal}
-                style={{ fontSize: width / 60, color: '#01315C', marginRight: 40, justifyContent: 'center' }}>
-                {!product ? `Products` : product} <Icon name='angle-down' size={12} style={{ alignSelf: 'center' }} />
-              </Text>
-            </View>
+
 
             <View style={{ height: 150, marginBottom: 10 }}>
               <Text style={{ fontSize: 18, color: '#01315C', marginVertical: 10 }}>
@@ -340,7 +344,20 @@ export default function AdHocService({ navigation, route }) {
                 borderBottomWidth: 1,
                 borderBottomColor: '#01315C',
                 marginBottom: 20,
-              }}></View>
+              }} />
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginBottom: 10,
+              }}>
+              <TouchableOpacity onPress={showModal}>
+                <Text
+                  style={{ fontSize: moderateScale(15), color: '#01315C', marginRight: 40, justifyContent: 'center' }}>
+                  {!product ? `Products` : product} <Icon name='angle-down' size={18} style={{ alignSelf: 'center' }} />
+                </Text>
+              </TouchableOpacity>
+            </View>
             <View
               style={{
                 flexDirection: 'row',
@@ -727,9 +744,12 @@ const styles = StyleSheet.create({
   },
   dragDown: {
     backgroundColor: 'white',
-    left: horizontalScale(65),
-    top: verticalScale(7),
-    // height: verticalScale(100),
-    width: horizontalScale(70)
+    right: horizontalScale(25),
+    top: verticalScale(17),
+    height: verticalScale(400),
+    width: horizontalScale(90),
+    alignSelf: 'center',
+    borderRadius: 5,
+    padding: 5
   }
 });

@@ -130,6 +130,16 @@ export default function DeliveryOrder({ navigation, route }) {
     }
   }
 
+  const sortedData = detailData.sort((a, b) => {
+    if (a[4] === 'Pending' && b[4] === 'Completed') {
+      return -1
+    } else if (a[4] === 'Completed' && b[4] === 'Pending') {
+      return 1
+    } else {
+      return 0
+    }
+  })
+
   const element = (data, index) => {
     if (data === 'Transfer') {
       return (
@@ -141,8 +151,8 @@ export default function DeliveryOrder({ navigation, route }) {
           {/* <Icon name="refresh" color="#2196F3" size={22} /> */}
           < Checkbox
             status={checked.includes(index) ? 'checked' : 'unchecked'}
-            onPress={() => onPressCheckbox(index)
-            }
+            onPress={() => onPressCheckbox(index)}
+            color='#01315C'
           />
         </Text>
       );
@@ -247,8 +257,9 @@ export default function DeliveryOrder({ navigation, route }) {
             contentContainerStyle={{
               flexGrow: 1,
             }}>
-            {detailData.map((rowData, index) => (
+            {sortedData.map((rowData, index) => (
               <TouchableOpacity
+                key={index.toString()}
                 onPress={() => {
                   //setshowInput(true)
                   navigation.navigate('EditTrip');
