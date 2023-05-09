@@ -64,7 +64,8 @@ export default function AdHocService({ navigation, route }) {
     'MGO01',
     '10PPM01',
   ])
-  const [visible, setVisible] = React.useState(false);
+  const [visible, setVisible] = useState(false);
+  const [product, setProduct] = useState('')
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false)
@@ -221,9 +222,11 @@ export default function AdHocService({ navigation, route }) {
   const ItemView = ({ item }) => {
     return (
       // FlatList Item
-      <View style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#01315C' }}>
+      <TouchableOpacity style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#01315C' }}
+        onPress={() => { setProduct(item), hideModal() }}
+      >
         <Text style={[text, { fontSize: moderateScale(10), alignSelf: 'center' }]}>{item}</Text>
-      </View>
+      </TouchableOpacity>
     );
   }
 
@@ -236,7 +239,6 @@ export default function AdHocService({ navigation, route }) {
             data={listData}
             renderItem={ItemView}
             keyExtractor={(item, index) => index.toString()}
-
           />
         </Modal>
       </Portal>
@@ -296,7 +298,7 @@ export default function AdHocService({ navigation, route }) {
               <Text
                 onPress={showModal}
                 style={{ fontSize: width / 60, color: '#01315C', marginRight: 40, justifyContent: 'center' }}>
-                Products <Icon name='angle-down' size={12} style={{ alignSelf: 'center' }} />
+                {!product ? `Products` : product} <Icon name='angle-down' size={12} style={{ alignSelf: 'center' }} />
               </Text>
             </View>
 
