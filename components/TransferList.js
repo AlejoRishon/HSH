@@ -12,7 +12,8 @@ import React, { useEffect, useState } from 'react';
 
 
 import { searchBox, button, buttonText, text } from './styles/MainStyle';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import IconF from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/Ionicons';
 import SideBar from './ui/SideBar';
 import { setVehicle } from './functions/helper';
 import { useTranslation } from 'react-i18next';
@@ -62,7 +63,7 @@ export default function TransferList({ navigation }) {
             marginHorizontal: 20,
             borderRadius: 8,
           }}>
-          <Icon name="chevron-left" color="white" style={{ padding: 5 }} size={22} />
+          <IconF name="chevron-left" color="white" style={{ padding: 5 }} size={22} />
         </TouchableOpacity>
       </View>
       <View style={{ flex: 1, padding: moderateScale(15) }}>
@@ -135,7 +136,7 @@ export default function TransferList({ navigation }) {
           <TouchableOpacity
             style={button}
             onPress={() => {
-              setVehicle(selectedVehicle);
+              // setVehicle(selectedVehicle);
               navigation.goBack();
             }}>
             <Text style={buttonText}>Proceed</Text>
