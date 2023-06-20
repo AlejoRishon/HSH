@@ -27,6 +27,7 @@ import { useTranslation } from 'react-i18next';
 import SideBar from './ui/SideBar';
 import RightDeliveryDetails from './ui/RightDeliveryDetails';
 import RightInputBar from './ui/RightInputBar';
+import { AdhocRightInputBar } from './ui/RightInputBar';
 import {
   Table,
   TableWrapper,
@@ -73,8 +74,21 @@ export default function AdHocService({ navigation, route }) {
       data: ['MGO05', '10PPM05', 'ADO03'],
     },
   ])
+
+  const BusinessName = ['XYZ', 'ABC', 'DEF', 'GHI']
+  const BusinessAddress = ['XYZ', 'ABC', 'DEF', 'GHI']
   const [visible, setVisible] = useState(false);
   const [product, setProduct] = useState('')
+  const [name, setName] = useState('')
+  const [address, setAddress] = useState('')
+  const [nameVisible, setNameVisible] = useState(false);
+  const [addressVisible, setAddressVisible] = useState(false);
+
+  const showNameModal = () => setNameVisible(true);
+  const hideNameModal = () => setNameVisible(false)
+
+  const showAddressModal = () => setAddressVisible(true);
+  const hideAddressModal = () => setAddressVisible(false)
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false)
@@ -239,6 +253,28 @@ export default function AdHocService({ navigation, route }) {
     );
   }
 
+  const NameView = ({ item }) => {
+    return (
+      // FlatList Item
+      <TouchableOpacity style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#0465bd' }}
+        onPress={() => { setName(item), hideNameModal() }}
+      >
+        <Text style={[text, { fontSize: moderateScale(12), alignSelf: 'center', color: '#0465bd' }]}>{item}</Text>
+      </TouchableOpacity>
+    );
+  }
+
+  const AddressView = ({ item }) => {
+    return (
+      // FlatList Item
+      <TouchableOpacity style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#0465bd' }}
+        onPress={() => { setAddress(item), hideAddressModal() }}
+      >
+        <Text style={[text, { fontSize: moderateScale(12), alignSelf: 'center', color: '#0465bd' }]}>{item}</Text>
+      </TouchableOpacity>
+    );
+  }
+
   const headerView = (({ section: { title } }) => (
     <Text style={{ fontSize: moderateScale(15), color: '#01315C', left: 5 }}>{title}</Text>
   ))
@@ -253,6 +289,24 @@ export default function AdHocService({ navigation, route }) {
             keyExtractor={(index) => index.toString()}
             renderSectionHeader={headerView}
             renderItem={ItemView}
+            showsVerticalScrollIndicator={true}
+          />
+        </Modal>
+
+        <Modal visible={nameVisible} onDismiss={hideNameModal} contentContainerStyle={styles.dragDown}>
+          <FlatList
+            data={BusinessName}
+            keyExtractor={(index) => index.toString()}
+            renderItem={NameView}
+            showsVerticalScrollIndicator={true}
+          />
+        </Modal>
+
+        <Modal visible={addressVisible} onDismiss={hideAddressModal} contentContainerStyle={styles.dragDown}>
+          <FlatList
+            data={BusinessAddress}
+            keyExtractor={(index) => index.toString()}
+            renderItem={AddressView}
             showsVerticalScrollIndicator={true}
           />
         </Modal>
@@ -274,65 +328,28 @@ export default function AdHocService({ navigation, route }) {
             />
           </TouchableOpacity>
           <ScrollView style={{ width: '55%' }}>
-            <View>
-              <Text
-                style={{
-                  fontSize: width / 40,
-                  color: '#01315C',
-                  fontWeight: 600,
-                  marginBottom: 5,
-                }}>
-                Eddie Ang
-              </Text>
-              <Text
-                style={{
-                  fontSize: width / 60,
-                  color: '#01315C',
-                  marginBottom: 10,
-                }}>
-                DO-12345678A
-              </Text>
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                marginBottom: 10,
-              }}>
-              <Text
-                style={{ fontSize: width / 60, color: '#01315C', marginRight: 40 }}>
-                BDP Global Project Logistics Pte Ltd
-              </Text>
-            </View>
+
 
 
             <View style={{ height: 150, marginBottom: 10 }}>
               <Text style={{ fontSize: 18, color: '#01315C', marginVertical: 10 }}>
                 Business Name
               </Text>
-              <TextInput
-                numberOfLines={2}
-                style={{
-                  fontSize: 18,
-                  color: '#01315C',
-                  borderWidth: 1,
-                  borderColor: '#2196F3',
-                  marginBottom: 20,
-                }}
-              />
+              <TouchableOpacity onPress={showNameModal}>
+                <Text
+                  style={{ fontSize: moderateScale(12), color: '#01315C', marginRight: 40, justifyContent: 'center' }}>
+                  {!product ? `Select Business Name` : name} <Icon name='angle-down' size={18} style={{ alignSelf: 'center' }} />
+                </Text>
+              </TouchableOpacity>
               <Text style={{ fontSize: 18, color: '#01315C', marginVertical: 10 }}>
                 Business Address
               </Text>
-              <TextInput
-                numberOfLines={2}
-                style={{
-                  fontSize: 18,
-                  color: '#01315C',
-                  borderWidth: 1,
-                  borderColor: '#2196F3',
-                  marginBottom: 20,
-                }}
-              />
+              <TouchableOpacity onPress={showAddressModal}>
+                <Text
+                  style={{ fontSize: moderateScale(12), color: '#01315C', marginRight: 40, justifyContent: 'center' }}>
+                  {!product ? `Select Business Address` : address} <Icon name='angle-down' size={18} style={{ alignSelf: 'center' }} />
+                </Text>
+              </TouchableOpacity>
               {/* <Text style={{fontSize: 18, color: '#01315C', marginVertical: 10}}>
               BDP Global Project Logistics Pte LtdContact Person: Bill Gates
               (+6598765432)
@@ -340,7 +357,7 @@ export default function AdHocService({ navigation, route }) {
             </View>
             <View
               style={{
-                marginTop: 120,
+                // marginTop: 120,
                 borderBottomWidth: 1,
                 borderBottomColor: '#01315C',
                 marginBottom: 20,
@@ -509,6 +526,18 @@ export default function AdHocService({ navigation, route }) {
               behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
               <TextInput style={[remarks]} multiline={true} numberOfLines={4} />
             </KeyboardAvoidingView>
+            <TouchableOpacity
+              style={{ backgroundColor: '#01315C', flex: 1, borderRadius: 8, width: '50%', alignSelf: 'flex-end' }}>
+              <Text
+                style={{
+                  color: 'white',
+                  textAlign: 'center',
+                  fontSize: 20,
+                  padding: 10,
+                }}>
+                Submit
+              </Text>
+            </TouchableOpacity>
           </ScrollView>
         </View>
 
@@ -581,7 +610,7 @@ export default function AdHocService({ navigation, route }) {
             </ScrollView>
           </Table>
         </View> */}
-        <RightInputBar
+        <AdhocRightInputBar
           header="Liters of Diesel Sold"
           subHeader="Enter quantity of diesel sold"
           show={showInput}
@@ -746,7 +775,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     right: horizontalScale(25),
     top: verticalScale(17),
-    height: verticalScale(400),
+    // height: verticalScale(400),
     width: horizontalScale(90),
     alignSelf: 'center',
     borderRadius: 5,

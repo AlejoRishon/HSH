@@ -19,7 +19,7 @@ import RightInputBar from './ui/RightInputBar';
 import RightConfirm from './ui/RightConfirm';
 import { horizontalScale, moderateScale, verticalScale } from './styles/Metrics';
 import { Button, ToggleButton } from 'react-native-paper';
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 export default function DieselTransfer({ navigation }) {
   const parameter = getVehicle();
   const [selected, setSelected] = useState(null);
@@ -41,45 +41,31 @@ export default function DieselTransfer({ navigation }) {
     'TLC1234S',
   ]
 
-  const onPressCheck = (item) => {
-    if (checkVehicle.length === 1 && checkDriver.length === 1) {
-      setshowInput(true);
-    } else {
-      setshowInput(false);
-    }
-  }
-
-  const DriverView = ({ item, index }) => {
+  const ItemView = ({ item, index }) => {
     return (
       // FlatList Item
       <TouchableOpacity
         style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
-        onPress={() => {
-          setCheckDriver([index]), onPressCheck()
-          console.log('driver:', checkDriver)
-        }}
+        onPress={() => { setCheckDriver([index]), setshowInput(true) }}
       >
         <Text style={[text, { fontSize: moderateScale(15) }]}>{item}</Text>
-        {checkDriver.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>}
+        {/* {checkDriver.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>} */}
       </TouchableOpacity>
     );
   }
 
-  const VehicleView = ({ item, index }) => {
-    return (
-      // FlatList Item
-      <TouchableOpacity
-        style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
-        onPress={() => {
-          setCheckVehicle([index])
-          console.log("checkVehicle:", checkVehicle)
-        }}
-      >
-        <Text style={[text, { fontSize: moderateScale(15) }]}>{item}</Text>
-        {checkVehicle.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>}
-      </TouchableOpacity>
-    );
-  }
+  // const VehicleView = ({ item, index }) => {
+  //   return (
+  //     // FlatList Item
+  //     <TouchableOpacity
+  //       style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
+  //       onPress={() => setCheckVehicle([index])}
+  //     >
+  //       <Text style={[text, { fontSize: moderateScale(15) }]}>{item}</Text>
+  //       {checkVehicle.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>}
+  //     </TouchableOpacity>
+  //   );
+  // }
 
   const handleButtonPress = (value) => {
     setSelectedButton(value);
@@ -88,7 +74,7 @@ export default function DieselTransfer({ navigation }) {
   return (
     <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
       <SideBar all={true} navigation={navigation} />
-      <View style={{ flex: 1, padding: 20 }}>
+      <View style={{ flex: 1, padding: 20, paddingBottom: 0 }}>
         <View
           style={{
             display: 'flex',
@@ -170,154 +156,89 @@ export default function DieselTransfer({ navigation }) {
               borderBottomColor: '#01315C',
               // marginVertical: 20,
               width: 40,
-            }}></View>
+            }} />
           <View
             style={{
               borderBottomWidth: 1,
               borderBottomColor: '#01315C',
               marginVertical: 10,
               flex: 1,
-            }}></View>
+            }} />
         </View>
-
-        {!showList ? <>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              margin: moderateScale(5),
-              marginRight: 20,
-            }}>
-            <TouchableOpacity
-              onPress={() => {
-                setshowInput(true);
-                setSelected('jin');
-              }}
-              style={[
-                boxContainer,
-                { borderWidth: selected == 'jin' ? 3 : 0, borderColor: 'green' },
-              ]}>
-              <Image
-                source={require('../assets/jin.png')}
-                style={{
-                  flex: 1,
-                  height: undefined,
-                  width: undefined,
-                  alignSelf: 'stretch',
-                }}
-                resizeMode="contain" />
-              <Text
-                style={[text, { fontSize: moderateScale(12) }]}>{`Jin Besut`}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setshowInput(true);
-                setSelected('chin');
-              }}
-              style={[
-                boxContainer,
-                { borderWidth: selected == 'chin' ? 3 : 0, borderColor: 'green' },
-              ]}>
-              <Image
-                source={require('../assets/chin.png')}
-                resizeMode="contain"
-                style={{ flex: 1 }} />
-
-              <Text
-                style={[text, { fontSize: moderateScale(12) }]}>{`Chin Bee`}</Text>
-            </TouchableOpacity>
-          </View><View
-            style={{
-              flex: 1,
-              // flexDirection: 'row',
-              width: '46%',
-              margin: moderateScale(5),
-              marginRight: 20,
-            }}>
-            <TouchableOpacity
-              onPress={() => {
-                setShowList(true);
-                setSelected('vehicle');
-              }}
-              style={[
-                boxContainer,
-                { borderWidth: selected == 'vehicle' ? 3 : 0, borderColor: 'green' },
-              ]}>
-              <Icon name='truck' size={20} color='#01315C' />
-              <Text
-                style={[text, { fontSize: moderateScale(12) }]}>{`Vehicle`}</Text>
-            </TouchableOpacity>
-          </View>
-        </>
-          :
-          <>
-            <Button icon='arrow-left' textColor='#01315C'
-              style={{ position: 'absolute', top: verticalScale(240), left: 5 }}
-              onPress={() => setShowList(!showList)}
-            >Back</Button>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', top: verticalScale(40) }}>
-              <View style={{ width: '45%' }}>
-                <Text style={text}>{`Vehicle List`}</Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View
-                    style={{
-                      borderBottomWidth: 3,
-                      borderBottomColor: '#01315C',
-                      // marginVertical: verticalScale(25),
-                      width: 40,
-                    }} />
-                  <View
-                    style={{
-                      borderBottomWidth: 1,
-                      borderBottomColor: '#01315C',
-                      marginVertical: verticalScale(15),
-                      flex: 1,
-                    }} />
-                </View>
-                <FlatList
-                  data={Data}
-                  renderItem={VehicleView}
-                  keyExtractor={(item, index) => index.toString()}
-                  style={{ height: '100%' }}
-                  contentContainerStyle={{ paddingBottom: 20 }}
-                />
-              </View>
-              <View style={{ width: '45%' }}>
-                <Text style={text}>{`Driver List`}</Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View
-                    style={{
-                      borderBottomWidth: 3,
-                      borderBottomColor: '#01315C',
-                      width: 40,
-                    }} />
-                  <View
-                    style={{
-                      borderBottomWidth: 1,
-                      borderBottomColor: '#01315C',
-                      marginVertical: verticalScale(15),
-                      flex: 1,
-                    }} />
-                </View>
-                <FlatList
-                  data={Data}
-                  renderItem={DriverView}
-                  keyExtractor={(item, index) => index.toString()}
-                  style={{ height: '100%' }}
-                  contentContainerStyle={{ paddingBottom: 20 }}
-                />
-              </View>
-            </View>
-          </>
-        }
         <View
           style={{
             flex: 1,
             flexDirection: 'row',
-            marginVertical: 20,
+            margin: moderateScale(5),
             marginRight: 20,
-          }}></View>
+          }}>
+          <TouchableOpacity
+            onPress={() => {
+              setshowInput(true);
+              setSelected('jin');
+            }}
+            style={[
+              boxContainer,
+              { borderWidth: selected == 'jin' ? 3 : 0, borderColor: 'green' },
+            ]}>
+            <Image
+              source={require('../assets/jin.png')}
+              style={{
+                flex: 1,
+                height: undefined,
+                width: undefined,
+                alignSelf: 'stretch',
+              }}
+              resizeMode="contain" />
+            <Text
+              style={[text, { fontSize: moderateScale(12) }]}>{`Jin Besut`}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setshowInput(true);
+              setSelected('chin');
+            }}
+            style={[
+              boxContainer,
+              { borderWidth: selected == 'chin' ? 3 : 0, borderColor: 'green' },
+            ]}>
+            <Image
+              source={require('../assets/chin.png')}
+              resizeMode="contain"
+              style={{
+                flex: 1,
+                height: undefined,
+                width: undefined,
+                alignSelf: 'stretch'
+              }}
+            />
+            <Text
+              style={[text, { fontSize: moderateScale(12) }]}>{`Chin Bee`}</Text>
+          </TouchableOpacity>
+        </View><View
+          style={{
+            flex: 1,
+            // flexDirection: 'row',
+            width: '46%',
+            margin: moderateScale(5),
+            marginRight: 20,
+          }}>
+          <TouchableOpacity
+            onPress={() => {
+              setShowList(true);
+              setSelected('vehicle');
+            }}
+            style={[
+              boxContainer,
+              { borderWidth: selected == 'vehicle' ? 3 : 0, borderColor: 'green' },
+            ]}>
+            <Icon name='truck' size={20} color='#01315C' />
+            <Text
+              style={[text, { fontSize: moderateScale(12) }]}>{`Vehicle`}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
+
       <View
         style={{
           width: width * 0.35,
@@ -325,21 +246,49 @@ export default function DieselTransfer({ navigation }) {
           padding: 50,
           justifyContent: 'space-between',
         }}>
-        <View style={{ marginTop: verticalScale(40) }}>
-          <Text style={text}>{`Welcome back,`}</Text>
-          <View
-            style={{
-              borderBottomWidth: 1,
-              borderBottomColor: '#01315C',
-              marginVertical: 20,
-            }}
-          />
-          <Text
-            style={[
-              text,
-              { marginTop: verticalScale(18) },
-            ]}>{`Select a module to continue`}</Text>
-        </View>
+        {!showList ?
+          <View style={{ marginTop: verticalScale(40) }}>
+            <Text style={text}>{`Welcome back,`}</Text>
+            <View
+              style={{
+                borderBottomWidth: 1,
+                borderBottomColor: '#01315C',
+                marginVertical: 20,
+              }}
+            />
+            <Text
+              style={[
+                text,
+                { marginTop: verticalScale(18) },
+              ]}>{`Select a module to continue`}</Text>
+          </View>
+          :
+          <>
+            <Text style={[text, { marginTop: 20 }]}>{`Vehicle List`}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View
+                style={{
+                  borderBottomWidth: 3,
+                  borderBottomColor: '#01315C',
+                  marginVertical: verticalScale(25),
+                  width: 40,
+                }} />
+              <View
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: '#01315C',
+                  marginVertical: verticalScale(15),
+                  flex: 1,
+                }} />
+            </View>
+            <FlatList
+              data={Data}
+              showsVerticalScrollIndicator={true}
+              renderItem={ItemView}
+              keyExtractor={(item, index) => index.toString()}
+            />
+          </>
+        }
       </View>
       <RightInputBar
         header="Liters of Diesel Pumped"

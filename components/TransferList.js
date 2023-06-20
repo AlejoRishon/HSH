@@ -14,6 +14,7 @@ import React, { useEffect, useState } from 'react';
 import { searchBox, button, buttonText, text } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import SideBar from './ui/SideBar';
+import Check from 'react-native-vector-icons/Ionicons'
 import { setVehicle } from './functions/helper';
 import { useTranslation } from 'react-i18next';
 import { horizontalScale, moderateScale, verticalScale } from './styles/Metrics';
@@ -24,24 +25,60 @@ export default function TransferList({ navigation }) {
 
   const { t, i18n } = useTranslation();
 
-  const [listData, setListDate] = useState([
+  const [checkVehicle, setCheckVehicle] = useState([])
+  const [checkDriver, setCheckDriver] = useState([])
+  const [proceed, setProceed] = useState(false)
+
+  const Data = [
     'TRB8888A',
     'TCB9990X',
     'THL8822B',
     'TLC1234S',
-  ]);
+    'TRB8888A',
+    'TCB9990X',
+    'THL8822B',
+    'TLC1234S',
+  ]
+
+  useEffect(() => {
+    onPressCheck()
+  }, [checkDriver, checkVehicle])
+
   const [selectedVehicle, setselectedVehicle] = useState(null);
 
-  const ItemView = ({ item }) => {
+  const onPressCheck = (item) => {
+    if (checkVehicle.length === 1 && checkDriver.length === 1) {
+      setProceed(true);
+    } else {
+      setProceed(false);
+    }
+  }
+
+  const DriverView = ({ item, index }) => {
     return (
       // FlatList Item
       <TouchableOpacity
-        style={{ marginVertical: verticalScale(20) }}
-        onPress={() => setselectedVehicle(item)}>
-        <Text style={[text, { fontSize: moderateScale(18) }]}>{item}</Text>
+        style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
+        onPress={() => setCheckDriver([index])}
+      >
+        <Text style={[text, { fontSize: moderateScale(15) }]}>{item}</Text>
+        {checkDriver.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>}
       </TouchableOpacity>
     );
-  };
+  }
+
+  const VehicleView = ({ item, index }) => {
+    return (
+      // FlatList Item
+      <TouchableOpacity
+        style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
+        onPress={() => setCheckVehicle([index])}
+      >
+        <Text style={[text, { fontSize: moderateScale(15) }]}>{item}</Text>
+        {checkVehicle.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>}
+      </TouchableOpacity>
+    );
+  }
 
   return (
     <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
@@ -74,29 +111,56 @@ export default function TransferList({ navigation }) {
             placeholder="Search for vehicle number"
           />
         </View>
-        <Text style={[text, { marginTop: 20 }]}>{`Transfer List`}</Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <View
-            style={{
-              borderBottomWidth: 3,
-              borderBottomColor: '#01315C',
-              marginVertical: verticalScale(25),
-              width: 40,
-            }} />
-          <View
-            style={{
-              borderBottomWidth: 1,
-              borderBottomColor: '#01315C',
-              marginVertical: verticalScale(15),
-              flex: 1,
-            }} />
+        <View style={{ padding: 10 }} />
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', flex: 1 }}>
+          <View style={{ flex: 1 }}>
+            <Text style={text}>{`Vehicle List`}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: horizontalScale(5) }}>
+              <View
+                style={{
+                  borderBottomWidth: 3,
+                  borderBottomColor: '#01315C',
+                  // marginVertical: verticalScale(25),
+                  width: 40,
+                }} />
+              <View
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: '#01315C',
+                  marginVertical: verticalScale(15),
+                  flex: 1,
+                }} />
+            </View>
+            <FlatList
+              data={Data}
+              renderItem={VehicleView}
+              keyExtractor={(item, index) => index.toString()}
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={text}>{`Driver List`}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View
+                style={{
+                  borderBottomWidth: 3,
+                  borderBottomColor: '#01315C',
+                  width: 40,
+                }} />
+              <View
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: '#01315C',
+                  marginVertical: verticalScale(15),
+                  flex: 1,
+                }} />
+            </View>
+            <FlatList
+              data={Data}
+              renderItem={DriverView}
+              keyExtractor={(item, index) => index.toString()}
+            />
+          </View>
         </View>
-        <FlatList
-          data={listData}
-          showsVerticalScrollIndicator={true}
-          renderItem={ItemView}
-          keyExtractor={(item, index) => index.toString()}
-        />
       </View>
       <View
         style={{
@@ -117,7 +181,7 @@ export default function TransferList({ navigation }) {
             style={[
               text,
               { marginTop: verticalScale(18) },
-            ]}>{t('homepage_message')}</Text>
+            ]}>{t('Please select a vehicle and driver to proceed.')}</Text>
 
           {selectedVehicle && (
             <View
@@ -131,7 +195,7 @@ export default function TransferList({ navigation }) {
             </View>
           )}
         </View>
-        {selectedVehicle && (
+        {proceed && (
           <TouchableOpacity
             style={button}
             onPress={() => {
