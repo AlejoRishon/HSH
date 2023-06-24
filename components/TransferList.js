@@ -1,5 +1,4 @@
 import {
-  StyleSheet,
   Text,
   View,
   Dimensions,
@@ -8,22 +7,18 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
-
-
-
 import { searchBox, button, buttonText, text } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import SideBar from './ui/SideBar';
 import Check from 'react-native-vector-icons/Ionicons'
 import { setVehicle } from './functions/helper';
 import { useTranslation } from 'react-i18next';
 import { horizontalScale, moderateScale, verticalScale } from './styles/Metrics';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 export default function TransferList({ navigation }) {
 
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const [checkVehicle, setCheckVehicle] = useState([])
   const [checkDriver, setCheckDriver] = useState([])
@@ -46,7 +41,7 @@ export default function TransferList({ navigation }) {
 
   const [selectedVehicle, setselectedVehicle] = useState(null);
 
-  const onPressCheck = (item) => {
+  const onPressCheck = () => {
     if (checkVehicle.length === 1 && checkDriver.length === 1) {
       setProceed(true);
     } else {
@@ -56,7 +51,6 @@ export default function TransferList({ navigation }) {
 
   const DriverView = ({ item, index }) => {
     return (
-      // FlatList Item
       <TouchableOpacity
         style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
         onPress={() => setCheckDriver([index])}
@@ -69,7 +63,6 @@ export default function TransferList({ navigation }) {
 
   const VehicleView = ({ item, index }) => {
     return (
-      // FlatList Item
       <TouchableOpacity
         style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
         onPress={() => setCheckVehicle([index])}
@@ -120,7 +113,6 @@ export default function TransferList({ navigation }) {
                 style={{
                   borderBottomWidth: 3,
                   borderBottomColor: '#01315C',
-                  // marginVertical: verticalScale(25),
                   width: 40,
                 }} />
               <View

@@ -1,5 +1,4 @@
 import {
-  StyleSheet,
   Text,
   View,
   Dimensions,
@@ -7,10 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
-
-
-
+import React, { useState, useEffect } from 'react';
 import { searchBox, button, buttonText, text } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SideBar from './ui/SideBar';
@@ -18,27 +14,33 @@ import { setVehicle } from './functions/helper';
 import { useTranslation } from 'react-i18next';
 import { horizontalScale, moderateScale, verticalScale } from './styles/Metrics';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 export default function VehicleList({ navigation }) {
 
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
-  const [listData, setListDate] = useState([
-    'TRB8888A',
-    'TCB9990X',
-    'THL8822B',
-    'TLC1234S',
-  ]);
+  const [listData, setListData] = useState([]);
   const [selectedVehicle, setselectedVehicle] = useState(null);
+
+  const getVehicleList = async () => {
+    try {
+      const response = await fetch('https://demo.vellas.net:94/pump/api/Values/GetVehicleList?_token=4B3B5C99-57E8-4593-A0AD-3D4EEA3C2F53');
+      const json = await response.json();
+      setListData(json);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  useEffect(() => { getVehicleList() }, [])
 
   const ItemView = ({ item }) => {
     return (
-      // FlatList Item
       <TouchableOpacity
         style={{ marginVertical: verticalScale(20) }}
-        onPress={() => setselectedVehicle(item)}>
-        <Text style={[text, { fontSize: moderateScale(18) }]}>{item}</Text>
+        onPress={() => setselectedVehicle(item.VEHICLE_INFO)}>
+        <Text style={[text, { fontSize: moderateScale(18) }]}>{item.VEHICLE_INFO}</Text>
       </TouchableOpacity>
     );
   };
@@ -76,7 +78,7 @@ export default function VehicleList({ navigation }) {
           data={listData}
           showsVerticalScrollIndicator={true}
           renderItem={ItemView}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={item => item.id}
         />
       </View>
       <View

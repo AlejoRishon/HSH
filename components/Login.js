@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import {
-  StyleSheet,
   Text,
   View,
   ImageBackground,
   TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
+  Alert
 } from 'react-native';
 import { inputBox, button, buttonText, text } from './styles/MainStyle';
 import { useTranslation } from 'react-i18next';
@@ -16,10 +16,34 @@ export default function Login({ navigation }) {
 
   const [lang, setlang] = useState('en');
   const { t, i18n } = useTranslation();
+  const [userName, setUserName] = useState('')
+  const [password, setPassword] = useState('')
 
   useState(() => {
     console.log(lang);
   }, [lang]);
+
+  const handleLogin = () => {
+    const token = 'b95909e1-d33f-469f-90c6-5a2fb1e5627c';
+    const opco = 'Deep';
+
+    const url = `https://demo.vellas.net:94/pump/api/Values/GetUserLogin?_token=${token}&_opco=${opco}&username=${encodeURIComponent(userName)}&pw=${encodeURIComponent(password)}`;
+
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        if (data.length > 0 && data[0].ACCESS_RIGHT !== null && data[0].CID !== null) {
+          navigation.navigate('VehicleList')
+        }
+        else {
+          Alert.alert('Enter credentials!')
+        }
+      })
+      .catch(e => {
+        console.log('error:', e)
+        Alert.alert('Wrong credentials!')
+      })
+  }
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior="height">
@@ -100,22 +124,31 @@ export default function Login({ navigation }) {
                 borderBottomColor: '#01315C',
                 marginVertical: verticalScale(15),
               }} />
-            <TextInput style={inputBox} placeholder="username" placeholderTextColor='#000' />
             <TextInput
-              style={inputBox}
+              style={[inputBox, { color: '#000' }]}
+              placeholder="username"
+              placeholderTextColor='#000'
+              value={userName}
+              onChangeText={text => setUserName(text)}
+            />
+            <TextInput
+              style={[inputBox, { color: '#000' }]}
               placeholder="password"
               placeholderTextColor='#000'
               textContentType="password"
               secureTextEntry={true}
+              value={password}
+              onChangeText={text => setPassword(text)}
             />
           </View>
           <TouchableOpacity
             style={button}
-            onPress={() => navigation.navigate('VehicleList')}>
+            onPress={() => handleLogin()}
+          >
             <Text style={buttonText}>Login</Text>
           </TouchableOpacity>
         </View>
       </View>
-    </KeyboardAvoidingView>
+    </KeyboardAvoidingView >
   );
 }

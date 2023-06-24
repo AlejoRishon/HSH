@@ -14,29 +14,14 @@ import {
 } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  searchBox,
-  tableHeader,
   text,
-  dataText,
   remarks,
 } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as ImagePicker from 'react-native-image-picker';
 import { useTranslation } from 'react-i18next';
 import SideBar from './ui/SideBar';
-import RightDeliveryDetails from './ui/RightDeliveryDetails';
-import RightInputBar from './ui/RightInputBar';
 import { AdhocRightInputBar } from './ui/RightInputBar';
-import {
-  Table,
-  TableWrapper,
-  Row,
-  Rows,
-  Col,
-  Cols,
-  Cell,
-} from 'react-native-table-component';
 import { getVehicle } from './functions/helper';
 import { Portal, Provider, Modal } from 'react-native-paper';
 import { horizontalScale, verticalScale, moderateScale } from './styles/Metrics';
@@ -60,23 +45,9 @@ export default function AdHocService({ navigation, route }) {
   //before
   const [previewImageUribefore, setpreviewImageUribefore] = useState('');
   const [imagePreviewbefore, setimagePreviewbefore] = useState(false);
-  const [listData, setListDate] = useState([
-    {
-      title: 'Shell',
-      data: ['MGO01', '10PPM01'],
-    },
-    {
-      title: 'Mobil',
-      data: ['EDE01', 'MGO03', 'ADO01'],
-    },
-    {
-      title: 'Caltex',
-      data: ['MGO05', '10PPM05', 'ADO03'],
-    },
-  ])
-
-  const BusinessName = ['XYZ', 'ABC', 'DEF', 'GHI']
-  const BusinessAddress = ['XYZ', 'ABC', 'DEF', 'GHI']
+  const [businessName, setBusinessName] = useState([])
+  const [businessAddress, setBusinessAddress] = useState([])
+  const [productList, setProductList] = useState([])
   const [visible, setVisible] = useState(false);
   const [product, setProduct] = useState('')
   const [name, setName] = useState('')
@@ -94,6 +65,35 @@ export default function AdHocService({ navigation, route }) {
   const hideModal = () => setVisible(false)
 
   const [diesel, setdiesel] = useState(0);
+
+  const getBusinessName = async () => {
+    try {
+      const response = await fetch('https://demo.vellas.net:94/pump/api/Values/getBusinessList?_token=B6D1941E-D2C9-40F5-AF75-1B0558F527C1');
+      const json = await response.json();
+      setBusinessName(json);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const getBusinessAddress = async () => {
+    try {
+      const response = await fetch('https://demo.vellas.net:94/pump/api/Values/getBusinessAddressByBusinessId?_token=BDB47BFE-A891-4D77-AFBB-27928083D777&custId=18');
+      const json = await response.json();
+      setBusinessAddress(json);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const getProductList = () => {
+    fetch('https://demo.vellas.net:94/pump/api/Values/getProductList?_token=FAEB7E31-0DE5-48BE-9EC9-8D97D21EF8B3')
+      .then(response => response.json())
+      .then(result => setProductList(result))
+      .catch(error => console.error(error))
+  }
+
+  useEffect(() => { getBusinessName(); getBusinessAddress(); getProductList() }, [])
 
   const getInputDiesel = diesel => {
     return setdiesel(diesel);
@@ -130,64 +130,6 @@ export default function AdHocService({ navigation, route }) {
     setModalVisible(!modalVisible);
   };
 
-  const [headerData, setheaderData] = useState([
-    'DO No.',
-    'Delivery Address',
-    'Liters',
-    'Status',
-  ]);
-  const [detailData, setdetailData] = useState([
-    ['DO-12345678A', '2 Adam Rd, Singapore 289876', '800,000', 'Pending'],
-    [
-      'DO-90485729B',
-      '21 Hillcrest Rd, Singapore 289072',
-      '1,000,000',
-      'Completed',
-    ],
-    [
-      'DO-93877463V',
-      '131 Rifle Range Rd, Singapore 588406',
-      '800',
-      'Completed',
-    ],
-    [
-      'DO-11038479K',
-      '21 Choa Chu Kang North 6, Singapore 689578',
-      '100,000',
-      'Completed',
-    ],
-    [
-      'DO-35493831S',
-      '101 Jln Bahar, Civil Defence Academy Complex, Singapore 649734',
-      '20,000',
-      'Completed',
-    ],
-    ['DO-12345678A', '2 Adam Rd, Singapore 289876', '800,000', 'Pending'],
-    [
-      'DO-90485729B',
-      '21 Hillcrest Rd, Singapore 289072',
-      '1,000,000',
-      'Completed',
-    ],
-    [
-      'DO-93877463V',
-      '131 Rifle Range Rd, Singapore 588406',
-      '800',
-      'Completed',
-    ],
-    [
-      'DO-11038479K',
-      '21 Choa Chu Kang North 6, Singapore 689578',
-      '100,000',
-      'Completed',
-    ],
-    [
-      'DO-35493831S',
-      '101 Jln Bahar, Civil Defence Academy Complex, Singapore 649734',
-      '20,000',
-      'Completed',
-    ],
-  ]);
   const statusColor = {
     Pending: { text: '#EA631D', button: 'rgba(255, 181, 114, 0.47)' },
     Completed: { text: '#3DB792', button: 'rgba(107, 226, 190, 0.24)' },
@@ -209,15 +151,6 @@ export default function AdHocService({ navigation, route }) {
         </Text>
       </TouchableOpacity>
     );
-  };
-
-  const onToggleMore = height => {
-    Animated.timing(heightAnim, {
-      toValue: height,
-      duration: 500,
-      useNativeDriver: false,
-    }).start();
-    setmore(!more);
   };
 
   const onToggleMoreAf = height => {
@@ -244,7 +177,6 @@ export default function AdHocService({ navigation, route }) {
 
   const ItemView = ({ item }) => {
     return (
-      // FlatList Item
       <TouchableOpacity style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#0465bd' }}
         onPress={() => { setProduct(item), hideModal() }}
       >
@@ -255,38 +187,37 @@ export default function AdHocService({ navigation, route }) {
 
   const NameView = ({ item }) => {
     return (
-      // FlatList Item
       <TouchableOpacity style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#0465bd' }}
-        onPress={() => { setName(item), hideNameModal() }}
+        onPress={() => { setName(item.BRAND_NAME), hideNameModal() }}
       >
-        <Text style={[text, { fontSize: moderateScale(12), alignSelf: 'center', color: '#0465bd' }]}>{item}</Text>
+        <Text style={[text, { fontSize: moderateScale(12), alignSelf: 'center', color: '#0465bd' }]}>{item.BRAND_NAME}</Text>
       </TouchableOpacity>
     );
   }
 
   const AddressView = ({ item }) => {
     return (
-      // FlatList Item
       <TouchableOpacity style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#0465bd' }}
-        onPress={() => { setAddress(item), hideAddressModal() }}
+        onPress={() => { setAddress(item.ADDRESS), hideAddressModal() }}
       >
-        <Text style={[text, { fontSize: moderateScale(12), alignSelf: 'center', color: '#0465bd' }]}>{item}</Text>
+        <Text style={[text, { fontSize: moderateScale(12), alignSelf: 'center', color: '#0465bd' }]}>{item.ADDRESS}</Text>
       </TouchableOpacity>
     );
   }
 
-  const headerView = (({ section: { title } }) => (
-    <Text style={{ fontSize: moderateScale(15), color: '#01315C', left: 5 }}>{title}</Text>
-  ))
+  const headerView = ({ section }) => {
+    return (
+      <Text style={{ fontSize: moderateScale(15), color: '#01315C', left: 5 }}>{section.title}</Text>
+    )
+  }
 
-  const [more, setmore] = useState(false);
   return (
     <Provider>
       <Portal>
         <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={styles.dragDown}>
           <SectionList
-            sections={listData}
-            keyExtractor={(index) => index.toString()}
+            sections={productList.map(item => ({ title: item.BRAND_NAME, data: item.code }))}
+            keyExtractor={(item, index) => item + index}
             renderSectionHeader={headerView}
             renderItem={ItemView}
             showsVerticalScrollIndicator={true}
@@ -295,17 +226,17 @@ export default function AdHocService({ navigation, route }) {
 
         <Modal visible={nameVisible} onDismiss={hideNameModal} contentContainerStyle={styles.dragDown}>
           <FlatList
-            data={BusinessName}
-            keyExtractor={(index) => index.toString()}
+            data={businessName}
+            keyExtractor={item => item.code}
             renderItem={NameView}
             showsVerticalScrollIndicator={true}
           />
         </Modal>
 
-        <Modal visible={addressVisible} onDismiss={hideAddressModal} contentContainerStyle={styles.dragDown}>
+        <Modal visible={addressVisible} onDismiss={hideAddressModal} contentContainerStyle={[styles.dragDown, { width: horizontalScale(180), marginRight: '14%' }]}>
           <FlatList
-            data={BusinessAddress}
-            keyExtractor={(index) => index.toString()}
+            data={businessAddress}
+            keyExtractor={item => item.UID}
             renderItem={AddressView}
             showsVerticalScrollIndicator={true}
           />
@@ -314,7 +245,6 @@ export default function AdHocService({ navigation, route }) {
       <Animated.View
         style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
         <SideBar all={true} navigation={navigation} />
-
         <View style={{ flex: 1, padding: 20 }}>
           <TouchableOpacity
             onPress={() => {
@@ -328,9 +258,6 @@ export default function AdHocService({ navigation, route }) {
             />
           </TouchableOpacity>
           <ScrollView style={{ width: '55%' }}>
-
-
-
             <View style={{ height: 150, marginBottom: 10 }}>
               <Text style={{ fontSize: 18, color: '#01315C', marginVertical: 10 }}>
                 Business Name
@@ -338,7 +265,7 @@ export default function AdHocService({ navigation, route }) {
               <TouchableOpacity onPress={showNameModal}>
                 <Text
                   style={{ fontSize: moderateScale(12), color: '#01315C', marginRight: 40, justifyContent: 'center' }}>
-                  {!product ? `Select Business Name` : name} <Icon name='angle-down' size={18} style={{ alignSelf: 'center' }} />
+                  {!name ? `Select Business Name` : name} <Icon name='angle-down' size={18} style={{ alignSelf: 'center' }} />
                 </Text>
               </TouchableOpacity>
               <Text style={{ fontSize: 18, color: '#01315C', marginVertical: 10 }}>
@@ -347,20 +274,17 @@ export default function AdHocService({ navigation, route }) {
               <TouchableOpacity onPress={showAddressModal}>
                 <Text
                   style={{ fontSize: moderateScale(12), color: '#01315C', marginRight: 40, justifyContent: 'center' }}>
-                  {!product ? `Select Business Address` : address} <Icon name='angle-down' size={18} style={{ alignSelf: 'center' }} />
+                  {!address ? `Select Business Address` : address} <Icon name='angle-down' size={18} style={{ alignSelf: 'center' }} />
                 </Text>
               </TouchableOpacity>
-              {/* <Text style={{fontSize: 18, color: '#01315C', marginVertical: 10}}>
-              BDP Global Project Logistics Pte LtdContact Person: Bill Gates
-              (+6598765432)
-            </Text> */}
+
             </View>
             <View
               style={{
-                // marginTop: 120,
                 borderBottomWidth: 1,
                 borderBottomColor: '#01315C',
                 marginBottom: 20,
+                marginTop: !address ? 0 : address?.length - 45
               }} />
             <View
               style={{
@@ -387,12 +311,6 @@ export default function AdHocService({ navigation, route }) {
                   {t('litres_of_diesel_sold')}
                 </Text>
               </View>
-              {/* <Icon
-              onPress={() => onShow(0)}
-              name="edit"
-              color="#01315C"
-              size={20}
-            /> */}
             </View>
             <Text
               style={{
@@ -435,7 +353,6 @@ export default function AdHocService({ navigation, route }) {
                   {t('metre_reading_after')}
                 </Text>
               </View>
-
               <Icon
                 onPress={() => {
                   setuploadtype('after');
@@ -445,21 +362,6 @@ export default function AdHocService({ navigation, route }) {
                 color="#01315C"
                 size={20}
               />
-              {/* {moreMeterAf ? (
-              <Icon
-                onPress={() => onToggleMoreAf(0)}
-                name="chevron-up"
-                color="#01315C"
-                size={20}
-              />
-            ) : (
-              <Icon
-                onPress={() => onToggleMoreAf(80)}
-                name="chevron-down"
-                color="#01315C"
-                size={20}
-              />
-            )} */}
             </View>
             <Animated.View
               style={{
@@ -540,76 +442,6 @@ export default function AdHocService({ navigation, route }) {
             </TouchableOpacity>
           </ScrollView>
         </View>
-
-        {/* <View style={{flex: 1, padding: 20}}>
-          <Text style={text}>{parameter.vehicle}</Text>
-          <TouchableOpacity
-            style={searchBox}
-            onPress={() => navigation.navigate('VehicleList')}>
-            <Icon name="exchange" color="#01315C" size={20} />
-  
-            <Text style={[text, {marginLeft: 10}]}>Change vehicle</Text>
-          </TouchableOpacity>
-          <View style={{flexDirection:'row',justifyContent:'flex-start'}}>
-            <Text style={[text, {marginTop: 20}]}>{t('trips')}</Text>
-          </View>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <View
-              style={{
-                borderBottomWidth: 3,
-                borderBottomColor: '#01315C',
-                marginVertical: 20,
-                width: 40,
-              }}></View>
-            <View
-              style={{
-                borderBottomWidth: 1,
-                borderBottomColor: '#01315C',
-                marginVertical: 20,
-                flex: 1,
-              }}></View>
-          </View>
-          <Table style={{flex: 1}}>
-            <Row
-              data={headerData}
-              flexArr={[1, 2, 1, 1]}
-              style={tableHeader}
-              textStyle={text}
-            />
-            <ScrollView
-              contentContainerStyle={{
-                flexGrow: 1,
-              }}>
-              {detailData.map((rowData, index) => (
-                <TouchableOpacity onPress={() => {
-                  //setshowInput(true)
-                  navigation.navigate('EditTrip');
-                  }}>
-                  <TableWrapper key={index} style={{flexDirection: 'row'}}>
-                    {rowData.map((cellData, cellIndex) => (
-                      <Cell
-                        flex={cellIndex == 1 ? 2 : 1}
-                        key={cellIndex}
-                        data={
-                          cellIndex === 3 ? element(cellData, index) : cellData
-                        }
-                        textStyle={[
-                          {
-                            fontSize: 20,
-                            color: '#01315C',
-                            paddingVertical: 20,
-                            backgroundColor: 'red',
-                          },
-                        ]}
-                      />
-                    ))}
-                  </TableWrapper>
-                </TouchableOpacity>
-              ))}
-              
-            </ScrollView>
-          </Table>
-        </View> */}
         <AdhocRightInputBar
           header="Liters of Diesel Sold"
           subHeader="Enter quantity of diesel sold"
@@ -774,9 +606,8 @@ const styles = StyleSheet.create({
   dragDown: {
     backgroundColor: 'white',
     right: horizontalScale(25),
-    top: verticalScale(17),
-    // height: verticalScale(400),
-    width: horizontalScale(90),
+    margin: '5%',
+    width: horizontalScale(100),
     alignSelf: 'center',
     borderRadius: 5,
     padding: 5
