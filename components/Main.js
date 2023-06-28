@@ -103,7 +103,9 @@ export default function Main({ navigation, route }) {
             marginRight: 20,
           }}>
           <TouchableOpacity style={boxContainer}
-            onPress={() => navigation.navigate('AdHocService')}>
+            onPress={() => navigation.navigate('AdHocService', {
+              info: route?.params
+            })}>
             <Icon name="file-text" color="#01315C" size={moderateScale(17)} />
             <Text style={[text, { fontSize: moderateScale(12) }]}>{t('ad_hoc_service')}</Text>
           </TouchableOpacity>

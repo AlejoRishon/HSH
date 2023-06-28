@@ -5,6 +5,7 @@ import {
   FlatList,
   TextInput,
   TouchableOpacity,
+  Modal
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { searchBox, button, buttonText, text } from './styles/MainStyle';
@@ -13,6 +14,7 @@ import SideBar from './ui/SideBar';
 import { setVehicle } from './functions/helper';
 import { useTranslation } from 'react-i18next';
 import { horizontalScale, moderateScale, verticalScale } from './styles/Metrics';
+import { ActivityIndicator, MD2Colors } from 'react-native-paper';
 
 const { width } = Dimensions.get('window');
 
@@ -22,12 +24,15 @@ export default function VehicleList({ navigation }) {
 
   const [listData, setListData] = useState([]);
   const [selectedVehicle, setselectedVehicle] = useState(null);
+  const [driverId, setDriverId] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const getVehicleList = async () => {
     try {
       const response = await fetch('https://demo.vellas.net:94/pump/api/Values/GetVehicleList?_token=4B3B5C99-57E8-4593-A0AD-3D4EEA3C2F53');
       const json = await response.json();
       setListData(json);
+      setLoading(false)
     } catch (error) {
       console.error(error);
     }
@@ -39,7 +44,7 @@ export default function VehicleList({ navigation }) {
     return (
       <TouchableOpacity
         style={{ marginVertical: verticalScale(20) }}
-        onPress={() => setselectedVehicle(item.VEHICLE_INFO)}>
+        onPress={() => { setselectedVehicle(item.VEHICLE_INFO), setDriverId(item.DRIVER_ID) }}>
         <Text style={[text, { fontSize: moderateScale(18) }]}>{item.VEHICLE_INFO}</Text>
       </TouchableOpacity>
     );
@@ -81,6 +86,13 @@ export default function VehicleList({ navigation }) {
           keyExtractor={item => item.id}
         />
       </View>
+      <Modal
+        animationType='none'
+        transparent={true}
+        visible={loading}
+      >
+        <ActivityIndicator animating={true} color={MD2Colors.red800} style={{ marginTop: '25%' }} size='large' />
+      </Modal>
       <View
         style={{
           width: width * 0.35,
@@ -119,12 +131,15 @@ export default function VehicleList({ navigation }) {
             style={button}
             onPress={() => {
               setVehicle(selectedVehicle);
-              navigation.navigate('Main');
+              navigation.navigate('Main', {
+                vehicleInfo: selectedVehicle,
+                driverId: driverId
+              })
             }}>
             <Text style={buttonText}>Proceed</Text>
           </TouchableOpacity>
         )}
       </View>
-    </View>
+    </View >
   );
 }

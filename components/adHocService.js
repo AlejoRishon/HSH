@@ -23,8 +23,10 @@ import { useTranslation } from 'react-i18next';
 import SideBar from './ui/SideBar';
 import { AdhocRightInputBar } from './ui/RightInputBar';
 import { getVehicle } from './functions/helper';
-import { Portal, Provider, Modal } from 'react-native-paper';
+import { Portal, Provider, Modal, Searchbar } from 'react-native-paper';
 import { horizontalScale, verticalScale, moderateScale } from './styles/Metrics';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { ActivityIndicator, MD2Colors } from 'react-native-paper';
 
 const { width, height } = Dimensions.get('window');
 export default function AdHocService({ navigation, route }) {
@@ -54,6 +56,10 @@ export default function AdHocService({ navigation, route }) {
   const [address, setAddress] = useState('')
   const [nameVisible, setNameVisible] = useState(false);
   const [addressVisible, setAddressVisible] = useState(false);
+  const [businessId, setBusinessId] = useState('')
+  const [businessCode, setBusinessCode] = useState('')
+  const [sku, setSku] = useState('')
+  const [loading, setLoading] = useState(true)
 
   const showNameModal = () => setNameVisible(true);
   const hideNameModal = () => setNameVisible(false)
@@ -65,12 +71,16 @@ export default function AdHocService({ navigation, route }) {
   const hideModal = () => setVisible(false)
 
   const [diesel, setdiesel] = useState(0);
+  const [searchQuery, setSearchQuery] = React.useState('');
+
+  const onChangeSearch = query => setSearchQuery(query)
 
   const getBusinessName = async () => {
     try {
       const response = await fetch('https://demo.vellas.net:94/pump/api/Values/getBusinessList?_token=B6D1941E-D2C9-40F5-AF75-1B0558F527C1');
       const json = await response.json();
       setBusinessName(json);
+      setLoading(false)
     } catch (error) {
       console.error(error);
     }
@@ -78,9 +88,10 @@ export default function AdHocService({ navigation, route }) {
 
   const getBusinessAddress = async () => {
     try {
-      const response = await fetch('https://demo.vellas.net:94/pump/api/Values/getBusinessAddressByBusinessId?_token=BDB47BFE-A891-4D77-AFBB-27928083D777&custId=18');
+      const response = await fetch(`https://demo.vellas.net:94/pump/api/Values/getBusinessAddressByBusinessId?_token=BDB47BFE-A891-4D77-AFBB-27928083D777&custId=${businessId}`);
       const json = await response.json();
       setBusinessAddress(json);
+      setLoading(false)
     } catch (error) {
       console.error(error);
     }
@@ -93,7 +104,42 @@ export default function AdHocService({ navigation, route }) {
       .catch(error => console.error(error))
   }
 
-  useEffect(() => { getBusinessName(); getBusinessAddress(); getProductList() }, [])
+  useEffect(() => { getBusinessName(); getBusinessAddress(); getProductList() }, [businessId])
+
+  const postJoborder = () => {
+    const url = "https://demo.vellas.net:94/pump/api/Values/postJobOrder";
+    const data = {
+      CUST_CODE: businessCode,
+      Location: address,
+      REC_DATE: "2023-05-25 00:00:00.000",
+      VEHICLE_CODE: route?.params?.info?.vehicleInfo,
+      DRIVER_ID: route?.params?.info?.driverId,
+      DELIVERED: 1,
+      SKU: sku,
+      Qty: diesel,
+      UOM_CODE: "Liter"
+    };
+
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(result => {
+        if (result == 1) {
+          alert("Job Successful");
+        } else {
+          alert("Job Failed");
+        }
+      })
+      .catch(error => {
+        console.error("Error:", error);
+      });
+
+  }
 
   const getInputDiesel = diesel => {
     return setdiesel(diesel);
@@ -135,24 +181,6 @@ export default function AdHocService({ navigation, route }) {
     Completed: { text: '#3DB792', button: 'rgba(107, 226, 190, 0.24)' },
   };
 
-  const element = (data, index) => {
-    return (
-      <TouchableOpacity
-        style={{
-          padding: 10,
-          borderRadius: 15,
-          backgroundColor: statusColor[data]
-            ? statusColor[data].button
-            : 'white',
-        }}>
-        <Text
-          style={{ color: statusColor[data] ? statusColor[data].text : 'black' }}>
-          {data}
-        </Text>
-      </TouchableOpacity>
-    );
-  };
-
   const onToggleMoreAf = height => {
     Animated.timing(heightMeterAfAnim, {
       toValue: height,
@@ -177,20 +205,23 @@ export default function AdHocService({ navigation, route }) {
 
   const ItemView = ({ item }) => {
     return (
-      <TouchableOpacity style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#0465bd' }}
-        onPress={() => { setProduct(item), hideModal() }}
+      <TouchableOpacity
+        style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#0465bd' }}
+        onPress={() => { setProduct(item.desc), setSku(item.SKU), hideModal() }}
       >
-        <Text style={[text, { fontSize: moderateScale(12), alignSelf: 'center', color: '#0465bd' }]}>{item}</Text>
+        <Text style={[text, { fontSize: moderateScale(14), color: '#0465bd', alignSelf: 'center' }]}>
+          {item.desc}
+        </Text>
       </TouchableOpacity>
     );
-  }
+  };
 
   const NameView = ({ item }) => {
     return (
       <TouchableOpacity style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#0465bd' }}
-        onPress={() => { setName(item.BRAND_NAME), hideNameModal() }}
+        onPress={() => { setName(item.name), hideNameModal(), setBusinessId(item.id), setBusinessCode(item.code), setLoading(true) }}
       >
-        <Text style={[text, { fontSize: moderateScale(12), alignSelf: 'center', color: '#0465bd' }]}>{item.BRAND_NAME}</Text>
+        <Text style={[text, { fontSize: moderateScale(12), alignSelf: 'center', color: '#0465bd' }]}>{item.name}</Text>
       </TouchableOpacity>
     );
   }
@@ -214,9 +245,29 @@ export default function AdHocService({ navigation, route }) {
   return (
     <Provider>
       <Portal>
+        <Modal visible={loading}>
+          <ActivityIndicator animating={true} color={MD2Colors.red800} size='large' />
+        </Modal>
         <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={styles.dragDown}>
+          <Searchbar
+            placeholder="Search"
+            placeholderTextColor='#000'
+            icon={() => <MaterialCommunityIcons name="magnify" size={20} color='#000' />}
+            onChangeText={onChangeSearch}
+            value={searchQuery}
+            inputStyle={{ fontSize: moderateScale(10), color: '#000' }}
+            style={{ backgroundColor: 'white', borderWidth: 0.2, height: '15%' }}
+            iconColor='#000'
+            elevation={0}
+          />
           <SectionList
-            sections={productList.map(item => ({ title: item.BRAND_NAME, data: item.code }))}
+            sections={productList.map((item) => ({
+              title: item.BRAND_NAME,
+              data: item.product.map((product) => ({
+                desc: product.desc,
+                SKU: product.SKU
+              }))
+            }))}
             keyExtractor={(item, index) => item + index}
             renderSectionHeader={headerView}
             renderItem={ItemView}
@@ -284,7 +335,7 @@ export default function AdHocService({ navigation, route }) {
                 borderBottomWidth: 1,
                 borderBottomColor: '#01315C',
                 marginBottom: 20,
-                marginTop: !address ? 0 : address?.length - 45
+                marginTop: !address ? 0 : address?.length - 15
               }} />
             <View
               style={{
@@ -429,7 +480,9 @@ export default function AdHocService({ navigation, route }) {
               <TextInput style={[remarks]} multiline={true} numberOfLines={4} />
             </KeyboardAvoidingView>
             <TouchableOpacity
-              style={{ backgroundColor: '#01315C', flex: 1, borderRadius: 8, width: '50%', alignSelf: 'flex-end' }}>
+              style={{ backgroundColor: '#01315C', flex: 1, borderRadius: 8, width: '50%', alignSelf: 'flex-end' }}
+              onPress={() => postJoborder()}
+            >
               <Text
                 style={{
                   color: 'white',
@@ -557,7 +610,7 @@ export default function AdHocService({ navigation, route }) {
           </View>
         </Modal>
       </Animated.View>
-    </Provider>
+    </Provider >
   );
 }
 

@@ -6,11 +6,13 @@ import {
   TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
-  Alert
+  Alert,
+  Modal
 } from 'react-native';
 import { inputBox, button, buttonText, text } from './styles/MainStyle';
 import { useTranslation } from 'react-i18next';
 import { horizontalScale, moderateScale, verticalScale } from './styles/Metrics';
+import { ActivityIndicator, MD2Colors } from 'react-native-paper';
 
 export default function Login({ navigation }) {
 
@@ -18,12 +20,14 @@ export default function Login({ navigation }) {
   const { t, i18n } = useTranslation();
   const [userName, setUserName] = useState('')
   const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
 
   useState(() => {
     console.log(lang);
   }, [lang]);
 
   const handleLogin = () => {
+    setLoading(true)
     const token = 'b95909e1-d33f-469f-90c6-5a2fb1e5627c';
     const opco = 'Deep';
 
@@ -109,6 +113,13 @@ export default function Login({ navigation }) {
             </View>
           </ImageBackground>
         </ImageBackground>
+        <Modal
+          animationType='none'
+          transparent={true}
+          visible={loading}
+        >
+          <ActivityIndicator animating={true} color={MD2Colors.red800} style={{ marginTop: '25%' }} size='large' />
+        </Modal>
         <View
           style={{
             width: horizontalScale(150),
@@ -143,7 +154,10 @@ export default function Login({ navigation }) {
           </View>
           <TouchableOpacity
             style={button}
-            onPress={() => handleLogin()}
+            onPress={() =>
+              navigation.navigate('VehicleList')
+              // handleLogin()
+            }
           >
             <Text style={buttonText}>Login</Text>
           </TouchableOpacity>
