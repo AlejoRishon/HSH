@@ -10,7 +10,8 @@ import {
   TouchableOpacity,
   ScrollView,
   KeyboardAvoidingView,
-  SectionList
+  SectionList,
+  Alert
 } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -100,7 +101,11 @@ export default function AdHocService({ navigation, route }) {
   const getProductList = () => {
     fetch('https://demo.vellas.net:94/pump/api/Values/getProductList?_token=FAEB7E31-0DE5-48BE-9EC9-8D97D21EF8B3')
       .then(response => response.json())
-      .then(result => setProductList(result))
+      .then(result => {
+        console.log(result);
+        var fproducts = result.filter(val => val.BRAND_NAME == 'HSH');
+        setProductList(fproducts)
+      })
       .catch(error => console.error(error))
   }
 
@@ -119,7 +124,7 @@ export default function AdHocService({ navigation, route }) {
       Qty: diesel,
       UOM_CODE: "Liter"
     };
-
+    console.log(data);
     fetch(url, {
       method: "POST",
       headers: {
@@ -129,14 +134,18 @@ export default function AdHocService({ navigation, route }) {
     })
       .then(response => response.json())
       .then(result => {
-        if (result == 1) {
-          alert("Job Successful");
+        console.log(result);
+        if (result == 'Saved' || result === 'Updated') {
+          Alert.alert('Success', 'Job Successful', [
+
+            { text: 'OK', onPress: () => navigation.pop() },
+          ]);
         } else {
           alert("Job Failed");
         }
       })
       .catch(error => {
-        console.error("Error:", error);
+        console.log("Error:", error);
       });
 
   }
@@ -207,10 +216,10 @@ export default function AdHocService({ navigation, route }) {
     return (
       <TouchableOpacity
         style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#0465bd' }}
-        onPress={() => { setProduct(item.desc), setSku(item.SKU), hideModal() }}
+        onPress={() => { setProduct(item.desc); setSku(item.SKU); hideModal() }}
       >
         <Text style={[text, { fontSize: moderateScale(14), color: '#0465bd', alignSelf: 'center' }]}>
-          {item.desc}
+          {item.desc + (item.category ? ' (' + item.category + ')' : '')}
         </Text>
       </TouchableOpacity>
     );
@@ -249,7 +258,7 @@ export default function AdHocService({ navigation, route }) {
           <ActivityIndicator animating={true} color={MD2Colors.red800} size='large' />
         </Modal>
         <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={styles.dragDown}>
-          <Searchbar
+          {/* <Searchbar
             placeholder="Search"
             placeholderTextColor='#000'
             icon={() => <MaterialCommunityIcons name="magnify" size={20} color='#000' />}
@@ -259,13 +268,15 @@ export default function AdHocService({ navigation, route }) {
             style={{ backgroundColor: 'white', borderWidth: 0.2, height: '15%' }}
             iconColor='#000'
             elevation={0}
-          />
+          /> */}
           <SectionList
             sections={productList.map((item) => ({
               title: item.BRAND_NAME,
               data: item.product.map((product) => ({
                 desc: product.desc,
-                SKU: product.SKU
+                SKU: product.SKU,
+                unit: product.unit,
+                category: product.category
               }))
             }))}
             keyExtractor={(item, index) => item + index}
