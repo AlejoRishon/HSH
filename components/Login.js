@@ -13,6 +13,7 @@ import { inputBox, button, buttonText, text } from './styles/MainStyle';
 import { useTranslation } from 'react-i18next';
 import { horizontalScale, moderateScale, verticalScale } from './styles/Metrics';
 import { ActivityIndicator, MD2Colors } from 'react-native-paper';
+import auth from '@react-native-firebase/auth';
 
 export default function Login({ navigation }) {
 
@@ -127,6 +128,19 @@ export default function Login({ navigation }) {
             padding: moderateScale(25),
             justifyContent: 'space-around',
           }}>
+          <TouchableOpacity
+            style={[button, {
+              width: horizontalScale(50),
+              height: verticalScale(70),
+              position: 'absolute',
+              right: 5,
+              padding: 0,
+              justifyContent: 'center'
+            }]}
+            onPress={() => auth().signOut().then(() => navigation.replace('MasterLogin'))}
+          >
+            <Text style={[buttonText, { fontSize: moderateScale(10) }]}>Log Out</Text>
+          </TouchableOpacity>
           <View style={{ marginTop: verticalScale(20) }}>
             <Text style={text}>{`Welcome back,\n${t('login_message')}`}</Text>
             <View
@@ -154,10 +168,7 @@ export default function Login({ navigation }) {
           </View>
           <TouchableOpacity
             style={button}
-            onPress={() =>
-              navigation.navigate('VehicleList')
-              // handleLogin()
-            }
+            onPress={() => handleLogin()}
           >
             <Text style={buttonText}>Login</Text>
           </TouchableOpacity>

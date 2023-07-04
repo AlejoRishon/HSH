@@ -1,6 +1,4 @@
-//import liraries
-import React, { Component } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './components/Login';
@@ -12,12 +10,30 @@ import DeliveryOrder from './components/DeliveryOrder';
 import EditTrip from './components/editTrip';
 import AdHocService from './components/adHocService';
 import TransferList from './components/TransferList';
-// create a component
+import MasterLogin from './components/MasterLogin';
+import auth from '@react-native-firebase/auth';
+
 const Stack = createNativeStackNavigator();
 const App = () => {
+
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState();
+
+  function onAuthStateChanged(user) {
+    setUser(user);
+    if (initializing) setInitializing(false);
+  }
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber;
+  }, []);
+
+  if (initializing) return null;
+
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName={!user ? 'MasterLogin' : 'Login'} screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="VehicleList" component={VehicleList} />
         <Stack.Screen name="Main" component={Main} />
@@ -27,10 +43,10 @@ const App = () => {
         <Stack.Screen name="EditTrip" component={EditTrip} />
         <Stack.Screen name="AdHocService" component={AdHocService} />
         <Stack.Screen name='TransferList' component={TransferList} />
+        <Stack.Screen name='MasterLogin' component={MasterLogin} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
 
-//make this component available to the app
 export default App;
