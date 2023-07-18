@@ -1,17 +1,13 @@
 import {
-  StyleSheet,
   Text,
   View,
   Dimensions,
-  FlatList,
-  TextInput,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
 import React, { useState } from 'react';
-import { searchBox, tableHeader, text, dataText } from './styles/MainStyle';
+import { tableHeader, text } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTranslation } from 'react-i18next';
 import SideBar from './ui/SideBar';
 import RightDeliveryDetails from './ui/RightDeliveryDetails';
@@ -19,9 +15,6 @@ import {
   Table,
   TableWrapper,
   Row,
-  Rows,
-  Col,
-  Cols,
   Cell,
 } from 'react-native-table-component';
 import { getVehicle } from './functions/helper';

@@ -13,7 +13,7 @@ import {
   SectionList,
   Alert
 } from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, createRef } from 'react';
 import {
   text,
   remarks,
@@ -23,18 +23,15 @@ import * as ImagePicker from 'react-native-image-picker';
 import { useTranslation } from 'react-i18next';
 import SideBar from './ui/SideBar';
 import { AdhocRightInputBar } from './ui/RightInputBar';
-import { getVehicle } from './functions/helper';
-import { Portal, Provider, Modal, Searchbar } from 'react-native-paper';
-import { horizontalScale, verticalScale, moderateScale } from './styles/Metrics';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { Portal, Provider, Modal, Button } from 'react-native-paper';
+import { horizontalScale, moderateScale } from './styles/Metrics';
 import { ActivityIndicator, MD2Colors } from 'react-native-paper';
+import SignatureCapture from 'react-native-signature-capture';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 export default function AdHocService({ navigation, route }) {
-  const { t, i18n } = useTranslation();
-  const parameter = getVehicle();
+  const { t } = useTranslation();
   const [showInput, setshowInput] = useState(!true);
-  const heightAnim = useRef(new Animated.Value(0)).current;
   const heightMeterAfAnim = useRef(new Animated.Value(0)).current;
   const heightMeterBeAnim = useRef(new Animated.Value(0)).current;
   const [uploadtype, setuploadtype] = useState('after');
@@ -61,6 +58,7 @@ export default function AdHocService({ navigation, route }) {
   const [businessCode, setBusinessCode] = useState('')
   const [sku, setSku] = useState('')
   const [loading, setLoading] = useState(true)
+  const [signatureVisible, setSignatureVisible] = useState(false)
 
   const showNameModal = () => setNameVisible(true);
   const hideNameModal = () => setNameVisible(false)
@@ -68,13 +66,15 @@ export default function AdHocService({ navigation, route }) {
   const showAddressModal = () => setAddressVisible(true);
   const hideAddressModal = () => setAddressVisible(false)
 
+  const showSignatureModal = () => setSignatureVisible(true)
+  const hideSignatureModal = () => setSignatureVisible(false)
+
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false)
 
   const [diesel, setdiesel] = useState(0);
   const [searchQuery, setSearchQuery] = React.useState('');
 
-  const onChangeSearch = query => setSearchQuery(query)
 
   const getBusinessName = async () => {
     try {
@@ -147,7 +147,6 @@ export default function AdHocService({ navigation, route }) {
       .catch(error => {
         console.log("Error:", error);
       });
-
   }
 
   const getInputDiesel = diesel => {
@@ -183,11 +182,6 @@ export default function AdHocService({ navigation, route }) {
       console.log(error);
     }
     setModalVisible(!modalVisible);
-  };
-
-  const statusColor = {
-    Pending: { text: '#EA631D', button: 'rgba(255, 181, 114, 0.47)' },
-    Completed: { text: '#3DB792', button: 'rgba(107, 226, 190, 0.24)' },
   };
 
   const onToggleMoreAf = height => {
@@ -248,6 +242,45 @@ export default function AdHocService({ navigation, route }) {
   const headerView = ({ section }) => {
     return (
       <Text style={{ fontSize: moderateScale(15), color: '#01315C', left: 5 }}>{section.title}</Text>
+    )
+  }
+
+  const sign = createRef()
+  const saveSign = () => sign.current.saveImage()
+  const resetSign = () => sign.current.resetImage()
+
+  const _onSaveEvent = (result) => {
+    Alert.alert('Signature Captured Successfully!')
+    console.log(result.encoded)
+    setSignatureVisible(false)
+  }
+
+  const _onDragEvent = () => console.log('dragged')
+
+  if (signatureVisible) {
+    return (
+      <View style={{ flex: 1, backgroundColor: 'white' }}>
+        <Text style={{ fontSize: 20, color: '#01315C', fontWeight: 'bold', margin: '5%', textDecorationLine: 'underline' }}>
+          Sign here..
+        </Text>
+        <SignatureCapture
+          style={{ flex: 1 }}
+          ref={sign}
+          onSaveEvent={_onSaveEvent}
+          onDragEvent={_onDragEvent}
+          showNativeButtons={false}
+          showTitleLabel={false}
+          viewMode={'landscape'}
+        />
+        <View style={{ flexDirection: 'row', justifyContent: 'space-around', bottom: 10 }}>
+          <Button mode="contained" onPress={() => saveSign()} buttonColor='#01315C' textColor='white'>
+            Save
+          </Button>
+          <Button mode="contained" onPress={() => resetSign()} buttonColor='#01315C' textColor='white'>
+            Reset
+          </Button>
+        </View>
+      </View>
     )
   }
 
@@ -394,8 +427,11 @@ export default function AdHocService({ navigation, route }) {
                 style={{ fontSize: width / 45, color: '#01315C', marginRight: 40 }}>
                 {t('signature')}
               </Text>
-              <Icon name="edit" color="#01315C" size={20} />
+              <Icon name="edit" color="#01315C" size={20} onPress={showSignatureModal} />
             </View>
+            {/* <Modal visible={signatureVisible} onDismiss={hideSignatureModal} contentContainerStyle={{ flex: 1, justifyContent: 'space-around' }}>
+                
+              </Modal> */}
             <Text
               style={{
                 fontSize: width / 60,

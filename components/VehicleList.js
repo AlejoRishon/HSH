@@ -35,17 +35,19 @@ export default function VehicleList({ navigation }) {
       setLoading(false)
     } catch (error) {
       console.error(error);
+      setLoading(false)
     }
   }
 
   useEffect(() => { getVehicleList() }, [])
 
   const ItemView = ({ item }) => {
+    console.log('saljdblsjcblj:', item)
     return (
       <TouchableOpacity
         style={{ marginVertical: verticalScale(20) }}
-        onPress={() => { setselectedVehicle(item.VEHICLE_INFO), setDriverId(item.DRIVER_ID) }}>
-        <Text style={[text, { fontSize: moderateScale(18) }]}>{item.VEHICLE_INFO}</Text>
+        onPress={() => { setselectedVehicle(item?.Vehicle[0]?.VEHICLE_INFO), setDriverId(item?.driver_id) }}>
+        <Text style={[text, { fontSize: moderateScale(18) }]}>{item?.Vehicle[0]?.VEHICLE_INFO}</Text>
       </TouchableOpacity>
     );
   };
@@ -83,7 +85,7 @@ export default function VehicleList({ navigation }) {
           data={listData}
           showsVerticalScrollIndicator={true}
           renderItem={ItemView}
-          keyExtractor={item => item.id}
+          keyExtractor={item => item?.driver_id}
         />
       </View>
       <Modal

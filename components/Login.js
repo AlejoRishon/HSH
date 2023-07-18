@@ -42,11 +42,13 @@ export default function Login({ navigation }) {
         }
         else {
           Alert.alert('Enter credentials!')
+          setLoading(false)
         }
       })
       .catch(e => {
         console.log('error:', e)
         Alert.alert('Wrong credentials!')
+        setLoading(false)
       })
   }
 
