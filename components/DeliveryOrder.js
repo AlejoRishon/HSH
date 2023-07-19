@@ -1,11 +1,11 @@
 import {
   Text,
   View,
-  Dimensions,
   TouchableOpacity,
   ScrollView,
+  Modal
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { tableHeader, text } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useTranslation } from 'react-i18next';
@@ -19,93 +19,41 @@ import {
 } from 'react-native-table-component';
 import { getVehicle } from './functions/helper';
 import { moderateScale, verticalScale } from './styles/Metrics';
-import { Checkbox } from 'react-native-paper';
+import { Checkbox, ActivityIndicator, MD2Colors } from 'react-native-paper';
 
-const { width, height } = Dimensions.get('window');
 export default function DeliveryOrder({ navigation, route }) {
   const { t, i18n } = useTranslation();
   const parameter = getVehicle();
   const [showInput, setshowInput] = useState(false);
   const [checked, setChecked] = useState([])
-  const [headerData, setheaderData] = useState([
-    '     ',
-    'DO No.',
-    'Delivery Address',
-    'Liters',
-    'Status',
-  ]);
-  const [detailData, setdetailData] = useState([
-    [
-      'Transfer',
-      'DO-12345678A',
-      '2 Adam Rd, Singapore 289876',
-      '800,000',
-      'Pending',
-    ],
-    [
-      'Transfer',
-      'DO-90485729B',
-      '21 Hillcrest Rd, Singapore 289072',
-      '1,000,000',
-      'Completed',
-    ],
-    [
-      'Transfer',
-      'DO-93877463V',
-      '131 Rifle Range Rd, Singapore 588406',
-      '800',
-      'Completed',
-    ],
-    [
-      'Transfer',
-      'DO-11038479K',
-      '21 Choa Chu Kang North 6, Singapore 689578',
-      '100,000',
-      'Completed',
-    ],
-    [
-      'Transfer',
-      'DO-35493831S',
-      '101 Jln Bahar, Civil Defence Academy Complex, Singapore 649734',
-      '20,000',
-      'Completed',
-    ],
-    [
-      'Transfer',
-      'DO-12345678A',
-      '2 Adam Rd, Singapore 289876',
-      '800,000',
-      'Pending',
-    ],
-    [
-      'Transfer',
-      'DO-90485729B',
-      '21 Hillcrest Rd, Singapore 289072',
-      '1,000,000',
-      'Completed',
-    ],
-    [
-      'Transfer',
-      'DO-93877463V',
-      '131 Rifle Range Rd, Singapore 588406',
-      '800',
-      'Completed',
-    ],
-    [
-      'Transfer',
-      'DO-11038479K',
-      '21 Choa Chu Kang North 6, Singapore 689578',
-      '100,000',
-      'Completed',
-    ],
-    [
-      'Transfer',
-      'DO-35493831S',
-      '101 Jln Bahar, Civil Defence Academy Complex, Singapore 649734',
-      '20,000',
-      'Completed',
-    ],
-  ]);
+  const [orderList, setOrderList] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [detailData, setdetailData] = useState([])
+  const headerData = ['     ', 'DO No.', 'Delivery Address', 'Liters', 'Status']
+
+  useEffect(() => { getDeliveryOrder() }, [])
+
+  const getDeliveryOrder = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch(`https://demo.vellas.net:94/pump/api/Values/getJobDetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&driverId=5`)
+      const json = await response.json()
+      setOrderList(json)
+      setdetailData([
+        [
+          'Transfer',
+          json?.Table[0]?.INV_NO,
+          json?.Table[0]?.PRINT_ADDRESS,
+          '20,000',
+          'Pending',
+        ]
+      ])
+      setLoading(false)
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   const statusColor = {
     Pending: { text: '#EA631D', button: 'rgba(255, 181, 114, 0.47)' },
     Completed: { text: '#3DB792', button: 'rgba(107, 226, 190, 0.24)' },
@@ -173,6 +121,13 @@ export default function DeliveryOrder({ navigation, route }) {
   return (
     <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
       <SideBar all={true} navigation={navigation} />
+      <Modal
+        animationType='none'
+        transparent={true}
+        visible={loading}
+      >
+        <ActivityIndicator animating={true} color={MD2Colors.red800} style={{ marginTop: '25%' }} size='large' />
+      </Modal>
       <View style={{ flex: 1, margin: moderateScale(10) }}>
         <View
           style={{

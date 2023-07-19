@@ -42,7 +42,6 @@ export default function VehicleList({ navigation }) {
   useEffect(() => { getVehicleList() }, [])
 
   const ItemView = ({ item }) => {
-    console.log('saljdblsjcblj:', item)
     return (
       <TouchableOpacity
         style={{ marginVertical: verticalScale(20) }}
