@@ -26,6 +26,7 @@ export default function VehicleList({ navigation }) {
   const [selectedVehicle, setselectedVehicle] = useState(null);
   const [driverId, setDriverId] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
 
   const getVehicleList = async () => {
     try {
@@ -51,6 +52,11 @@ export default function VehicleList({ navigation }) {
     );
   };
 
+  const filteredListData = listData.filter((item) =>
+    item?.Vehicle[0]?.VEHICLE_INFO.toLowerCase().includes(search.toLowerCase())
+  );
+
+
   return (
     <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
       <SideBar all={false} navigation={navigation} />
@@ -58,9 +64,11 @@ export default function VehicleList({ navigation }) {
         <View style={searchBox}>
           <Icon name="search" color="#01315C" size={20} />
           <TextInput
-            style={{ marginLeft: horizontalScale(5) }}
+            style={{ marginLeft: horizontalScale(5), color: '#000' }}
             placeholderTextColor={'#01315C'}
             placeholder="Search for vehicle number"
+            value={search}
+            onChangeText={setSearch}
           />
         </View>
         <Text style={[text, { marginTop: 20 }]}>{`Vehicle List`}</Text>
@@ -81,7 +89,7 @@ export default function VehicleList({ navigation }) {
             }} />
         </View>
         <FlatList
-          data={listData}
+          data={search ? filteredListData : listData}
           showsVerticalScrollIndicator={true}
           renderItem={ItemView}
           keyExtractor={item => item?.driver_id}

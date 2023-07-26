@@ -41,13 +41,13 @@ export default function Login({ navigation }) {
           navigation.navigate('VehicleList')
         }
         else {
-          Alert.alert('Enter credentials!')
+          Alert.alert('Wrong credentials!')
           setLoading(false)
         }
       })
       .catch(e => {
         console.log('error:', e)
-        Alert.alert('Wrong credentials!')
+        Alert.alert('Access Denied!')
         setLoading(false)
       })
   }

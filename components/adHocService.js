@@ -50,6 +50,7 @@ export default function AdHocService({ navigation, route }) {
   const [productList, setProductList] = useState([])
   const [visible, setVisible] = useState(false);
   const [product, setProduct] = useState('')
+  const [category, setCategory] = useState('')
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
   const [nameVisible, setNameVisible] = useState(false);
@@ -59,6 +60,7 @@ export default function AdHocService({ navigation, route }) {
   const [sku, setSku] = useState('')
   const [loading, setLoading] = useState(true)
   const [signatureVisible, setSignatureVisible] = useState(false)
+  const [show, setShow] = useState(false)
 
   const showNameModal = () => setNameVisible(true);
   const hideNameModal = () => setNameVisible(false)
@@ -73,8 +75,8 @@ export default function AdHocService({ navigation, route }) {
   const hideModal = () => setVisible(false)
 
   const [diesel, setdiesel] = useState(0);
-  const [searchQuery, setSearchQuery] = React.useState('');
-
+  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [showCategory, setShowCategory] = useState(false)
 
   const getBusinessName = async () => {
     try {
@@ -103,8 +105,7 @@ export default function AdHocService({ navigation, route }) {
       .then(response => response.json())
       .then(result => {
         console.log(result);
-        var fproducts = result.filter(val => val.BRAND_NAME == 'HSH');
-        setProductList(fproducts)
+        setProductList(result)
       })
       .catch(error => console.error(error))
   }
@@ -137,7 +138,6 @@ export default function AdHocService({ navigation, route }) {
         console.log(result);
         if (result == 'Saved' || result === 'Updated') {
           Alert.alert('Success', 'Job Successful', [
-
             { text: 'OK', onPress: () => navigation.pop() },
           ]);
         } else {
@@ -152,6 +152,32 @@ export default function AdHocService({ navigation, route }) {
   const getInputDiesel = diesel => {
     return setdiesel(diesel);
   };
+
+  const handleCategoryPress = (category) => {
+    setSelectedCategory(category);
+  }
+
+  const renderProductList = () => {
+    if (!selectedCategory) return null;
+
+    const categoryItem = productList?.find(item => item.category === selectedCategory)
+
+    if (!categoryItem) return null;
+
+    return (
+      <FlatList
+        data={categoryItem.product}
+        renderItem={({ item }) => (
+          <TouchableOpacity style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#0465bd', padding: 6 }}
+            onPress={() => {setProduct(item.desc), hideModal()}}
+          >
+            <Text style={[text, { fontSize: moderateScale(12), alignSelf: 'center', color: '#0465bd' }]}>{item.desc}</Text>
+          </TouchableOpacity>
+        )}
+        keyExtractor={(item, index) => index.toString()}
+      />
+    );
+  }
 
   const openGallery = async (type, section) => {
     const options = {
@@ -221,7 +247,7 @@ export default function AdHocService({ navigation, route }) {
 
   const NameView = ({ item }) => {
     return (
-      <TouchableOpacity style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#0465bd' }}
+      <TouchableOpacity style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#0465bd', padding: 6 }}
         onPress={() => { setName(item.name), hideNameModal(), setBusinessId(item.id), setBusinessCode(item.code), setLoading(true) }}
       >
         <Text style={[text, { fontSize: moderateScale(12), alignSelf: 'center', color: '#0465bd' }]}>{item.name}</Text>
@@ -231,17 +257,25 @@ export default function AdHocService({ navigation, route }) {
 
   const AddressView = ({ item }) => {
     return (
-      <TouchableOpacity style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#0465bd' }}
+      <TouchableOpacity style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#0465bd', padding: 6 }}
         onPress={() => { setAddress(item.ADDRESS), hideAddressModal() }}
       >
-        <Text style={[text, { fontSize: moderateScale(12), alignSelf: 'center', color: '#0465bd' }]}>{item.ADDRESS}</Text>
+        {item.ADDRESS ?
+          <Text style={[text, { fontSize: moderateScale(12), alignSelf: 'center', color: '#0465bd' }]}>{item.ADDRESS}</Text>
+          :
+          <Text style={[text, { fontSize: moderateScale(12), alignSelf: 'center', color: '#0465bd' }]}>No Address Available</Text>
+        }
       </TouchableOpacity>
-    );
+    )
   }
 
-  const headerView = ({ section }) => {
+  const renderItem = ({ item }) => {
     return (
-      <Text style={{ fontSize: moderateScale(15), color: '#01315C', left: 5 }}>{section.title}</Text>
+      <TouchableOpacity style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#0465bd', padding: 6 }}
+        onPress={() => { handleCategoryPress(item.category), setShowCategory(true) }}
+      >
+        <Text style={[text, { fontSize: moderateScale(12), alignSelf: 'center', color: '#0465bd' }]} >{item.category}</Text>
+      </TouchableOpacity >
     )
   }
 
@@ -291,34 +325,20 @@ export default function AdHocService({ navigation, route }) {
           <ActivityIndicator animating={true} color={MD2Colors.red800} size='large' />
         </Modal>
         <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={styles.dragDown}>
-          {/* <Searchbar
-            placeholder="Search"
-            placeholderTextColor='#000'
-            icon={() => <MaterialCommunityIcons name="magnify" size={20} color='#000' />}
-            onChangeText={onChangeSearch}
-            value={searchQuery}
-            inputStyle={{ fontSize: moderateScale(10), color: '#000' }}
-            style={{ backgroundColor: 'white', borderWidth: 0.2, height: '15%' }}
-            iconColor='#000'
-            elevation={0}
-          /> */}
-          <SectionList
-            sections={productList.map((item) => ({
-              title: item.BRAND_NAME,
-              data: item.product.map((product) => ({
-                desc: product.desc,
-                SKU: product.SKU,
-                unit: product.unit,
-                category: product.category
-              }))
-            }))}
-            keyExtractor={(item, index) => item + index}
-            renderSectionHeader={headerView}
-            renderItem={ItemView}
-            showsVerticalScrollIndicator={true}
-          />
+          {!showCategory ?
+            <>
+              <Text
+                style={{ fontSize: moderateScale(15), color: '#01315C', marginRight: 40, justifyContent: 'center' }}>
+                {!category ? `Category` : category} <Icon name='angle-down' size={18} style={{ alignSelf: 'center' }} />
+              </Text>
+              <FlatList
+                data={productList}
+                renderItem={renderItem}
+                keyExtractor={(item, index) => `${item}_${index}`}
+              />
+            </> :
+            renderProductList()}
         </Modal>
-
         <Modal visible={nameVisible} onDismiss={hideNameModal} contentContainerStyle={styles.dragDown}>
           <FlatList
             data={businessName}
@@ -429,9 +449,6 @@ export default function AdHocService({ navigation, route }) {
               </Text>
               <Icon name="edit" color="#01315C" size={20} onPress={showSignatureModal} />
             </View>
-            {/* <Modal visible={signatureVisible} onDismiss={hideSignatureModal} contentContainerStyle={{ flex: 1, justifyContent: 'space-around' }}>
-                
-              </Modal> */}
             <Text
               style={{
                 fontSize: width / 60,
