@@ -38,16 +38,15 @@ export default function DeliveryOrder({ navigation, route }) {
     try {
       const response = await fetch(`https://demo.vellas.net:94/pump/api/Values/getJobDetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&driverId=5`)
       const json = await response.json()
-      setOrderList(json)
-      setdetailData([
-        [
-          'Transfer',
-          json?.Table[0]?.INV_NO,
-          json?.Table[0]?.PRINT_ADDRESS,
-          '20,000',
-          'Pending',
-        ]
+      setOrderList(json.Table)
+      const transformedData = json.Table.map(item => [
+        'Transfer',
+        item?.INV_NO,
+        item?.PRINT_ADDRESS,
+        '20,000',
+        'Pending',
       ])
+      setdetailData(transformedData)
       setLoading(false)
     } catch (error) {
       console.error(error);
@@ -210,7 +209,13 @@ export default function DeliveryOrder({ navigation, route }) {
                 key={index.toString()}
                 onPress={() => {
                   //setshowInput(true)
-                  navigation.navigate('EditTrip');
+                  navigation.navigate('EditTrip', {
+                    driver: orderList[0]?.DRIVER_NAME,
+                    inv: orderList[0]?.INV_NO,
+                    name: orderList[0]?.NAME,
+                    address1: orderList[0]?.ADDRESS2,
+                    address2: orderList[0]?.PRINT_ADDRESS
+                  });
                 }}>
                 <TableWrapper key={index} style={{ flexDirection: 'row' }}>
                   {rowData.map((cellData, cellIndex) => (

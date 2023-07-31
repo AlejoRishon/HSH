@@ -9,7 +9,7 @@ import {
   Image,
   TextInput
 } from 'react-native';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   searchBox,
   button,
@@ -28,6 +28,7 @@ import RightConfirm from './ui/RightConfirm';
 import { getVehicle } from './functions/helper';
 import { verticalScale, horizontalScale, moderateScale } from './styles/Metrics';
 const { width, height } = Dimensions.get('window');
+
 export default function TankFill({ navigation, route }) {
   const { t, i18n } = useTranslation();
   const rightBar = useRef(null);
@@ -38,10 +39,26 @@ export default function TankFill({ navigation, route }) {
   const [showConfirm, setshowConfirm] = useState(false);
   const [showList, setShowList] = useState(false)
   const [checked, setChecked] = useState([])
-  const [listData, setListDate] = useState([
-    'MGO01',
-    '10PPM01',
-  ])
+  const [listData, setListData] = useState([])
+
+  const getBrandList = async () => {
+    try {
+      const response = await fetch('https://demo.vellas.net:94/pump/api/Values/getBrandList?_token=67E38BF0-4B45-4D93-891D-8E4F60C5485D');
+      const json = await response.json();
+      setListData(json);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  useEffect(() => { getBrandList() }, [])
+
+    const getProductListForBrand = () => {
+    const selectedBrandData = listData.find(
+      (item) => item.Brand_Desc === selected
+    );
+    return selectedBrandData ? selectedBrandData.productList : [];
+  }
 
   const ItemView = ({ item, index }) => {
     return (
@@ -50,11 +67,13 @@ export default function TankFill({ navigation, route }) {
         style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
         onPress={() => setChecked([index])}
       >
-        <Text style={[text, { fontSize: moderateScale(18) }]}>{item}</Text>
+        <Text style={[text, { fontSize: moderateScale(18) }]}>{item.Desc_Eng}</Text>
         {checked.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>}
       </TouchableOpacity>
     );
   }
+
+  console.log('z;kjnarkjnk:', getProductListForBrand())
 
   return (
     <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
@@ -135,12 +154,12 @@ export default function TankFill({ navigation, route }) {
           <TouchableOpacity
             onPress={() => {
               setshowInput(true);
-              setSelected('shell');
+              setSelected('SHELL');
               setShowList(true)
             }}
             style={[
               boxContainer,
-              { borderWidth: selected == 'shell' ? 3 : 0, borderColor: 'green' },
+              { borderWidth: selected == 'SHELL' ? 3 : 0, borderColor: 'green' },
             ]}>
             <Image source={require('../assets/shell.png')} style={styles.img} />
             {/* <Text style={[text, {fontSize: 25}]}>{`Shell`}</Text> */}
@@ -148,12 +167,12 @@ export default function TankFill({ navigation, route }) {
           <TouchableOpacity
             onPress={() => {
               setshowInput(true);
-              setSelected('caltec');
+              setSelected('Chevron Normal');
               setShowList(true)
             }}
             style={[
               boxContainer,
-              { borderWidth: selected == 'caltec' ? 3 : 0, borderColor: 'green' },
+              { borderWidth: selected == 'Chevron Normal' ? 3 : 0, borderColor: 'green' },
             ]}>
             <Image
               source={require('../assets/caltex.png')}
@@ -173,13 +192,13 @@ export default function TankFill({ navigation, route }) {
           <TouchableOpacity
             onPress={() => {
               setshowInput(true);
-              setSelected('chevron');
+              setSelected('Chevron');
               setShowList(true)
             }}
             style={[
               boxContainer,
               {
-                borderWidth: selected == 'chevron' ? 3 : 0,
+                borderWidth: selected == 'Chevron' ? 3 : 0,
                 borderColor: 'green',
               },
             ]}>
@@ -193,12 +212,12 @@ export default function TankFill({ navigation, route }) {
           <TouchableOpacity
             onPress={() => {
               setshowInput(true);
-              setSelected('spec');
+              setSelected('SPC');
               setShowList(true)
             }}
             style={[
               boxContainer,
-              { borderWidth: selected == 'spec' ? 3 : 0, borderColor: 'green' },
+              { borderWidth: selected == 'SPC' ? 3 : 0, borderColor: 'green' },
             ]}>
             <Image source={require('../assets/spc.png')} style={styles.img} />
 
@@ -244,10 +263,10 @@ export default function TankFill({ navigation, route }) {
               }} />
           </View>
           <FlatList
-            data={listData}
+            data={getProductListForBrand()}
             showsVerticalScrollIndicator={true}
             renderItem={ItemView}
-            keyExtractor={(item, index) => index.toString()}
+            keyExtractor={(item) => item.Id.toString()}
           />
         </View>
       }

@@ -25,6 +25,7 @@ export default function Login({ navigation }) {
 
   useState(() => {
     console.log(lang);
+    setLoading(false)
   }, [lang]);
 
   const handleLogin = () => {
@@ -38,6 +39,7 @@ export default function Login({ navigation }) {
       .then(res => res.json())
       .then(data => {
         if (data.length > 0 && data[0].ACCESS_RIGHT !== null && data[0].CID !== null) {
+          setLoading(false)
           navigation.navigate('VehicleList')
         }
         else {
