@@ -25,6 +25,7 @@ export default function VehicleList({ navigation }) {
   const [listData, setListData] = useState([]);
   const [selectedVehicle, setselectedVehicle] = useState(null);
   const [driverId, setDriverId] = useState(null)
+  const [driverName, setDriverName] = useState('')
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
 
@@ -46,7 +47,11 @@ export default function VehicleList({ navigation }) {
     return (
       <TouchableOpacity
         style={{ marginVertical: verticalScale(20) }}
-        onPress={() => { setselectedVehicle(item?.Vehicle[0]?.VEHICLE_INFO), setDriverId(item?.driver_id) }}>
+        onPress={() => {
+          setselectedVehicle(item?.Vehicle[0]?.VEHICLE_INFO),
+          setDriverId(item?.driver_id),
+          setDriverName(item?.Vehicle[0]?.driver_name)
+        }}>
         <Text style={[text, { fontSize: moderateScale(18) }]}>{item?.Vehicle[0]?.VEHICLE_INFO}</Text>
       </TouchableOpacity>
     );
@@ -142,7 +147,8 @@ export default function VehicleList({ navigation }) {
               setVehicle(selectedVehicle);
               navigation.navigate('Main', {
                 vehicleInfo: selectedVehicle,
-                driverId: driverId
+                driverId: driverId,
+                driverName: driverName
               })
             }}>
             <Text style={buttonText}>Proceed</Text>

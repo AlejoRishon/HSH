@@ -39,6 +39,7 @@ export default function DeliveryOrder({ navigation, route }) {
   //before
   const [previewImageUribefore, setpreviewImageUribefore] = useState('');
   const [imagePreviewbefore, setimagePreviewbefore] = useState(false);
+  const [dieselValue, setDieselValue] = useState(0)
 
   const openGallery = async (type, section) => {
     const options = {
@@ -88,6 +89,8 @@ export default function DeliveryOrder({ navigation, route }) {
     }).start();
     setmoreMeterBe(!moreMeterBe);
   };
+
+  const handleGetInputDiesel = (value) => setDieselValue(value)
 
   useEffect(() => {
     setshowInput(true);
@@ -174,7 +177,7 @@ export default function DeliveryOrder({ navigation, route }) {
               fontWeight: 600,
               marginBottom: 20,
             }}>
-            8000
+            {dieselValue}
           </Text>
           <View
             style={{
@@ -292,6 +295,7 @@ export default function DeliveryOrder({ navigation, route }) {
         show={showInput}
         defaultValue={true}
         keepinView={true}
+        getInputDiesel={handleGetInputDiesel}
         hide={() => setshowInput(false)}
         onSubmit={() => {
           // setSelected(null);

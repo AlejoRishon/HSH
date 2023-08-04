@@ -28,20 +28,28 @@ export default function MasterLoginLogin({ navigation }) {
     }, [lang]);
 
     const login = async () => {
-        setLoading(true)
+        if (!userEmail || !password) {
+            Alert.alert('Please enter your email and password.');
+            return;
+        }
+    
+        setLoading(true);
         await auth().signInWithEmailAndPassword(userEmail, password)
             .then(() => {
                 console.log('Success');
-                navigation.replace('Login')
+                navigation.replace('Login');
             })
             .catch(error => {
-                setLoading(false)
+                setLoading(false);
                 if (error.code === 'auth/invalid-email') {
-                    Alert.alert('email address/password is invalid!');
+                    Alert.alert('Email address/password is invalid!');
+                } else {
+                    Alert.alert('An error occurred while logging in. Please try again.');
                 }
                 console.error(error);
-            })
-    }
+            });
+    };
+    
 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior="height">

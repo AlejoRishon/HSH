@@ -25,9 +25,11 @@ import { getVehicle } from './functions/helper';
 
 const { width, height } = Dimensions.get('window');
 export default function Main({ navigation, route }) {
+  
   const { t, i18n } = useTranslation();
-
   const parameter = getVehicle();
+
+  console.log('zjkgnkvrlzkv:', route?.params)
 
   return (
     <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
@@ -84,7 +86,9 @@ export default function Main({ navigation, route }) {
           }}>
           <TouchableOpacity
             style={boxContainer}
-            onPress={() => navigation.navigate('TankFill')}>
+            onPress={() => navigation.navigate('TankFill', {
+              info: route?.params
+            })}>
             <Icons name="truck-fast" color="#01315C" size={moderateScale(20)} />
             <Text style={[text, { fontSize: moderateScale(12) }]}>{t('tank_fill_up')}</Text>
           </TouchableOpacity>

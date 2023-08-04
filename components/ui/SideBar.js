@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   StatusBar,
@@ -33,7 +33,7 @@ const SideBar = props => {
             marginHorizontal: 20,
             borderRadius: 8,
           }}>
-          <Icon name="home" color="white" style={{padding: 5}} size={20} />
+          <Icon name="home" color="white" style={{ padding: 5 }} size={20} />
         </TouchableOpacity>
       )}
       {props.all && (
@@ -50,7 +50,7 @@ const SideBar = props => {
           <Icon
             name="truck-fast"
             color="white"
-            style={{padding: 5}}
+            style={{ padding: 5 }}
             size={20}
           />
         </TouchableOpacity>
@@ -69,13 +69,14 @@ const SideBar = props => {
           <Icon
             name="format-list-bulleted"
             color="white"
-            style={{padding: 5}}
+            style={{ padding: 5 }}
             size={20}
           />
         </TouchableOpacity>
       )}
       {props.all && (
         <TouchableOpacity
+          onPress={() => props.navigation.navigate('AdHocService')}
           style={{
             backgroundColor: '#01315C',
             justifyContent: 'center',
@@ -87,7 +88,7 @@ const SideBar = props => {
           <Icons
             name="file-text"
             color="white"
-            style={{padding: 5}}
+            style={{ padding: 5 }}
             size={20}
           />
         </TouchableOpacity>
@@ -107,7 +108,7 @@ const SideBar = props => {
             marginHorizontal: 20,
             borderRadius: 8,
           }}>
-          <Icons name="building" color="white" style={{padding: 5}} size={20} />
+          <Icons name="building" color="white" style={{ padding: 5 }} size={20} />
         </TouchableOpacity>
       )}
       <TouchableOpacity
@@ -120,7 +121,7 @@ const SideBar = props => {
           marginHorizontal: 20,
           borderRadius: 8,
         }}>
-        <Icon name="power" color="white" style={{padding: 5}} size={20} />
+        <Icon name="power" color="white" style={{ padding: 5 }} size={20} />
       </TouchableOpacity>
     </View>
   );

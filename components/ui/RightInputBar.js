@@ -23,16 +23,17 @@ export default function RightInputBar({
 }) {
   const fadeAnim = useRef(new Animated.Value(-500)).current;
   const numPad = [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, '<'];
-  const [calVal, setcalVal] = useState([]);
-  const [dval, setdval] = useState(true);
+  const [calVal, setCalVal] = useState([]);
+
   useEffect(() => {
     if (show) {
       onShow();
       if (defaultValue) {
-        setcalVal([8, 0, 0, 0]);
+        setCalVal([8, 0, 0, 0]);
       }
     }
   }, [show]);
+
   const onShow = () => {
     Animated.timing(fadeAnim, {
       toValue: 0,
@@ -40,6 +41,7 @@ export default function RightInputBar({
       useNativeDriver: false,
     }).start();
   };
+
   const onHide = () => {
     hide();
     Animated.timing(fadeAnim, {
@@ -48,17 +50,19 @@ export default function RightInputBar({
       useNativeDriver: false,
     }).start();
   };
+
   const add = val => {
-    setdval(false);
-    var aVal = [...calVal];
-    if (val == '<') {
-      aVal.pop(val);
-      setcalVal(aVal);
+    if (val === '<') {
+      setCalVal(prevVal => prevVal.slice(0, -1));
     } else {
-      aVal.push(val);
-      setcalVal(aVal);
+      setCalVal(prevVal => [...prevVal, val]);
     }
   };
+
+  useEffect(() => {
+    const dieselValue = parseInt(calVal.join('')) || 0;
+    getInputDiesel(dieselValue);
+  }, [calVal, getInputDiesel]);
 
   return (
     <Animated.View
@@ -164,7 +168,7 @@ export default function RightInputBar({
         )}
         <TouchableOpacity
           onPress={() => {
-            onSubmit(calVal.join(''));
+            onSubmit();
             if (!keepinView) {
               onHide();
             }

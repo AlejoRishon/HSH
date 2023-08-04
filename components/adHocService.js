@@ -169,7 +169,7 @@ export default function AdHocService({ navigation, route }) {
         data={categoryItem.product}
         renderItem={({ item }) => (
           <TouchableOpacity style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#0465bd', padding: 6 }}
-            onPress={() => {setProduct(item.desc), hideModal()}}
+            onPress={() => { setProduct(item.desc), hideModal() }}
           >
             <Text style={[text, { fontSize: moderateScale(12), alignSelf: 'center', color: '#0465bd' }]}>{item.desc}</Text>
           </TouchableOpacity>
@@ -569,8 +569,6 @@ export default function AdHocService({ navigation, route }) {
           onSubmit={val => {
             setshowInput(false);
             getInputDiesel(val);
-            //setSelected(null);
-            //setshowConfirm(true);
           }}
         />
         <Modal

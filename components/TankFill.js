@@ -4,21 +4,18 @@ import {
   View,
   Dimensions,
   FlatList,
-  Animated,
   TouchableOpacity,
   Image,
-  TextInput
+  TextInput,
+  Alert
 } from 'react-native';
 import React, { useState, useRef, useEffect } from 'react';
 import {
   searchBox,
-  button,
-  buttonText,
   text,
   boxContainer,
 } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Check from 'react-native-vector-icons/Ionicons'
 import { useTranslation } from 'react-i18next';
 
@@ -40,6 +37,10 @@ export default function TankFill({ navigation, route }) {
   const [showList, setShowList] = useState(false)
   const [checked, setChecked] = useState([])
   const [listData, setListData] = useState([])
+  const [prodId, setProdId] = useState('')
+  const [dieselValue, setDieselValue] = useState(0)
+
+  const handleGetInputDiesel = (value) => setDieselValue(value)
 
   const getBrandList = async () => {
     try {
@@ -51,9 +52,42 @@ export default function TankFill({ navigation, route }) {
     }
   }
 
+  const postJobPurchase = () => {
+    const url = "https://demo.vellas.net:94/pump/api/Values/PostjobPurchase"
+    const data = {
+      "VEHICLE_CODE": route?.params?.info?.vehicleInfo,
+      "DRIVER_ID": route?.params?.info?.driverId,
+      "PROD_ID": prodId,
+      "QTY": dieselValue,
+      "UPDATE_BY": route?.params?.info?.driverName
+    }
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(result => {
+        console.log(result);
+        if (result == 'success') {
+          setSelected(null);
+          setshowInput(false);
+          setshowConfirm(true);
+          setChecked([]);
+        } else {
+          Alert.alert("Job Failed");
+        }
+      })
+      .catch(error => {
+        console.log("Error:", error);
+      })
+  }
+
   useEffect(() => { getBrandList() }, [])
 
-    const getProductListForBrand = () => {
+  const getProductListForBrand = () => {
     const selectedBrandData = listData.find(
       (item) => item.Brand_Desc === selected
     );
@@ -62,18 +96,15 @@ export default function TankFill({ navigation, route }) {
 
   const ItemView = ({ item, index }) => {
     return (
-      // FlatList Item
       <TouchableOpacity
         style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
-        onPress={() => setChecked([index])}
+        onPress={() => { setChecked([index]), setProdId(item.Id) }}
       >
         <Text style={[text, { fontSize: moderateScale(18) }]}>{item.Desc_Eng}</Text>
         {checked.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>}
       </TouchableOpacity>
     );
   }
-
-  console.log('z;kjnarkjnk:', getProductListForBrand())
 
   return (
     <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
@@ -162,7 +193,6 @@ export default function TankFill({ navigation, route }) {
               { borderWidth: selected == 'SHELL' ? 3 : 0, borderColor: 'green' },
             ]}>
             <Image source={require('../assets/shell.png')} style={styles.img} />
-            {/* <Text style={[text, {fontSize: 25}]}>{`Shell`}</Text> */}
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -178,8 +208,6 @@ export default function TankFill({ navigation, route }) {
               source={require('../assets/caltex.png')}
               style={styles.img}
             />
-
-            {/* <Text style={[text, {fontSize: 25}]}>{`Caltec`}</Text> */}
           </TouchableOpacity>
         </View>
         <View
@@ -206,8 +234,6 @@ export default function TankFill({ navigation, route }) {
               source={require('../assets/chevron.png')}
               style={styles.img}
             />
-
-            {/* <Text style={[text, {fontSize: 25}]}>{`Chevron`}</Text> */}
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -220,8 +246,6 @@ export default function TankFill({ navigation, route }) {
               { borderWidth: selected == 'SPC' ? 3 : 0, borderColor: 'green' },
             ]}>
             <Image source={require('../assets/spc.png')} style={styles.img} />
-
-            {/* <Text style={[text, {fontSize: 25}]}>{`Spec`}</Text> */}
           </TouchableOpacity>
         </View>
       </View> :
@@ -270,7 +294,6 @@ export default function TankFill({ navigation, route }) {
           />
         </View>
       }
-
       <View
         style={{
           width: width * 0.35,
@@ -299,12 +322,11 @@ export default function TankFill({ navigation, route }) {
         header="Liters of Diesel Pumped"
         subHeader="Enter quantity of diesel pumped"
         show={showInput}
+        getInputDiesel={handleGetInputDiesel}
         hide={() => { setshowInput(false), setShowList(false) }}
         onSubmit={() => {
-          setSelected(null);
-          setshowInput(false);
-          setshowConfirm(true);
-          setChecked([])
+          handleGetInputDiesel(dieselValue)
+          postJobPurchase()
         }}
       />
       <RightConfirm show={showConfirm} hide={() => setshowConfirm(false)} />

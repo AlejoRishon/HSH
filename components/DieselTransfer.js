@@ -29,6 +29,7 @@ export default function DieselTransfer({ navigation }) {
   const [checkVehicle, setCheckVehicle] = useState([])
   const [checkDriver, setCheckDriver] = useState([])
   const [showList, setShowList] = useState(false)
+  const [dieselValue, setDieselValue] = useState(0)
 
   const Data = [
     'TRB8888A',
@@ -70,6 +71,8 @@ export default function DieselTransfer({ navigation }) {
   const handleButtonPress = (value) => {
     setSelectedButton(value);
   }
+
+  const handleGetInputDiesel = (value) => setDieselValue(value)
 
   return (
     <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
@@ -294,6 +297,7 @@ export default function DieselTransfer({ navigation }) {
         header="Liters of Diesel Pumped"
         subHeader="Enter quantity of diesel pumped"
         show={showInput}
+        getInputDiesel={handleGetInputDiesel}
         hide={() => setshowInput(false)}
         onSubmit={() => {
           setSelected(null);
