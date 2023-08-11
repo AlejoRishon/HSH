@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   ScrollView,
   KeyboardAvoidingView,
+  Alert,
 } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -31,6 +32,7 @@ export default function DeliveryOrder({ navigation, route }) {
   const [uploadtype, setuploadtype] = useState('after');
   const [moreMeterAf, setmoreMeterAf] = useState(false);
   const [moreMeterBe, setmoreMeterBe] = useState(false);
+  const [remark, setRemark] = useState('')
 
   const [modalVisible, setModalVisible] = useState(false);
   //after
@@ -40,6 +42,41 @@ export default function DeliveryOrder({ navigation, route }) {
   const [previewImageUribefore, setpreviewImageUribefore] = useState('');
   const [imagePreviewbefore, setimagePreviewbefore] = useState(false);
   const [dieselValue, setDieselValue] = useState(0)
+
+  console.log('jgfgfhfxhxhxh:', route?.params)
+
+  const PostJobOrderDelivered = () => {
+    const url = "https://demo.vellas.net:94/pump/api/Values/PostJObOrderDelivered"
+    const data = {
+      "JobNumber": route?.params?.inv,
+      "ProdId": "12",
+      "PumpPrevious": 10.4,
+      "PumpNow": 15.2,
+      "Remark": remark,
+      "QTY": dieselValue,
+      "UpdatedBy": route?.params?.driver
+    }
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(result => {
+        console.log(result);
+        if (result == 'success') {
+         Alert.alert('Success')
+         setshowInput(false)
+        } else {
+          Alert.alert("Job Failed");
+        }
+      })
+      .catch(error => {
+        console.log("Error:", error);
+      })
+  }
 
   const openGallery = async (type, section) => {
     const options = {
@@ -285,7 +322,7 @@ export default function DeliveryOrder({ navigation, route }) {
           <KeyboardAvoidingView
             style={{ marginBottom: 50 }}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-            <TextInput style={[remarks]} multiline={true} numberOfLines={4} />
+            <TextInput style={[remarks]} multiline={true} numberOfLines={4} value={remark} onChangeText={text => setRemark(text)} />
           </KeyboardAvoidingView>
         </ScrollView>
       </View>
@@ -298,8 +335,9 @@ export default function DeliveryOrder({ navigation, route }) {
         getInputDiesel={handleGetInputDiesel}
         hide={() => setshowInput(false)}
         onSubmit={() => {
+          PostJobOrderDelivered()
           // setSelected(null);
-          setshowInput(false);
+          // setshowInput(false);
           // setshowConfirm(true);
         }}
       />

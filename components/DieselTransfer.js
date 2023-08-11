@@ -12,14 +12,13 @@ import {
   boxContainer,
 } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Check from 'react-native-vector-icons/Ionicons'
 import SideBar from './ui/SideBar';
 import { getVehicle } from './functions/helper';
 import RightInputBar from './ui/RightInputBar';
 import RightConfirm from './ui/RightConfirm';
 import { horizontalScale, moderateScale, verticalScale } from './styles/Metrics';
-import { Button, ToggleButton } from 'react-native-paper';
-const { width, height } = Dimensions.get('window');
+import { ToggleButton } from 'react-native-paper';
+const { width } = Dimensions.get('window');
 export default function DieselTransfer({ navigation }) {
   const parameter = getVehicle();
   const [selected, setSelected] = useState(null);
@@ -30,47 +29,35 @@ export default function DieselTransfer({ navigation }) {
   const [checkDriver, setCheckDriver] = useState([])
   const [showList, setShowList] = useState(false)
   const [dieselValue, setDieselValue] = useState(0)
+  const [listData, setListData] = useState([]);
 
-  const Data = [
-    'TRB8888A',
-    'TCB9990X',
-    'THL8822B',
-    'TLC1234S',
-    'TRB8888A',
-    'TCB9990X',
-    'THL8822B',
-    'TLC1234S',
-  ]
+  const getVehicleList = async () => {
+    try {
+      const response = await fetch('https://demo.vellas.net:94/pump/api/Values/GetVehicleList?_token=4B3B5C99-57E8-4593-A0AD-3D4EEA3C2F53');
+      const json = await response.json();
+      setListData(json);
+      // setLoading(false)
+    } catch (error) {
+      console.error(error);
+      // setLoading(false)
+    }
+  }
+
+  useEffect(() => { getVehicleList() }, [])
 
   const ItemView = ({ item, index }) => {
     return (
-      // FlatList Item
       <TouchableOpacity
         style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
-        onPress={() => { setCheckDriver([index]), setshowInput(true) }}
+        onPress={() => { setCheckDriver([index]), setshowInput(true), setShowList(false) }}
       >
-        <Text style={[text, { fontSize: moderateScale(15) }]}>{item}</Text>
+        <Text style={[text, { fontSize: moderateScale(15) }]}>{item?.Vehicle[0]?.VEHICLE_INFO}</Text>
         {/* {checkDriver.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>} */}
       </TouchableOpacity>
     );
   }
 
-  // const VehicleView = ({ item, index }) => {
-  //   return (
-  //     // FlatList Item
-  //     <TouchableOpacity
-  //       style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
-  //       onPress={() => setCheckVehicle([index])}
-  //     >
-  //       <Text style={[text, { fontSize: moderateScale(15) }]}>{item}</Text>
-  //       {checkVehicle.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>}
-  //     </TouchableOpacity>
-  //   );
-  // }
-
-  const handleButtonPress = (value) => {
-    setSelectedButton(value);
-  }
+  const handleButtonPress = (value) => setSelectedButton(value)
 
   const handleGetInputDiesel = (value) => setDieselValue(value)
 
@@ -121,7 +108,6 @@ export default function DieselTransfer({ navigation }) {
           </TouchableOpacity>
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-          {/* <Text style={[text, {marginTop: 20}]}>{t('return')}</Text> */}
           <ToggleButton.Group
             value={selectedButton}
             onValueChange={handleButtonPress}>
@@ -157,7 +143,6 @@ export default function DieselTransfer({ navigation }) {
             style={{
               borderBottomWidth: 3,
               borderBottomColor: '#01315C',
-              // marginVertical: 20,
               width: 40,
             }} />
           <View
@@ -221,7 +206,6 @@ export default function DieselTransfer({ navigation }) {
         </View><View
           style={{
             flex: 1,
-            // flexDirection: 'row',
             width: '46%',
             margin: moderateScale(5),
             marginRight: 20,
@@ -285,7 +269,7 @@ export default function DieselTransfer({ navigation }) {
                 }} />
             </View>
             <FlatList
-              data={Data}
+              data={listData}
               showsVerticalScrollIndicator={true}
               renderItem={ItemView}
               keyExtractor={(item, index) => index.toString()}
@@ -303,7 +287,6 @@ export default function DieselTransfer({ navigation }) {
           setSelected(null);
           setshowInput(false);
           setshowConfirm(true);
-          setShowList(!showList)
         }}
       />
       <RightConfirm show={showConfirm} hide={() => setshowConfirm(false)} />

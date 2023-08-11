@@ -43,7 +43,7 @@ export default function DeliveryOrder({ navigation, route }) {
         'Transfer',
         item?.INV_NO,
         item?.PRINT_ADDRESS,
-        '20,000',
+        item?.qty_order,
         'Pending',
       ])
       setdetailData(transformedData)
@@ -213,6 +213,7 @@ export default function DeliveryOrder({ navigation, route }) {
                     driver: orderList[0]?.DRIVER_NAME,
                     inv: orderList[0]?.INV_NO,
                     name: orderList[0]?.NAME,
+                    qty: orderList[0]?.qty_order,
                     address1: orderList[0]?.ADDRESS2,
                     address2: orderList[0]?.PRINT_ADDRESS
                   });
