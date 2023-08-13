@@ -199,7 +199,7 @@ export default function TransferList({ navigation }) {
           <TouchableOpacity
             style={button}
             onPress={() => {
-              setVehicle(selectedVehicle);
+              // setVehicle(selectedVehicle);
               navigation.goBack();
             }}>
             <Text style={buttonText}>Proceed</Text>

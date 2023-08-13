@@ -5,6 +5,7 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
+  Alert
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import {
@@ -18,6 +19,7 @@ import RightInputBar from './ui/RightInputBar';
 import RightConfirm from './ui/RightConfirm';
 import { horizontalScale, moderateScale, verticalScale } from './styles/Metrics';
 import { ToggleButton } from 'react-native-paper';
+
 const { width } = Dimensions.get('window');
 export default function DieselTransfer({ navigation }) {
   const parameter = getVehicle();
@@ -49,7 +51,7 @@ export default function DieselTransfer({ navigation }) {
     return (
       <TouchableOpacity
         style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
-        onPress={() => { setCheckDriver([index]), setshowInput(true), setShowList(false) }}
+        onPress={() => { setCheckDriver([index]), setshowInput(true), setShowList(false); setCheckVehicle(item?.Vehicle[0]?.VEHICLE_INFO) }}
       >
         <Text style={[text, { fontSize: moderateScale(15) }]}>{item?.Vehicle[0]?.VEHICLE_INFO}</Text>
         {/* {checkDriver.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>} */}
@@ -60,7 +62,38 @@ export default function DieselTransfer({ navigation }) {
   const handleButtonPress = (value) => setSelectedButton(value)
 
   const handleGetInputDiesel = (value) => setDieselValue(value)
-
+  const postTransfer = () => {
+    var vehicleData = getVehicle().vehicle;
+    const url = "https://demo.vellas.net:94/pump/api/Values/PostJobTransfer"
+    const data = {
+      "UID": "",
+      "VEHICLE_FROM": vehicleData.VEHICLE_INFO,
+      "VEHICLE_TO": selected == 'vehicle' ? checkVehicle : '',
+      "LOCATION_FROM": "",
+      "LOCATION_TO": selected !== 'vehicle' ? selected : '',
+      "REMARK": "your_remark_value",
+      "UPDATE_BY": vehicleData.DRIVER_NAME ? vehicleData.DRIVER_NAME : 'admin',
+    }
+    console.log(data)
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(result => {
+        console.log(result);
+        Alert.alert('Success')
+        setshowInput(false);
+        setshowConfirm(true);
+        setCheckVehicle('');
+      })
+      .catch(error => {
+        console.log("Error:", error);
+      })
+  }
   return (
     <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
       <SideBar all={true} navigation={navigation} />
@@ -90,7 +123,7 @@ export default function DieselTransfer({ navigation }) {
                 style={{ marginRight: 10 }}
               />
             </TouchableOpacity>
-            <Text style={text}>{parameter.vehicle}</Text>
+            <Text style={text}>{parameter.vehicle.VEHICLE_INFO}</Text>
           </View>
           <TouchableOpacity
             style={{
@@ -107,7 +140,7 @@ export default function DieselTransfer({ navigation }) {
             <Text style={[text, { marginLeft: 10 }]}>Change vehicle</Text>
           </TouchableOpacity>
         </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+        {/* <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
           <ToggleButton.Group
             value={selectedButton}
             onValueChange={handleButtonPress}>
@@ -137,7 +170,7 @@ export default function DieselTransfer({ navigation }) {
             />
           </ToggleButton.Group>
 
-        </View>
+        </View> */}
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View
             style={{
@@ -163,6 +196,7 @@ export default function DieselTransfer({ navigation }) {
           <TouchableOpacity
             onPress={() => {
               setshowInput(true);
+              setCheckVehicle('')
               setSelected('jin');
             }}
             style={[
@@ -183,6 +217,7 @@ export default function DieselTransfer({ navigation }) {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
+              setCheckVehicle('')
               setshowInput(true);
               setSelected('chin');
             }}
@@ -214,6 +249,7 @@ export default function DieselTransfer({ navigation }) {
             onPress={() => {
               setShowList(true);
               setSelected('vehicle');
+              setCheckVehicle('')
             }}
             style={[
               boxContainer,
@@ -286,7 +322,8 @@ export default function DieselTransfer({ navigation }) {
         onSubmit={() => {
           setSelected(null);
           setshowInput(false);
-          setshowConfirm(true);
+          postTransfer();
+          // setshowConfirm(true);
         }}
       />
       <RightConfirm show={showConfirm} hide={() => setshowConfirm(false)} />

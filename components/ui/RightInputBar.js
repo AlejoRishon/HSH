@@ -20,10 +20,19 @@ export default function RightInputBar({
   getInputDiesel,
   hide,
   onSubmit,
+  initialValue
 }) {
   const fadeAnim = useRef(new Animated.Value(-500)).current;
   const numPad = [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, '<'];
   const [calVal, setCalVal] = useState([]);
+
+  useEffect(() => {
+    if (initialValue) {
+      setCalVal(String(initialValue).split("").map((num) => {
+        return Number(num)
+      }))
+    }
+  }, [initialValue]);
 
   useEffect(() => {
     if (show) {

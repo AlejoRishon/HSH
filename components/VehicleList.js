@@ -48,9 +48,12 @@ export default function VehicleList({ navigation }) {
       <TouchableOpacity
         style={{ marginVertical: verticalScale(20) }}
         onPress={() => {
-          setselectedVehicle(item?.Vehicle[0]?.VEHICLE_INFO),
-          setDriverId(item?.driver_id),
-          setDriverName(item?.Vehicle[0]?.driver_name)
+
+          var vehicleData = { ...item?.Vehicle[0], driver_id: item?.driver_id };
+          console.log(vehicleData);
+          setselectedVehicle(vehicleData),
+            setDriverId(item?.driver_id),
+            setDriverName(item?.Vehicle[0]?.driver_name)
         }}>
         <Text style={[text, { fontSize: moderateScale(18) }]}>{item?.Vehicle[0]?.VEHICLE_INFO}</Text>
       </TouchableOpacity>
@@ -136,7 +139,7 @@ export default function VehicleList({ navigation }) {
                 marginTop: verticalScale(45),
               }}>
               <Icon name="md-checkmark-sharp" color="green" size={28} />
-              <Text style={[text, { fontSize: moderateScale(15) }]}>{selectedVehicle}</Text>
+              <Text style={[text, { fontSize: moderateScale(15) }]}>{selectedVehicle.VEHICLE_INFO}</Text>
             </View>
           )}
         </View>
@@ -146,7 +149,7 @@ export default function VehicleList({ navigation }) {
             onPress={() => {
               setVehicle(selectedVehicle);
               navigation.navigate('Main', {
-                vehicleInfo: selectedVehicle,
+                vehicleInfo: selectedVehicle.VEHICLE_INFO,
                 driverId: driverId,
                 driverName: driverName
               })

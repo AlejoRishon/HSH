@@ -24,6 +24,7 @@ import RightInputBar from './ui/RightInputBar';
 import RightConfirm from './ui/RightConfirm';
 import { getVehicle } from './functions/helper';
 import { verticalScale, horizontalScale, moderateScale } from './styles/Metrics';
+import { ScrollView } from 'react-native-gesture-handler';
 const { width, height } = Dimensions.get('window');
 
 export default function TankFill({ navigation, route }) {
@@ -46,6 +47,7 @@ export default function TankFill({ navigation, route }) {
     try {
       const response = await fetch('https://demo.vellas.net:94/pump/api/Values/getBrandList?_token=67E38BF0-4B45-4D93-891D-8E4F60C5485D');
       const json = await response.json();
+      console.log(json);
       setListData(json);
     } catch (error) {
       console.error(error);
@@ -61,6 +63,7 @@ export default function TankFill({ navigation, route }) {
       "QTY": dieselValue,
       "UPDATE_BY": route?.params?.info?.driverName
     }
+    console.log(data)
     fetch(url, {
       method: "POST",
       headers: {
@@ -88,9 +91,7 @@ export default function TankFill({ navigation, route }) {
   useEffect(() => { getBrandList() }, [])
 
   const getProductListForBrand = () => {
-    const selectedBrandData = listData.find(
-      (item) => item.Brand_Desc === selected
-    );
+    const selectedBrandData = selected
     return selectedBrandData ? selectedBrandData.productList : [];
   }
 
@@ -98,7 +99,7 @@ export default function TankFill({ navigation, route }) {
     return (
       <TouchableOpacity
         style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
-        onPress={() => { setChecked([index]), setProdId(item.Id) }}
+        onPress={() => { setChecked([index]), setProdId(item.Id), setshowInput(true) }}
       >
         <Text style={[text, { fontSize: moderateScale(18) }]}>{item.Desc_Eng}</Text>
         {checked.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>}
@@ -135,7 +136,7 @@ export default function TankFill({ navigation, route }) {
                 style={{ marginRight: 10 }}
               />
             </TouchableOpacity>
-            <Text style={text}>{parameter.vehicle}</Text>
+            <Text style={text}>{parameter.vehicle.VEHICLE_INFO}</Text>
           </View>
           <TouchableOpacity
             style={{
@@ -175,79 +176,35 @@ export default function TankFill({ navigation, route }) {
             }}
           />
         </View>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: 'row',
-            marginVertical: verticalScale(20),
-            marginRight: 20,
-          }}>
-          <TouchableOpacity
-            onPress={() => {
-              setshowInput(true);
-              setSelected('SHELL');
-              setShowList(true)
-            }}
-            style={[
-              boxContainer,
-              { borderWidth: selected == 'SHELL' ? 3 : 0, borderColor: 'green' },
-            ]}>
-            <Image source={require('../assets/shell.png')} style={styles.img} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setshowInput(true);
-              setSelected('Chevron Normal');
-              setShowList(true)
-            }}
-            style={[
-              boxContainer,
-              { borderWidth: selected == 'Chevron Normal' ? 3 : 0, borderColor: 'green' },
-            ]}>
-            <Image
-              source={require('../assets/caltex.png')}
-              style={styles.img}
-            />
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: 'row',
-            marginVertical: 20,
-            marginRight: 20,
-          }}>
-          <TouchableOpacity
-            onPress={() => {
-              setshowInput(true);
-              setSelected('Chevron');
-              setShowList(true)
-            }}
-            style={[
-              boxContainer,
-              {
-                borderWidth: selected == 'Chevron' ? 3 : 0,
-                borderColor: 'green',
-              },
-            ]}>
-            <Image
-              source={require('../assets/chevron.png')}
-              style={styles.img}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setshowInput(true);
-              setSelected('SPC');
-              setShowList(true)
-            }}
-            style={[
-              boxContainer,
-              { borderWidth: selected == 'SPC' ? 3 : 0, borderColor: 'green' },
-            ]}>
-            <Image source={require('../assets/spc.png')} style={styles.img} />
-          </TouchableOpacity>
-        </View>
+        <ScrollView style={{ flex: 1 }}>
+          <View style={{ flexWrap: 'wrap', flexDirection: 'row', }}>
+            {listData.length > 0 && listData.map((val, index) => {
+              return <View
+                key={index}
+                style={{
+                  marginVertical: verticalScale(20),
+                  width: '45%',
+
+                }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setshowInput(false);
+                    setSelected(val);
+                    setShowList(true);
+                    setChecked([])
+                  }}
+                  style={[
+                    boxContainer,
+                    { borderWidth: selected?.Brand_Desc == val.Brand_Desc ? 3 : 0, borderColor: 'green' },
+                  ]}>
+                  {/* <Image source={require('../assets/shell.png')} style={styles.img} /> */}
+                  <Text style={{ fontSize: width / 35, color: 'red', fontWeight: '900', paddingVertical: 10, paddingHorizontal: 5 }}>{val.Brand_Desc}</Text>
+                </TouchableOpacity>
+              </View>
+            })}
+          </View>
+
+        </ScrollView>
       </View> :
         <View style={{ flex: 1, padding: moderateScale(15) }}>
           <View style={{ flexDirection: 'row', justifyContent: 'center' }}>

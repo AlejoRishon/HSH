@@ -43,19 +43,20 @@ export default function DeliveryOrder({ navigation, route }) {
   const [imagePreviewbefore, setimagePreviewbefore] = useState(false);
   const [dieselValue, setDieselValue] = useState(0)
 
-  console.log('jgfgfhfxhxhxh:', route?.params)
+  // console.log('jgfgfhfxhxhxh:', route?.params)
 
   const PostJobOrderDelivered = () => {
     const url = "https://demo.vellas.net:94/pump/api/Values/PostJObOrderDelivered"
     const data = {
-      "JobNumber": route?.params?.inv,
-      "ProdId": "12",
-      "PumpPrevious": 10.4,
-      "PumpNow": 15.2,
+      "JobNumber": route?.params?.invData.INV_NO,
+      "ProdId": route?.params?.invData.PO_NO ? route.params.invData.PO_NO : 0,
+      "PumpPrevious": route?.params?.invData.qty_order,
+      "PumpNow": dieselValue,
       "Remark": remark,
-      "QTY": dieselValue,
-      "UpdatedBy": route?.params?.driver
+      "QTY": route?.params?.invData.qty_order,
+      "UpdatedBy": route?.params?.invData.DRIVER_NAME ? route.params.invData.DRIVER_NAME : 'admin'
     }
+    console.log(data);
     fetch(url, {
       method: "POST",
       headers: {
@@ -66,15 +67,12 @@ export default function DeliveryOrder({ navigation, route }) {
       .then(response => response.json())
       .then(result => {
         console.log(result);
-        if (result == 'success') {
-         Alert.alert('Success')
-         setshowInput(false)
-        } else {
-          Alert.alert("Job Failed");
-        }
+        Alert.alert('Success')
+        setshowInput(false);
       })
       .catch(error => {
         console.log("Error:", error);
+        Alert.alert("Job Failed");
       })
   }
 
@@ -130,6 +128,7 @@ export default function DeliveryOrder({ navigation, route }) {
   const handleGetInputDiesel = (value) => setDieselValue(value)
 
   useEffect(() => {
+    setDieselValue(route?.params?.invData.qty_order)
     setshowInput(true);
   }, []);
 
@@ -158,7 +157,7 @@ export default function DeliveryOrder({ navigation, route }) {
                 fontWeight: 600,
                 marginBottom: 5,
               }}>
-              {route?.params?.driver}
+              {route?.params?.invData.DRIVER_NAME}
             </Text>
             <Text
               style={{
@@ -166,7 +165,7 @@ export default function DeliveryOrder({ navigation, route }) {
                 color: '#01315C',
                 marginBottom: 10,
               }}>
-              {route?.params?.inv}
+              {route?.params?.invData.INV_NO}
             </Text>
           </View>
           <View
@@ -177,15 +176,15 @@ export default function DeliveryOrder({ navigation, route }) {
             }}>
             <Text
               style={{ fontSize: width / 60, color: '#01315C', marginRight: 40 }}>
-              {route?.params?.name}
+              {route?.params?.invData.NAME}
             </Text>
           </View>
           <Animated.View style={{ height: 150, marginBottom: 10 }}>
             <Text style={{ fontSize: 18, color: '#01315C' }}>
-              {route?.params?.address1}
+              {route?.params?.invData.PRINT_ADDRESS}
             </Text>
             <Text style={{ fontSize: 18, color: '#01315C', marginVertical: 10 }}>
-              {route?.params?.address2}
+              {route?.params?.invData.ADDRESS2}
             </Text>
           </Animated.View>
           <View
@@ -330,10 +329,11 @@ export default function DeliveryOrder({ navigation, route }) {
         header="Liters of Diesel Sold"
         subHeader="Enter quantity of diesel sold"
         show={showInput}
-        defaultValue={true}
+        defaultValue={false}
         keepinView={true}
         getInputDiesel={handleGetInputDiesel}
         hide={() => setshowInput(false)}
+        initialValue={route?.params?.invData.qty_order}
         onSubmit={() => {
           PostJobOrderDelivered()
           // setSelected(null);

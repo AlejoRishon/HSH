@@ -153,7 +153,7 @@ export default function DeliveryOrder({ navigation, route }) {
                 style={{ marginRight: 10 }}
               />
             </TouchableOpacity>
-            <Text style={text}>{parameter.vehicle}</Text>
+            <Text style={text}>{parameter.vehicle.VEHICLE_INFO}</Text>
           </View>
           <TouchableOpacity
             style={{
@@ -215,7 +215,8 @@ export default function DeliveryOrder({ navigation, route }) {
                     name: orderList[0]?.NAME,
                     qty: orderList[0]?.qty_order,
                     address1: orderList[0]?.ADDRESS2,
-                    address2: orderList[0]?.PRINT_ADDRESS
+                    address2: orderList[0]?.PRINT_ADDRESS,
+                    invData: orderList.find((val) => val.INV_NO === rowData[1])
                   });
                 }}>
                 <TableWrapper key={index} style={{ flexDirection: 'row' }}>

@@ -27,6 +27,7 @@ import { Portal, Provider, Modal, Button } from 'react-native-paper';
 import { horizontalScale, moderateScale } from './styles/Metrics';
 import { ActivityIndicator, MD2Colors } from 'react-native-paper';
 import SignatureCapture from 'react-native-signature-capture';
+import { getVehicle } from './functions/helper';
 
 const { width } = Dimensions.get('window');
 export default function AdHocService({ navigation, route }) {
@@ -114,12 +115,14 @@ export default function AdHocService({ navigation, route }) {
 
   const postJoborder = () => {
     const url = "https://demo.vellas.net:94/pump/api/Values/postJobOrder";
+    var vehicleData = getVehicle();
+    console.log(vehicleData);
     const data = {
       CUST_CODE: businessCode,
       Location: address,
       REC_DATE: "2023-05-25 00:00:00.000",
-      VEHICLE_CODE: route?.params?.info?.vehicleInfo,
-      DRIVER_ID: route?.params?.info?.driverId,
+      VEHICLE_CODE: vehicleData.vehicle.VEHICLE_INFO,
+      DRIVER_ID: vehicleData.vehicle.driver_id,
       DELIVERED: 1,
       SKU: sku,
       Qty: diesel,

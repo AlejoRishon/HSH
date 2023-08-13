@@ -32,7 +32,7 @@ export default function MasterLoginLogin({ navigation }) {
             Alert.alert('Please enter your email and password.');
             return;
         }
-    
+
         setLoading(true);
         await auth().signInWithEmailAndPassword(userEmail, password)
             .then(() => {
@@ -41,6 +41,7 @@ export default function MasterLoginLogin({ navigation }) {
             })
             .catch(error => {
                 setLoading(false);
+                // console.log(JSON.stringify(error));
                 if (error.code === 'auth/invalid-email') {
                     Alert.alert('Email address/password is invalid!');
                 } else {
@@ -49,7 +50,7 @@ export default function MasterLoginLogin({ navigation }) {
                 console.error(error);
             });
     };
-    
+
 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior="height">

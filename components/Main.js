@@ -25,7 +25,7 @@ import { getVehicle } from './functions/helper';
 
 const { width, height } = Dimensions.get('window');
 export default function Main({ navigation, route }) {
-  
+
   const { t, i18n } = useTranslation();
   const parameter = getVehicle();
 
@@ -43,7 +43,7 @@ export default function Main({ navigation, route }) {
             alignItems: 'center',
           }}>
 
-          <Text style={text}>{parameter.vehicle}</Text>
+          <Text style={text}>{parameter.vehicle.VEHICLE_INFO}</Text>
           <TouchableOpacity
             style={{
               borderWidth: 1,
@@ -147,7 +147,7 @@ export default function Main({ navigation, route }) {
               alignItems: 'center',
               marginTop: verticalScale(45),
             }}>
-            <Text style={[text, { fontSize: 25 }]}>{parameter.vehicle}</Text>
+            <Text style={[text, { fontSize: 25 }]}>{parameter.vehicle.VEHICLE_INFO}</Text>
           </View>
         </View>
       </View>

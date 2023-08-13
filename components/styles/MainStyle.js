@@ -12,12 +12,12 @@ export const searchBox = {
   borderWidth: 1,
   borderColor: '#01315C',
   borderRadius: 8,
-  marginTop: verticalScale(10),
+  marginTop: verticalScale(5),
   paddingHorizontal: horizontalScale(8),
   flexDirection: 'row',
   alignItems: 'center',
   width: horizontalScale(170),
-  padding: moderateScale(7),
+  padding: moderateScale(1),
 };
 export const boxContainer = {
   flex: 1,
