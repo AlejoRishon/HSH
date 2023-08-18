@@ -3,7 +3,7 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  Modal
+  Modal,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { tableHeader, text } from './styles/MainStyle';
@@ -19,7 +19,7 @@ import {
 } from 'react-native-table-component';
 import { getVehicle } from './functions/helper';
 import { moderateScale, verticalScale } from './styles/Metrics';
-import { Checkbox, ActivityIndicator, MD2Colors } from 'react-native-paper';
+import { Checkbox, ActivityIndicator, MD2Colors, Avatar, Button, TextInput } from 'react-native-paper';
 
 export default function DeliveryOrder({ navigation, route }) {
   const { t, i18n } = useTranslation();
@@ -29,17 +29,31 @@ export default function DeliveryOrder({ navigation, route }) {
   const [orderList, setOrderList] = useState([])
   const [loading, setLoading] = useState(true)
   const [detailData, setdetailData] = useState([])
+  const [showDate, setShowDate] = useState(false)
   const headerData = ['     ', 'DO No.', 'Delivery Address', 'Liters', 'Status']
+  const [dateInput, setDateInput] = useState('');
+  const [formattedDate, setFormattedDate] = useState('');
+
+  const formatDate = (inputDate) => {
+    const [day, month, year] = inputDate.split('-');
+    const formatted = `${day}-${month}-${year}`;
+    return formatted;
+  };
+
+  const handleDateChange = () => {
+    const formatted = formatDate(dateInput);
+    setFormattedDate(formatted);
+  };
 
   useEffect(() => { getDeliveryOrder() }, [])
 
   const getDeliveryOrder = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`https://demo.vellas.net:94/pump/api/Values/getJobDetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&driverId=5`)
+      const response = await fetch(`https://demo.vellas.net:94/pump/api/Values/getJobDetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&driverId=11&date=17-05-2023`)
       const json = await response.json()
-      setOrderList(json.Table)
-      const transformedData = json.Table.map(item => [
+      setOrderList(json)
+      const transformedData = json?.map(item => [
         'Transfer',
         item?.INV_NO,
         item?.PRINT_ADDRESS,
@@ -52,6 +66,7 @@ export default function DeliveryOrder({ navigation, route }) {
       console.error(error);
     }
   }
+  console.log('Qdljgn:', orderList)
 
   const statusColor = {
     Pending: { text: '#EA631D', button: 'rgba(255, 181, 114, 0.47)' },
@@ -70,7 +85,7 @@ export default function DeliveryOrder({ navigation, route }) {
     }
   }
 
-  const sortedData = detailData.sort((a, b) => {
+  const sortedData = detailData?.sort((a, b) => {
     if (a[4] === 'Pending' && b[4] === 'Completed') {
       return -1
     } else if (a[4] === 'Completed' && b[4] === 'Pending') {
@@ -155,20 +170,50 @@ export default function DeliveryOrder({ navigation, route }) {
             </TouchableOpacity>
             <Text style={text}>{parameter.vehicle.VEHICLE_INFO}</Text>
           </View>
-          <TouchableOpacity
-            style={{
-              borderWidth: 1,
-              borderColor: '#01315C',
-              borderRadius: 8,
-              flexDirection: 'row',
-              alignItems: 'center',
-              padding: 10,
-            }}
-            onPress={() => navigation.navigate('TransferList')}>
-            <Icon name="exchange" color="#01315C" size={20} />
+          <View style={{ flexDirection: 'row' }}>
+            <TouchableOpacity
+              style={{
+                borderWidth: 1,
+                borderColor: '#01315C',
+                borderRadius: 8,
+                flexDirection: 'row',
+                alignItems: 'center',
+                padding: 10,
+              }}
+              onPress={() => navigation.navigate('TransferList', {
+                info: route?.params
+              })}>
+              <Icon name="exchange" color="#01315C" size={20} />
 
-            <Text style={[text, { marginLeft: 10 }]}>Transfer</Text>
-          </TouchableOpacity>
+              <Text style={[text, { marginLeft: 10 }]}>Transfer</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowDate(true)}>
+              <Avatar.Icon size={50} icon="calendar-month-outline" style={{ backgroundColor: 'white' }} color='#01315C' />
+            </TouchableOpacity>
+          </View>
+          <Modal
+            animationType='none'
+            transparent={true}
+            visible={true}
+          >
+            <View style={{ alignSelf: 'center', height: '40%', width: '40%', borderRadius: 10, backgroundColor: 'white', elevation: 2, justifyContent: 'space-around', marginTop: '20%' }}>
+              <TextInput
+                placeholder="dd-mm-yyyy"
+                value={dateInput}
+                onChangeText={setDateInput}
+                style={{
+                  borderBottomWidth: 1,
+                  borderColor: '#333',
+                  backgroundColor: 'white',
+                  width: '80%',
+                  alignSelf: 'center',
+                  height: 50
+                }}
+              />
+              <Button onPress={handleDateChange} style={{ alignSelf: 'flex-end', marginRight: 40, marginTop: 20 }} >Save</Button>
+              <Text style={{ marginTop: 20 }}>Formatted Date: {formattedDate}</Text>
+            </View>
+          </Modal>
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
           <Text style={[text, { marginTop: verticalScale(15) }]}>
@@ -204,7 +249,7 @@ export default function DeliveryOrder({ navigation, route }) {
             contentContainerStyle={{
               flexGrow: 1,
             }}>
-            {sortedData.map((rowData, index) => (
+            {sortedData?.map((rowData, index) => (
               <TouchableOpacity
                 key={index.toString()}
                 onPress={() => {
@@ -220,7 +265,7 @@ export default function DeliveryOrder({ navigation, route }) {
                   });
                 }}>
                 <TableWrapper key={index} style={{ flexDirection: 'row' }}>
-                  {rowData.map((cellData, cellIndex) => (
+                  {rowData?.map((cellData, cellIndex) => (
                     <Cell
                       flex={cellIndex == 0 ? 0.5 : cellIndex == 2 ? 2 : 1}
                       key={cellIndex}

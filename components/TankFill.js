@@ -40,6 +40,9 @@ export default function TankFill({ navigation, route }) {
   const [listData, setListData] = useState([])
   const [prodId, setProdId] = useState('')
   const [dieselValue, setDieselValue] = useState(0)
+  const [showWareHouse, setShowWareHouse] = useState(false)
+  const [wareHouseList, setWareHouseList] = useState([])
+  const [wareHouseId, setWareHouseId] = useState(null)
 
   const handleGetInputDiesel = (value) => setDieselValue(value)
 
@@ -47,12 +50,23 @@ export default function TankFill({ navigation, route }) {
     try {
       const response = await fetch('https://demo.vellas.net:94/pump/api/Values/getBrandList?_token=67E38BF0-4B45-4D93-891D-8E4F60C5485D');
       const json = await response.json();
-      console.log(json);
+      // console.log(json);
       setListData(json);
     } catch (error) {
       console.error(error);
     }
   }
+
+  const getWareHouseList = async () => {
+    try {
+      const response = await fetch('https://demo.vellas.net:94/pump/api/Values/GetWarehouseList?_token=FF9B60E6-5DB4-4A58-BBA9-4C3F84CE9105')
+      const json = await response.json();
+      console.log('Warehouse List:', json)
+      setWareHouseList(json);
+    } catch (error) {
+      console.error('Error fetching warehouse list:', error);
+    }
+  };
 
   const postJobPurchase = () => {
     const url = "https://demo.vellas.net:94/pump/api/Values/PostjobPurchase"
@@ -88,7 +102,44 @@ export default function TankFill({ navigation, route }) {
       })
   }
 
-  useEffect(() => { getBrandList() }, [])
+  const postJobTransfer = () => {
+    var vehicleData = getVehicle().vehicle;
+    const url = "https://demo.vellas.net:94/pump/api/Values/PostJobTransfer"
+    const data = {
+      "VEHICLE_FROM": vehicleData.VEHICLE_INFO,
+      "VEHICLE_TO": "",
+      "LOCATION_FROM": wareHouseId,
+      "LOCATION_TO": "",
+      "REMARK": "",
+      "UPDATE_BY": vehicleData.DRIVER_NAME ? vehicleData.DRIVER_NAME : 'admin',
+      "PROD_ID": 0,
+      "QTY": dieselValue,
+      "TRANSFER_TYPE": 0
+    }
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(result => {
+        console.log(result);
+        setSelected(null);
+        setshowInput(false);
+        setshowConfirm(true);
+        setChecked([]);
+      })
+      .catch(error => {
+        console.log("Error:", error);
+      })
+  }
+
+  useEffect(() => {
+    getBrandList()
+    getWareHouseList()
+  }, [])
 
   const getProductListForBrand = () => {
     const selectedBrandData = selected
@@ -154,9 +205,16 @@ export default function TankFill({ navigation, route }) {
           </TouchableOpacity>
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-          <Text style={[text, { marginTop: verticalScale(20) }]}>
-            {t('brand')}
-          </Text>
+          <TouchableOpacity onPress={() => setShowWareHouse(!showWareHouse)}>
+            <Text style={[text, { marginTop: verticalScale(20) }]}>
+              {t('brand')}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setShowWareHouse(true)}>
+            <Text style={[text, { marginTop: verticalScale(20), marginLeft: horizontalScale(20) }]}>
+              {t('Warehouse')}
+            </Text>
+          </TouchableOpacity>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View
@@ -176,15 +234,14 @@ export default function TankFill({ navigation, route }) {
             }}
           />
         </View>
-        <ScrollView style={{ flex: 1 }}>
+        {!showWareHouse ? <ScrollView style={{ flex: 1 }}>
           <View style={{ flexWrap: 'wrap', flexDirection: 'row', }}>
-            {listData.length > 0 && listData.map((val, index) => {
+            {listData.length > 0 && listData?.slice(2)?.map((val, index) => {
               return <View
                 key={index}
                 style={{
                   marginVertical: verticalScale(20),
                   width: '45%',
-
                 }}>
                 <TouchableOpacity
                   onPress={() => {
@@ -204,7 +261,36 @@ export default function TankFill({ navigation, route }) {
             })}
           </View>
 
-        </ScrollView>
+        </ScrollView> :
+          <ScrollView style={{ flex: 1 }}>
+            <View style={{ flexWrap: 'wrap', flexDirection: 'row', }}>
+              {wareHouseList.length > 0 && wareHouseList?.map((val, index) => {
+                return <View
+                  key={index}
+                  style={{
+                    marginVertical: verticalScale(20),
+                    width: '45%',
+                  }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setshowInput(true);
+                      setSelected(val);
+                      setChecked([])
+                      setWareHouseId(val?.id)
+                    }}
+                    style={[
+                      boxContainer,
+                      { borderWidth: selected?.name == val.name ? 3 : 0, borderColor: 'green' },
+                    ]}>
+                    {/* <Image source={require('../assets/shell.png')} style={styles.img} /> */}
+                    <Text style={{ fontSize: width / 35, color: 'red', fontWeight: '900', paddingVertical: 10, paddingHorizontal: 5 }}>{val.name}</Text>
+                  </TouchableOpacity>
+                </View>
+              })}
+            </View>
+
+          </ScrollView>}
+
       </View> :
         <View style={{ flex: 1, padding: moderateScale(15) }}>
           <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
@@ -283,7 +369,11 @@ export default function TankFill({ navigation, route }) {
         hide={() => { setshowInput(false), setShowList(false) }}
         onSubmit={() => {
           handleGetInputDiesel(dieselValue)
-          postJobPurchase()
+          if (showWareHouse == true) {
+            postJobTransfer()
+          } else {
+            postJobPurchase()
+          }
         }}
       />
       <RightConfirm show={showConfirm} hide={() => setshowConfirm(false)} />

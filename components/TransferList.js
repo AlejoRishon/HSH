@@ -17,8 +17,7 @@ import { ActivityIndicator, MD2Colors } from 'react-native-paper';
 
 const { width } = Dimensions.get('window');
 
-export default function TransferList({ navigation }) {
-
+export default function TransferList({ navigation, route }) {
   const { t } = useTranslation();
 
   const [checkVehicle, setCheckVehicle] = useState([])
@@ -39,6 +38,36 @@ export default function TransferList({ navigation }) {
     }
   }
 
+  const PostJobTransfer = () => {
+    const url = `https://demo.vellas.net:94/pump/api/Values/PostJobTransfer`
+    const data = {
+      "VEHICLE_FROM": route?.params?.info?.vehicle,
+      "VEHICLE_TO": "VEHICLE_TO2",
+      "LOCATION_FROM": "",
+      "LOCATION_TO": "",
+      "REMARK": "your_remark",
+      "UPDATE_BY": route?.params?.info?.name,
+      "PROD_ID": 526,
+      "QTY": 165,
+      "TRANSFER_TYPE": 1
+    }
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(result => {
+        console.log(result);
+        Alert.alert('Success')
+      })
+      .catch(error => {
+        console.log("Error:", error);
+      })
+  }
+
   useEffect(() => {
     getVehicleList()
     onPressCheck()
@@ -47,12 +76,16 @@ export default function TransferList({ navigation }) {
   const [selectedVehicle, setselectedVehicle] = useState(null);
 
   const onPressCheck = () => {
-    if (checkVehicle.length === 1 && checkDriver.length === 1) {
+    if (checkVehicle.length === 1 && checkDriver.length === 0) {
+      setCheckDriver([checkVehicle[0]]); 
+      setProceed(true);
+    } else if (checkVehicle.length === 1 && checkDriver.length === 1) {
       setProceed(true);
     } else {
       setProceed(false);
     }
-  }
+  };
+  
 
   const DriverView = ({ item, index }) => {
     return (
@@ -70,7 +103,7 @@ export default function TransferList({ navigation }) {
     return (
       <TouchableOpacity
         style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
-        onPress={() => { setCheckVehicle([index]) }}>
+        onPress={() => { setCheckVehicle([index]); setCheckDriver([index]) }}>
         <Text style={[text, { fontSize: moderateScale(15) }]}>{item?.Vehicle[0]?.VEHICLE_INFO}</Text>
         {checkVehicle.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>}
       </TouchableOpacity>

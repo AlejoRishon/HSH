@@ -43,8 +43,6 @@ export default function DeliveryOrder({ navigation, route }) {
   const [imagePreviewbefore, setimagePreviewbefore] = useState(false);
   const [dieselValue, setDieselValue] = useState(0)
 
-  // console.log('jgfgfhfxhxhxh:', route?.params)
-
   const PostJobOrderDelivered = () => {
     const url = "https://demo.vellas.net:94/pump/api/Values/PostJObOrderDelivered"
     const data = {
@@ -336,9 +334,6 @@ export default function DeliveryOrder({ navigation, route }) {
         initialValue={route?.params?.invData.qty_order}
         onSubmit={() => {
           PostJobOrderDelivered()
-          // setSelected(null);
-          // setshowInput(false);
-          // setshowConfirm(true);
         }}
       />
       <Modal

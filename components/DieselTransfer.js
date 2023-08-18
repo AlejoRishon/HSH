@@ -17,8 +17,7 @@ import SideBar from './ui/SideBar';
 import { getVehicle } from './functions/helper';
 import RightInputBar from './ui/RightInputBar';
 import RightConfirm from './ui/RightConfirm';
-import { horizontalScale, moderateScale, verticalScale } from './styles/Metrics';
-import { ToggleButton } from 'react-native-paper';
+import { moderateScale, verticalScale } from './styles/Metrics';
 
 const { width } = Dimensions.get('window');
 export default function DieselTransfer({ navigation }) {
@@ -32,6 +31,8 @@ export default function DieselTransfer({ navigation }) {
   const [showList, setShowList] = useState(false)
   const [dieselValue, setDieselValue] = useState(0)
   const [listData, setListData] = useState([]);
+  const [wareHouseList, setWareHouseList] = useState([])
+  const [wareHouseId, setWareHouseId] = useState(null)
 
   const getVehicleList = async () => {
     try {
@@ -45,7 +46,21 @@ export default function DieselTransfer({ navigation }) {
     }
   }
 
-  useEffect(() => { getVehicleList() }, [])
+  const getWareHouseList = async () => {
+    try {
+      const response = await fetch('https://demo.vellas.net:94/pump/api/Values/GetWarehouseList?_token=FF9B60E6-5DB4-4A58-BBA9-4C3F84CE9105')
+      const json = await response.json();
+      // console.log('Warehouse List:', json)
+      setWareHouseList(json);
+    } catch (error) {
+      console.error('Error fetching warehouse list:', error);
+    }
+  }
+
+  useEffect(() => {
+    getVehicleList()
+    getWareHouseList()
+  }, [])
 
   const ItemView = ({ item, index }) => {
     return (
@@ -58,21 +73,25 @@ export default function DieselTransfer({ navigation }) {
       </TouchableOpacity>
     );
   }
+  console.log('Qaljnrnev:', wareHouseId)
 
   const handleButtonPress = (value) => setSelectedButton(value)
 
   const handleGetInputDiesel = (value) => setDieselValue(value)
+
   const postTransfer = () => {
     var vehicleData = getVehicle().vehicle;
     const url = "https://demo.vellas.net:94/pump/api/Values/PostJobTransfer"
     const data = {
-      "UID": "",
       "VEHICLE_FROM": vehicleData.VEHICLE_INFO,
       "VEHICLE_TO": selected == 'vehicle' ? checkVehicle : '',
       "LOCATION_FROM": "",
-      "LOCATION_TO": selected !== 'vehicle' ? selected : '',
-      "REMARK": "your_remark_value",
+      "LOCATION_TO": selected !== 'vehicle' ? selected : wareHouseId,
+      "REMARK": "",
       "UPDATE_BY": vehicleData.DRIVER_NAME ? vehicleData.DRIVER_NAME : 'admin',
+      "PROD_ID": 0,
+      "QTY": dieselValue,
+      "TRANSFER_TYPE": 1
     }
     console.log(data)
     fetch(url, {
@@ -85,15 +104,18 @@ export default function DieselTransfer({ navigation }) {
       .then(response => response.json())
       .then(result => {
         console.log(result);
-        Alert.alert('Success')
+        // Alert.alert('Success')
         setshowInput(false);
         setshowConfirm(true);
         setCheckVehicle('');
+        setSelected(null);
       })
       .catch(error => {
         console.log("Error:", error);
+        Alert.alert('Job Failed!')
       })
   }
+
   return (
     <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
       <SideBar all={true} navigation={navigation} />
@@ -140,37 +162,6 @@ export default function DieselTransfer({ navigation }) {
             <Text style={[text, { marginLeft: 10 }]}>Change vehicle</Text>
           </TouchableOpacity>
         </View>
-        {/* <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-          <ToggleButton.Group
-            value={selectedButton}
-            onValueChange={handleButtonPress}>
-            <ToggleButton
-              icon={() => <View><Text style={{ color: selectedButton !== 'button1' ? '#01315C' : '#fff' }}>Input</Text></View>}
-              value="button1"
-              color='#01315C'
-              style={{
-                backgroundColor: selectedButton === 'button1' ? '#01315C' : '#FFF',
-                color: selectedButton === 'button2' ? '#FFFFFF' : '#01315C',
-                width: horizontalScale(30),
-                height: verticalScale(70),
-                margin: 2
-              }}
-            />
-            <ToggleButton
-              icon={() => <View><Text style={{ color: selectedButton !== 'button2' ? '#01315C' : '#fff' }}>Output</Text></View>}
-              value="button2"
-              color='#01315C'
-              style={{
-                backgroundColor: selectedButton === 'button2' ? '#01315C' : '#FFF',
-                color: selectedButton === 'button2' ? '#FFF' : '#01315C',
-                width: horizontalScale(30),
-                height: verticalScale(70),
-                margin: 2
-              }}
-            />
-          </ToggleButton.Group>
-
-        </View> */}
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View
             style={{
@@ -192,58 +183,42 @@ export default function DieselTransfer({ navigation }) {
             flexDirection: 'row',
             margin: moderateScale(5),
             marginRight: 20,
+            flexWrap: 'wrap',
+            alignItems: 'center'
           }}>
-          <TouchableOpacity
-            onPress={() => {
-              setshowInput(true);
-              setCheckVehicle('')
-              setSelected('jin');
-            }}
-            style={[
-              boxContainer,
-              { borderWidth: selected == 'jin' ? 3 : 0, borderColor: 'green' },
-            ]}>
-            <Image
-              source={require('../assets/jin.png')}
+          {wareHouseList.length > 0 && wareHouseList?.map((val, index) => {
+            return <View
+              key={index}
               style={{
-                flex: 1,
-                height: undefined,
-                width: undefined,
-                alignSelf: 'stretch',
-              }}
-              resizeMode="contain" />
-            <Text
-              style={[text, { fontSize: moderateScale(12) }]}>{`Jin Besut`}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setCheckVehicle('')
-              setshowInput(true);
-              setSelected('chin');
-            }}
-            style={[
-              boxContainer,
-              { borderWidth: selected == 'chin' ? 3 : 0, borderColor: 'green' },
-            ]}>
-            <Image
-              source={require('../assets/chin.png')}
-              resizeMode="contain"
-              style={{
-                flex: 1,
-                height: undefined,
-                width: undefined,
-                alignSelf: 'stretch'
-              }}
-            />
-            <Text
-              style={[text, { fontSize: moderateScale(12) }]}>{`Chin Bee`}</Text>
-          </TouchableOpacity>
-        </View><View
+                marginVertical: verticalScale(20),
+                width: '45%',
+              }}>
+              <TouchableOpacity
+                onPress={() => {
+                  setshowInput(true);
+                  setSelected(val);
+                  setCheckVehicle('')
+                  setWareHouseId(val?.id)
+                }}
+                style={[
+                  boxContainer,
+                  { borderWidth: selected?.name == val.name ? 3 : 0, borderColor: 'green' },
+                ]}>
+
+                {/* <Image source={require('../assets/shell.png')} style={styles.img} /> */}
+                <Text style={{ fontSize: width / 35, color: 'red', fontWeight: '900', paddingVertical: 10, paddingHorizontal: 5 }}>{val.name}</Text>
+              </TouchableOpacity>
+            </View>
+          })}
+
+        </View>
+        <View
           style={{
             flex: 1,
             width: '46%',
             margin: moderateScale(5),
-            marginRight: 20,
+            marginRight: 28,
+            alignSelf: 'flex-end',
           }}>
           <TouchableOpacity
             onPress={() => {
@@ -253,7 +228,7 @@ export default function DieselTransfer({ navigation }) {
             }}
             style={[
               boxContainer,
-              { borderWidth: selected == 'vehicle' ? 3 : 0, borderColor: 'green' },
+              { borderWidth: selected == 'vehicle' ? 3 : 0, borderColor: 'green', width: 100 },
             ]}>
             <Icon name='truck' size={20} color='#01315C' />
             <Text
@@ -320,8 +295,8 @@ export default function DieselTransfer({ navigation }) {
         getInputDiesel={handleGetInputDiesel}
         hide={() => setshowInput(false)}
         onSubmit={() => {
-          setSelected(null);
-          setshowInput(false);
+          // setSelected(null);
+          // setshowInput(false);
           postTransfer();
           // setshowConfirm(true);
         }}

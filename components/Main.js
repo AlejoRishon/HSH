@@ -94,7 +94,10 @@ export default function Main({ navigation, route }) {
           </TouchableOpacity>
           <TouchableOpacity
             style={boxContainer}
-            onPress={() => navigation.navigate('DeliveryOrder')}>
+            onPress={() => navigation.navigate('DeliveryOrder', {
+              vehicle: route?.params?.vehicleInfo,
+              name: route?.params?.driverName
+            })}>
             <Icons name="format-list-bulleted" color="#01315C" size={moderateScale(20)} />
             <Text style={[text, { fontSize: moderateScale(12) }]}>{t('delivery_order')}</Text>
           </TouchableOpacity>
