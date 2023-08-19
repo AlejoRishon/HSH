@@ -9,6 +9,8 @@ import React, { useState, useEffect } from 'react';
 import { tableHeader, text } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useTranslation } from 'react-i18next';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+
 import SideBar from './ui/SideBar';
 import RightDeliveryDetails from './ui/RightDeliveryDetails';
 import {
@@ -33,26 +35,41 @@ export default function DeliveryOrder({ navigation, route }) {
   const headerData = ['     ', 'DO No.', 'Delivery Address', 'Liters', 'Status']
   const [dateInput, setDateInput] = useState('');
   const [formattedDate, setFormattedDate] = useState('');
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
+  const showDatePicker = () => {
+    console.log(parameter)
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (date) => {
+    // console.warn("A date has been picked: ", formatDate(new Date(date).toLocaleDateString()));
+    getDeliveryOrder(formatDate(new Date(date).toLocaleDateString()))
+    hideDatePicker();
+  };
 
   const formatDate = (inputDate) => {
-    const [day, month, year] = inputDate.split('-');
+    const [month, day, year] = inputDate.split('/');
+
     const formatted = `${day}-${month}-${year}`;
     return formatted;
   };
 
-  const handleDateChange = () => {
-    const formatted = formatDate(dateInput);
-    setFormattedDate(formatted);
-  };
 
-  useEffect(() => { getDeliveryOrder() }, [])
 
-  const getDeliveryOrder = async () => {
+  useEffect(() => { getDeliveryOrder(formatDate(new Date().toLocaleDateString())) }, [])
+
+  const getDeliveryOrder = async (sdate) => {
     setLoading(true)
     try {
-      const response = await fetch(`https://demo.vellas.net:94/pump/api/Values/getJobDetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&driverId=11&date=17-05-2023`)
-      const json = await response.json()
-      setOrderList(json)
+      const response = await fetch(`https://demo.vellas.net:94/pump/api/Values/getJobDetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&driverId=${parameter.vehicle.driver_id}&date=${sdate}`)
+      const json = await response.json();
+      console.log(json);
+      setOrderList(json);
       const transformedData = json?.map(item => [
         'Transfer',
         item?.INV_NO,
@@ -66,7 +83,6 @@ export default function DeliveryOrder({ navigation, route }) {
       console.error(error);
     }
   }
-  console.log('Qdljgn:', orderList)
 
   const statusColor = {
     Pending: { text: '#EA631D', button: 'rgba(255, 181, 114, 0.47)' },
@@ -187,11 +203,11 @@ export default function DeliveryOrder({ navigation, route }) {
 
               <Text style={[text, { marginLeft: 10 }]}>Transfer</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setShowDate(true)}>
+            <TouchableOpacity onPress={showDatePicker}>
               <Avatar.Icon size={50} icon="calendar-month-outline" style={{ backgroundColor: 'white' }} color='#01315C' />
             </TouchableOpacity>
           </View>
-          <Modal
+          {/* <Modal
             animationType='none'
             transparent={true}
             visible={true}
@@ -213,7 +229,7 @@ export default function DeliveryOrder({ navigation, route }) {
               <Button onPress={handleDateChange} style={{ alignSelf: 'flex-end', marginRight: 40, marginTop: 20 }} >Save</Button>
               <Text style={{ marginTop: 20 }}>Formatted Date: {formattedDate}</Text>
             </View>
-          </Modal>
+          </Modal> */}
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
           <Text style={[text, { marginTop: verticalScale(15) }]}>
@@ -294,6 +310,12 @@ export default function DeliveryOrder({ navigation, route }) {
         </Table>
       </View>
       <RightDeliveryDetails show={showInput} hide={() => setshowInput(false)} />
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
+      />
     </View>
   );
 }
