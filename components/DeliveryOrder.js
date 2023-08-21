@@ -207,29 +207,6 @@ export default function DeliveryOrder({ navigation, route }) {
               <Avatar.Icon size={50} icon="calendar-month-outline" style={{ backgroundColor: 'white' }} color='#01315C' />
             </TouchableOpacity>
           </View>
-          {/* <Modal
-            animationType='none'
-            transparent={true}
-            visible={true}
-          >
-            <View style={{ alignSelf: 'center', height: '40%', width: '40%', borderRadius: 10, backgroundColor: 'white', elevation: 2, justifyContent: 'space-around', marginTop: '20%' }}>
-              <TextInput
-                placeholder="dd-mm-yyyy"
-                value={dateInput}
-                onChangeText={setDateInput}
-                style={{
-                  borderBottomWidth: 1,
-                  borderColor: '#333',
-                  backgroundColor: 'white',
-                  width: '80%',
-                  alignSelf: 'center',
-                  height: 50
-                }}
-              />
-              <Button onPress={handleDateChange} style={{ alignSelf: 'flex-end', marginRight: 40, marginTop: 20 }} >Save</Button>
-              <Text style={{ marginTop: 20 }}>Formatted Date: {formattedDate}</Text>
-            </View>
-          </Modal> */}
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
           <Text style={[text, { marginTop: verticalScale(15) }]}>

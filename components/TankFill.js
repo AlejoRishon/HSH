@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
-  Alert
+  Alert,
+  Modal
 } from 'react-native';
 import React, { useState, useRef, useEffect } from 'react';
 import {
@@ -18,7 +19,7 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Check from 'react-native-vector-icons/Ionicons'
 import { useTranslation } from 'react-i18next';
-
+import { ActivityIndicator, MD2Colors } from 'react-native-paper';
 import SideBar from './ui/SideBar';
 import RightInputBar from './ui/RightInputBar';
 import RightConfirm from './ui/RightConfirm';
@@ -43,6 +44,7 @@ export default function TankFill({ navigation, route }) {
   const [showWareHouse, setShowWareHouse] = useState(false)
   const [wareHouseList, setWareHouseList] = useState([])
   const [wareHouseId, setWareHouseId] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const handleGetInputDiesel = (value) => setDieselValue(value)
 
@@ -52,6 +54,7 @@ export default function TankFill({ navigation, route }) {
       const json = await response.json();
       // console.log(json);
       setListData(json);
+      setLoading(false)
     } catch (error) {
       console.error(error);
     }
@@ -234,9 +237,35 @@ export default function TankFill({ navigation, route }) {
             }}
           />
         </View>
+        <Modal
+          animationType='none'
+          transparent={true}
+          visible={loading}>
+          <View style={{ justifyContent: 'center', flex: 1 }}>
+            <ActivityIndicator animating={true} color={MD2Colors.red800} style={{ position: 'absolute', alignSelf: 'center' }} size='large' />
+          </View>
+        </Modal>
         {!showWareHouse ? <ScrollView style={{ flex: 1 }}>
           <View style={{ flexWrap: 'wrap', flexDirection: 'row', }}>
             {listData.length > 0 && listData?.slice(2)?.map((val, index) => {
+              let imageSource;
+
+              switch (val.Brand_Desc) {
+                case "SPC":
+                  imageSource = require('../assets/spc.png');
+                  break;
+                case "SHELL":
+                  imageSource = require('../assets/shell.png');
+                  break;
+                case "Mobil":
+                  imageSource = require('../assets/spc.png');
+                  break;
+                case "Chevron":
+                  imageSource = require('../assets/chevron.png');
+                  break;
+                default:
+                  imageSource = require('../assets/spc.png');
+              }
               return <View
                 key={index}
                 style={{
@@ -254,8 +283,8 @@ export default function TankFill({ navigation, route }) {
                     boxContainer,
                     { borderWidth: selected?.Brand_Desc == val.Brand_Desc ? 3 : 0, borderColor: 'green' },
                   ]}>
-                  {/* <Image source={require('../assets/shell.png')} style={styles.img} /> */}
-                  <Text style={{ fontSize: width / 35, color: 'red', fontWeight: '900', paddingVertical: 10, paddingHorizontal: 5 }}>{val.Brand_Desc}</Text>
+                  <Image source={imageSource} style={{ width: '100%', resizeMode: 'contain' }} />
+                  {/* <Text style={{ fontSize: width / 35, color: 'red', fontWeight: '900', paddingVertical: 10, paddingHorizontal: 5 }}>{val.Brand_Desc}</Text> */}
                 </TouchableOpacity>
               </View>
             })}
@@ -265,6 +294,21 @@ export default function TankFill({ navigation, route }) {
           <ScrollView style={{ flex: 1 }}>
             <View style={{ flexWrap: 'wrap', flexDirection: 'row', }}>
               {wareHouseList.length > 0 && wareHouseList?.map((val, index) => {
+                let imageSource
+
+                switch (val.id) {
+                  case 1:
+                    imageSource = require('../assets/jin.png');
+                    break;
+                  case 2:
+                    imageSource = require('../assets/chin.png');
+                    break;
+                  case 3:
+                    imageSource = require('../assets/penjuru.jpeg');
+                    break;
+                  default:
+                    imageSource = require('../assets/shell.png');
+                }
                 return <View
                   key={index}
                   style={{
@@ -280,10 +324,10 @@ export default function TankFill({ navigation, route }) {
                     }}
                     style={[
                       boxContainer,
-                      { borderWidth: selected?.name == val.name ? 3 : 0, borderColor: 'green' },
+                      { borderWidth: selected?.name == val.name ? 3 : 0, borderColor: 'green', height: 120 },
                     ]}>
-                    {/* <Image source={require('../assets/shell.png')} style={styles.img} /> */}
-                    <Text style={{ fontSize: width / 35, color: 'red', fontWeight: '900', paddingVertical: 10, paddingHorizontal: 5 }}>{val.name}</Text>
+                    <Image source={imageSource} style={styles.img} />
+                    <Text style={{ fontSize: width / 35, color: 'red', fontWeight: '900' }}>{val.name}</Text>
                   </TouchableOpacity>
                 </View>
               })}
@@ -383,7 +427,8 @@ export default function TankFill({ navigation, route }) {
 
 const styles = StyleSheet.create({
   img: {
-    width: horizontalScale(60),
+    width: '100%',
+    height: '65%',
     resizeMode: 'contain',
   },
 });
