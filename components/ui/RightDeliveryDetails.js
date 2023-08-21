@@ -10,14 +10,14 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
-import React, {useRef, useEffect, useState} from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import * as ImagePicker from 'react-native-image-picker';
-import {searchBox, button, buttonText, remarks} from '../styles/MainStyle';
+import { searchBox, button, buttonText, remarks } from '../styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useTranslation } from 'react-i18next';
-import {TextInput} from 'react-native-paper';
-import {Image} from 'react-native-animatable';
-const {width,height}=Dimensions.get('window');
+import { TextInput } from 'react-native-paper';
+import { Image } from 'react-native-animatable';
+const { width, height } = Dimensions.get('window');
 
 export default function RightDeliveryDetails({
   show,
@@ -27,7 +27,7 @@ export default function RightDeliveryDetails({
   onSubmit,
 }) {
   const [modalVisible, setModalVisible] = useState(false);
-  const {t,i18n}=useTranslation();
+  const { t, i18n } = useTranslation();
   const fadeAnim = useRef(new Animated.Value(-800)).current;
   const heightAnim = useRef(new Animated.Value(0)).current;
   const heightMeterAfAnim = useRef(new Animated.Value(0)).current;
@@ -38,14 +38,14 @@ export default function RightDeliveryDetails({
   const [moreMeterAf, setmoreMeterAf] = useState(false);
   const [moreMeterBe, setmoreMeterBe] = useState(false);
 
-  const [uploadtype,setuploadtype]=useState('after');
+  const [uploadtype, setuploadtype] = useState('after');
 
   //after
-  const [previewImageUri,setpreviewImageUri]=useState('');
-  const [imagePreview,setimagePreview]=useState(false);
+  const [previewImageUri, setpreviewImageUri] = useState('');
+  const [imagePreview, setimagePreview] = useState(false);
   //before
-  const [previewImageUribefore,setpreviewImageUribefore]=useState('');
-  const [imagePreviewbefore,setimagePreviewbefore]=useState(false);
+  const [previewImageUribefore, setpreviewImageUribefore] = useState('');
+  const [imagePreviewbefore, setimagePreviewbefore] = useState(false);
   useEffect(() => {
     if (show) {
       onShow(-400);
@@ -112,28 +112,28 @@ export default function RightDeliveryDetails({
     }
   };
 
-  const openGallery=async (type,section)=>{
-    const options={mediaType:'image',includeBase64: false,maxHeight: 800,maxWidth: 800};
+  const openGallery = async (type, section) => {
+    const options = { mediaType: 'image', includeBase64: false, maxHeight: 800, maxWidth: 800 };
     try {
       var response;
-      if(type){
-        response=await ImagePicker.launchImageLibrary(options);
-      }else{
-        response=await ImagePicker.launchCamera(options);
+      if (type) {
+        response = await ImagePicker.launchImageLibrary(options);
+      } else {
+        response = await ImagePicker.launchCamera(options);
       }
-      console.log("resp",response);
+      console.log("resp", response);
       // setFile(response);
-      if(section==='after'){
+      if (section === 'after') {
         setpreviewImageUri(response.assets[0].uri);
         setimagePreview(true)
         onToggleMoreAf(80);
-      }else{
+      } else {
         setpreviewImageUribefore(response.assets[0].uri)
         setimagePreviewbefore(true);
         onToggleMoreBe(80);
       }
-       
-    }catch (error) {
+
+    } catch (error) {
       console.log(error);
     }
     setModalVisible(!modalVisible)
@@ -153,7 +153,7 @@ export default function RightDeliveryDetails({
           backgroundColor: '#EEF7FF',
           borderTopLeftRadius: 15,
           borderBottomLeftRadius: 15,
-          width: (width/2.8),
+          width: (width / 2.8),
         }}>
         <ScrollView
           style={{
@@ -162,23 +162,23 @@ export default function RightDeliveryDetails({
           }}>
           <Text
             style={{
-              fontSize: width/40,
+              fontSize: width / 40,
               color: '#01315C',
               fontWeight: 600,
               marginBottom: 5,
             }}>
             Eddie Ang
           </Text>
-          <Text style={{fontSize: width/60, color: '#01315C', marginBottom: 10}}>
+          <Text style={{ fontSize: width / 60, color: '#01315C', marginBottom: 10 }}>
             DO-12345678A
           </Text>
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
-              marginBottom:10,
+              marginBottom: 10,
             }}>
-            <Text style={{fontSize: width/60, color: '#01315C', marginRight: 40}}>
+            <Text style={{ fontSize: width / 60, color: '#01315C', marginRight: 40 }}>
               BDP Global Project Logistics Pte Ltd
             </Text>
             {more ? (
@@ -197,11 +197,11 @@ export default function RightDeliveryDetails({
               />
             )}
           </View>
-          <Animated.View style={{height: heightAnim,marginBottom:10}}>
-            <Text style={{fontSize: 18, color: '#01315C'}}>
+          <Animated.View style={{ height: heightAnim, marginBottom: 10 }}>
+            <Text style={{ fontSize: 18, color: '#01315C' }}>
               101 Jln Bahar, Civil Defence Academy Complex, Singapore 649734
             </Text>
-            <Text style={{fontSize: 18, color: '#01315C', marginVertical: 10}}>
+            <Text style={{ fontSize: 18, color: '#01315C', marginVertical: 10 }}>
               BDP Global Project Logistics Pte LtdContact Person: Bill Gates
               (+6598765432)
             </Text>
@@ -219,9 +219,9 @@ export default function RightDeliveryDetails({
               alignItems: 'center',
               marginBottom: 10,
             }}>
-              <View>
-              <Text style={{fontSize: 25, color: '#01315C', marginRight: 40}}>
-              {t('litres_of_diesel_sold')}
+            <View>
+              <Text style={{ fontSize: 25, color: '#01315C', marginRight: 40 }}>
+                {t('litres_of_diesel_sold')}
               </Text>
             </View>
             <Icon
@@ -233,7 +233,7 @@ export default function RightDeliveryDetails({
           </View>
           <Text
             style={{
-              fontSize: width/45,
+              fontSize: width / 45,
               color: '#01315C',
               fontWeight: 600,
               marginBottom: 20,
@@ -247,14 +247,14 @@ export default function RightDeliveryDetails({
               alignItems: 'center',
               marginBottom: 10,
             }}>
-            <Text style={{fontSize:width/45, color: '#01315C', marginRight: 40}}>
+            <Text style={{ fontSize: width / 45, color: '#01315C', marginRight: 40 }}>
               {t('signature')}
             </Text>
             <Icon name="edit" color="#01315C" size={20} />
           </View>
           <Text
             style={{
-              fontSize: width/60,
+              fontSize: width / 60,
               color: '#3DB792',
               marginBottom: 20,
             }}>
@@ -267,15 +267,15 @@ export default function RightDeliveryDetails({
               marginBottom: 20,
             }}>
             <View>
-              <Text style={{fontSize: 20, color: '#01315C', marginRight: 40}}>
-              {t('metre_reading_after')}
+              <Text style={{ fontSize: 20, color: '#01315C', marginRight: 40 }}>
+                {t('metre_reading_after')}
               </Text>
             </View>
-            
+
             <Icon
-              onPress={() =>{
+              onPress={() => {
                 setuploadtype('after');
-                  setModalVisible(true);
+                setModalVisible(true);
               }}
               name="edit"
               color="#01315C"
@@ -298,7 +298,7 @@ export default function RightDeliveryDetails({
             )} */}
           </View>
           {/* <View style={{marginBottom:20}}> */}
-              {/* {
+          {/* {
                 imagePreview ?
                 <>
                 <TouchableOpacity
@@ -416,17 +416,17 @@ export default function RightDeliveryDetails({
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
             }}>
-              {
-                previewImageUri.length==0 ?
+            {
+              previewImageUri.length == 0 ?
                 null
                 :
                 <Image
-                  style={{height: '100%', flex: 1}}
-                  source={{uri:previewImageUri}}
+                  style={{ height: '100%', flex: 1 }}
+                  source={{ uri: previewImageUri }}
                   resizeMode="contain"
                 />
-              }
-            
+            }
+
           </Animated.View>
           <View
             style={{
@@ -436,22 +436,22 @@ export default function RightDeliveryDetails({
               backgroundColor: '#EEF7FF',
             }}>
             <View>
-              <Text style={{fontSize: 20, color: '#01315C', marginRight: 40}}>
-              {t('metre_reading_before')}
+              <Text style={{ fontSize: 20, color: '#01315C', marginRight: 40 }}>
+                {t('metre_reading_before')}
               </Text>
             </View>
             <Icon
-              onPress={() =>{
+              onPress={() => {
                 setuploadtype('before');
-                  setModalVisible(true);
+                setModalVisible(true);
               }}
               name="edit"
               color="#01315C"
               size={20}
             />
           </View>
-          
-{/* <View style={{marginBottom:20}}>
+
+          {/* <View style={{marginBottom:20}}>
               {
                 imagePreviewbefore ?
                 <>
@@ -569,17 +569,17 @@ export default function RightDeliveryDetails({
               justifyContent: 'space-between',
               alignItems: 'center',
             }}>
-              {previewImageUribefore.length==0 ?
+            {previewImageUribefore.length == 0 ?
               null
               :
               <Image
-              style={{height: '100%', flex: 1}}
-              source={{uri:previewImageUribefore}}
-              resizeMode="contain"
-            />
-              }
-            
-            
+                style={{ height: '100%', flex: 1 }}
+                source={{ uri: previewImageUribefore }}
+                resizeMode="contain"
+              />
+            }
+
+
           </Animated.View>
           <Text
             style={{
@@ -591,7 +591,7 @@ export default function RightDeliveryDetails({
             {t('remarks')}
           </Text>
           <KeyboardAvoidingView
-            style={{marginBottom: 50}}
+            style={{ marginBottom: 50 }}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <TextInput style={remarks} multiline={true} numberOfLines={4} />
           </KeyboardAvoidingView>
@@ -615,7 +615,7 @@ export default function RightDeliveryDetails({
           </Text>
         </TouchableOpacity>
       </View>
-      <View style={{backgroundColor: '#01315C', width: 400}}>
+      <View style={{ backgroundColor: '#01315C', width: 400 }}>
         <View
           style={{
             flex: 1,
@@ -631,7 +631,7 @@ export default function RightDeliveryDetails({
             }}>
             Liters of Diesel Pumped
           </Text>
-          <Text style={{fontSize: 20, color: '#fff', marginBottom: 40}}>
+          <Text style={{ fontSize: 20, color: '#fff', marginBottom: 40 }}>
             Enter quantity of diesel pumped
           </Text>
           <View
@@ -642,7 +642,7 @@ export default function RightDeliveryDetails({
               padding: 20,
               borderRadius: 8,
             }}>
-            <Text style={{fontSize: 30, color: '#01315C'}}>
+            <Text style={{ fontSize: 30, color: '#01315C' }}>
               {calVal.join('')}
             </Text>
           </View>
@@ -653,9 +653,10 @@ export default function RightDeliveryDetails({
               justifyContent: 'space-between',
               marginTop: 20,
             }}>
-            {numPad.map(val => {
+            {numPad.map((val, index) => {
               return (
                 <TouchableOpacity
+                  key={index}
                   onPress={() => add(val)}
                   style={{
                     padding: 10,
@@ -677,7 +678,7 @@ export default function RightDeliveryDetails({
             })}
           </View>
         </View>
-        <View style={{flexDirection: 'row', padding: 20}}>
+        <View style={{ flexDirection: 'row', padding: 20 }}>
           <TouchableOpacity
             onPress={() => onShow(-400)}
             style={{
@@ -700,7 +701,7 @@ export default function RightDeliveryDetails({
             onPress={() => {
               onShow(-400);
             }}
-            style={{backgroundColor: '#EAF5FF', flex: 1, borderRadius: 8}}>
+            style={{ backgroundColor: '#EAF5FF', flex: 1, borderRadius: 8 }}>
             <Text
               style={{
                 color: '#01315C',
@@ -723,71 +724,71 @@ export default function RightDeliveryDetails({
         }}>
         <View style={styles.centeredView}>
           <View style={[styles.modalView]}>
-            <View style={{flexDirection:'row'}}>
-              <View style={{width:'80%',height:50,backgroundColor:'#d3d3d370'}}>
-                <Text style={[{fontSize:22,color:"#000",fontWeight:'600',paddingLeft:10,paddingVertical:8}]}>{t('Metre Reading After')}</Text>
+            <View style={{ flexDirection: 'row' }}>
+              <View style={{ width: '80%', height: 50, backgroundColor: '#d3d3d370' }}>
+                <Text style={[{ fontSize: 22, color: "#000", fontWeight: '600', paddingLeft: 10, paddingVertical: 8 }]}>{t('Metre Reading After')}</Text>
               </View>
-              <View style={{width:'20%',height:50,backgroundColor:'#d3d3d370',alignItems:'center',justifyContent:'center'}}>
+              <View style={{ width: '20%', height: 50, backgroundColor: '#d3d3d370', alignItems: 'center', justifyContent: 'center' }}>
                 <TouchableOpacity onPress={() => setModalVisible(!modalVisible)} style={{
-                  width:50,
-                  height:50,
-                  justifyContent:'center',
-                  alignItems:'center'
+                  width: 50,
+                  height: 50,
+                  justifyContent: 'center',
+                  alignItems: 'center'
                 }}>
-                <Text style={[{fontSize:22,color:"#000",paddingLeft:20,fontWeight:'600'}]}>
-                <Icon
-                    name="close"
-                    color="#000"
-                    size={20}
-                  />
-                </Text>
+                  <Text style={[{ fontSize: 22, color: "#000", paddingLeft: 20, fontWeight: '600' }]}>
+                    <Icon
+                      name="close"
+                      color="#000"
+                      size={20}
+                    />
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
-            <View style={{flexDirection:'row',paddingTop:20,paddingLeft:20}}>
-                          <TouchableOpacity  style={{
-                                width:80,
-                                height:80,
-                                borderWidth:2,
-                                borderColor:'navy',
-                                marginRight:50,
-                                flexDirection: 'column',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                              }} 
-                              onPress={()=>{
-                                openGallery(true,uploadtype)
-                                
-                              }}>
-                                <Icon
-                              name="image"
-                              color="navy"
-                              size={20}
-                            />
-                              <Text style={{color:'navy'}}>Gallery</Text>
-                                
-                              </TouchableOpacity>
-                              <TouchableOpacity  style={{
-                                width:80,
-                                height:80,
-                                borderWidth:2,
-                                borderColor:'navy',
-                                marginRight:10,
-                                flexDirection: 'column',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                              }} 
-                              onPress={()=>{
-                                openGallery(false,uploadtype)
-                              }}>
-                                <Icon
-                              name="camera"
-                              color="navy"
-                              size={20}
-                            />
-                                <Text style={{color:'navy'}}>Camera</Text>
-                              </TouchableOpacity>
-                
+            <View style={{ flexDirection: 'row', paddingTop: 20, paddingLeft: 20 }}>
+              <TouchableOpacity style={{
+                width: 80,
+                height: 80,
+                borderWidth: 2,
+                borderColor: 'navy',
+                marginRight: 50,
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+                onPress={() => {
+                  openGallery(true, uploadtype)
+
+                }}>
+                <Icon
+                  name="image"
+                  color="navy"
+                  size={20}
+                />
+                <Text style={{ color: 'navy' }}>Gallery</Text>
+
+              </TouchableOpacity>
+              <TouchableOpacity style={{
+                width: 80,
+                height: 80,
+                borderWidth: 2,
+                borderColor: 'navy',
+                marginRight: 10,
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+                onPress={() => {
+                  openGallery(false, uploadtype)
+                }}>
+                <Icon
+                  name="camera"
+                  color="navy"
+                  size={20}
+                />
+                <Text style={{ color: 'navy' }}>Camera</Text>
+              </TouchableOpacity>
+
             </View>
           </View>
         </View>
@@ -805,8 +806,8 @@ const styles = StyleSheet.create({
     marginTop: 22,
   },
   modalView: {
-    width:400,
-    height:200,
+    width: 400,
+    height: 200,
     margin: 20,
     backgroundColor: 'white',
     borderRadius: 20,
@@ -837,6 +838,6 @@ const styles = StyleSheet.create({
   },
   modalText: {
     marginBottom: 15,
-    color:'#000'
+    color: '#000'
   },
 });
