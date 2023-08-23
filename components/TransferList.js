@@ -77,7 +77,7 @@ export default function TransferList({ navigation, route }) {
 
   const onPressCheck = () => {
     if (checkVehicle.length === 1 && checkDriver.length === 0) {
-      setCheckDriver([checkVehicle[0]]); 
+      setCheckDriver([checkVehicle[0]]);
       setProceed(true);
     } else if (checkVehicle.length === 1 && checkDriver.length === 1) {
       setProceed(true);
@@ -85,30 +85,84 @@ export default function TransferList({ navigation, route }) {
       setProceed(false);
     }
   };
-  
 
+
+  // const DriverView = ({ item, index }) => {
+  //   return (
+  //     <TouchableOpacity
+  //       style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
+  //       onPress={() => setCheckDriver([index])}
+  //     >
+  //       <Text style={[text, { fontSize: moderateScale(15) }]}>{item?.Vehicle[0]?.driver_name}</Text>
+  //       {checkDriver.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>}
+  //     </TouchableOpacity>
+  //   );
+  // }
+
+  // const VehicleView = ({ item, index }) => {
+  //   return (
+  //     <TouchableOpacity
+  //       style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
+  //       onPress={() => { setCheckVehicle([index]); setCheckDriver([index]) }}>
+  //       <Text style={[text, { fontSize: moderateScale(15) }]}>{item?.Vehicle[0]?.VEHICLE_INFO}</Text>
+  //       {checkVehicle.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>}
+  //     </TouchableOpacity>
+  //   );
+  // }
   const DriverView = ({ item, index }) => {
+    const isSelected = checkDriver.includes(index);
+
     return (
       <TouchableOpacity
-        style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
+        style={{
+          marginVertical: verticalScale(20),
+          flexDirection: 'row',
+        }}
         onPress={() => setCheckDriver([index])}
       >
-        <Text style={[text, { fontSize: moderateScale(15) }]}>{item?.Vehicle[0]?.driver_name}</Text>
-        {checkDriver.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>}
+        <Text
+          style={[
+            text,
+            {
+              fontSize: moderateScale(15),
+              color: isSelected ? 'green' : '#01315C',
+            },
+          ]}
+        >
+          {item?.Vehicle[0]?.driver_name}
+        </Text>
       </TouchableOpacity>
     );
-  }
+  };
 
   const VehicleView = ({ item, index }) => {
+    const isSelected = checkVehicle.includes(index);
+
     return (
       <TouchableOpacity
-        style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
-        onPress={() => { setCheckVehicle([index]); setCheckDriver([index]) }}>
-        <Text style={[text, { fontSize: moderateScale(15) }]}>{item?.Vehicle[0]?.VEHICLE_INFO}</Text>
-        {checkVehicle.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>}
+        style={{
+          marginVertical: verticalScale(20),
+          flexDirection: 'row',
+        }}
+        onPress={() => {
+          setCheckVehicle([index]);
+          setCheckDriver([index]);
+        }}
+      >
+        <Text
+          style={[
+            text,
+            {
+              fontSize: moderateScale(15),
+              color: isSelected ? 'green' : '#01315C', 
+            },
+          ]}
+        >
+          {item?.Vehicle[0]?.VEHICLE_INFO}
+        </Text>
       </TouchableOpacity>
     );
-  }
+  };
 
   return (
     <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>

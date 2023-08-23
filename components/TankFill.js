@@ -209,12 +209,12 @@ export default function TankFill({ navigation, route }) {
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
           <TouchableOpacity onPress={() => setShowWareHouse(!showWareHouse)}>
-            <Text style={[text, { marginTop: verticalScale(20) }]}>
+            <Text style={[text, { marginTop: verticalScale(20), color: !showWareHouse ? '#fff' : '#01315C', backgroundColor: !showWareHouse ? 'rgba(1, 49, 92, 0.7)' : '#fff', borderRadius: 2, padding: 5 }]}>
               {t('brand')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setShowWareHouse(true)}>
-            <Text style={[text, { marginTop: verticalScale(20), marginLeft: horizontalScale(20) }]}>
+            <Text style={[text, { marginTop: verticalScale(20), marginLeft: horizontalScale(20), color: showWareHouse ? '#fff' : '#01315C', backgroundColor: showWareHouse ? 'rgba(1, 49, 92, 0.7)' : '#fff', borderRadius: 2, padding: 5 }]}>
               {t('Warehouse')}
             </Text>
           </TouchableOpacity>
@@ -258,7 +258,7 @@ export default function TankFill({ navigation, route }) {
                   imageSource = require('../assets/shell.png');
                   break;
                 case "Mobil":
-                  imageSource = require('../assets/spc.png');
+                  imageSource = require('../assets/mobil.jpeg');
                   break;
                 case "Chevron":
                   imageSource = require('../assets/chevron.png');
@@ -270,7 +270,7 @@ export default function TankFill({ navigation, route }) {
                 key={index}
                 style={{
                   marginVertical: verticalScale(20),
-                  width: '45%',
+                  width: '47%',
                 }}>
                 <TouchableOpacity
                   onPress={() => {
@@ -283,8 +283,7 @@ export default function TankFill({ navigation, route }) {
                     boxContainer,
                     { borderWidth: selected?.Brand_Desc == val.Brand_Desc ? 3 : 0, borderColor: 'green' },
                   ]}>
-                  <Image source={imageSource} style={{ width: '100%', resizeMode: 'contain' }} />
-                  {/* <Text style={{ fontSize: width / 35, color: 'red', fontWeight: '900', paddingVertical: 10, paddingHorizontal: 5 }}>{val.Brand_Desc}</Text> */}
+                  <Image source={imageSource} style={{ width: '90%', resizeMode: 'contain' }} />
                 </TouchableOpacity>
               </View>
             })}
