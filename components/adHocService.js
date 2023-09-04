@@ -27,11 +27,15 @@ import { Portal, Provider, Modal, Button } from 'react-native-paper';
 import { horizontalScale, moderateScale } from './styles/Metrics';
 import { ActivityIndicator, MD2Colors } from 'react-native-paper';
 import SignatureCapture from 'react-native-signature-capture';
-import { getVehicle } from './functions/helper';
+import { getVehicle, getDomain } from './functions/helper';
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
+import RNPrint from 'react-native-print';
 
 const { width } = Dimensions.get('window');
 export default function AdHocService({ navigation, route }) {
   const { t } = useTranslation();
+  const domain = getDomain();
+
   const [showInput, setshowInput] = useState(!true);
   const heightMeterAfAnim = useRef(new Animated.Value(0)).current;
   const heightMeterBeAnim = useRef(new Animated.Value(0)).current;
@@ -81,7 +85,7 @@ export default function AdHocService({ navigation, route }) {
 
   const getBusinessName = async () => {
     try {
-      const response = await fetch('https://demo.vellas.net:94/pump/api/Values/getBusinessList?_token=B6D1941E-D2C9-40F5-AF75-1B0558F527C1');
+      const response = await fetch(domain + '/getBusinessList?_token=B6D1941E-D2C9-40F5-AF75-1B0558F527C1');
       const json = await response.json();
       setBusinessName(json);
       setLoading(false)
@@ -92,7 +96,7 @@ export default function AdHocService({ navigation, route }) {
 
   const getBusinessAddress = async () => {
     try {
-      const response = await fetch(`https://demo.vellas.net:94/pump/api/Values/getBusinessAddressByBusinessId?_token=BDB47BFE-A891-4D77-AFBB-27928083D777&custId=${businessId}`);
+      const response = await fetch(domain + `/getBusinessAddressByBusinessId?_token=BDB47BFE-A891-4D77-AFBB-27928083D777&custId=${businessId}`);
       const json = await response.json();
       setBusinessAddress(json);
       setLoading(false)
@@ -102,7 +106,7 @@ export default function AdHocService({ navigation, route }) {
   }
 
   const getProductList = () => {
-    fetch('https://demo.vellas.net:94/pump/api/Values/getProductList?_token=FAEB7E31-0DE5-48BE-9EC9-8D97D21EF8B3')
+    fetch(domain + '/getProductList?_token=FAEB7E31-0DE5-48BE-9EC9-8D97D21EF8B3')
       .then(response => response.json())
       .then(result => {
         console.log(result);
@@ -114,13 +118,13 @@ export default function AdHocService({ navigation, route }) {
   useEffect(() => { getBusinessName(); getBusinessAddress(); getProductList() }, [businessId])
 
   const postJoborder = () => {
-    const url = "https://demo.vellas.net:94/pump/api/Values/postJobOrder";
+    const url = domain + "/postJobOrder";
     var vehicleData = getVehicle();
     console.log(vehicleData);
     const data = {
       CUST_CODE: businessCode,
       Location: address,
-      REC_DATE: "2023-05-25 00:00:00.000",
+      REC_DATE: new Date().toISOString(),
       VEHICLE_CODE: vehicleData.vehicle.VEHICLE_INFO,
       DRIVER_ID: vehicleData.vehicle.driver_id,
       DELIVERED: 1,
@@ -141,6 +145,10 @@ export default function AdHocService({ navigation, route }) {
         console.log(result);
         if (result == 'Saved' || result === 'Updated') {
           Alert.alert('Success', 'Job Successful', [
+            {
+              text: 'Print',
+              onPress: () => printHTML(),
+            },
             { text: 'OK', onPress: () => navigation.pop() },
           ]);
         } else {
@@ -172,7 +180,7 @@ export default function AdHocService({ navigation, route }) {
         data={categoryItem.product}
         renderItem={({ item }) => (
           <TouchableOpacity style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#0465bd', padding: 6 }}
-            onPress={() => { setProduct(item.desc), hideModal() }}
+            onPress={() => { setProduct(item.desc), hideModal(); setShowCategory(false) }}
           >
             <Text style={[text, { fontSize: moderateScale(12), alignSelf: 'center', color: '#0465bd' }]}>{item.desc}</Text>
           </TouchableOpacity>
@@ -321,6 +329,73 @@ export default function AdHocService({ navigation, route }) {
     )
   }
 
+
+  const printHTML = async () => {
+    await RNPrint.print({
+      html: `<html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Display Form</title>
+          <style>
+              body {
+                  font-family: Arial, sans-serif;
+              }
+              .form-container {
+                  width: 80%;
+                  margin: 0 auto;
+              }
+              fieldset {
+                  border: 1px solid #ccc;
+                  border-radius: 4px;
+                  padding: 10px;
+                  margin-bottom: 20px;
+              }
+              legend {
+                  font-weight: bold;
+              }
+              .form-field {
+                  margin-bottom: 10px;
+              }
+          </style>
+      </head>
+      <body>
+          <div class="form-container">
+              <fieldset>
+                  <legend>Business Information</legend>
+                  <div class="form-field">
+                      <label>Business Name:</label>
+                      <span>${name}</span>
+                  </div>
+                  <div class="form-field">
+                      <label>Business Address:</label>
+                      <span>${address}</span>
+                  </div>
+              </fieldset>
+      
+              <fieldset>
+                  <legend>Product Information</legend>
+                  <div class="form-field">
+                      <label>Product:</label>
+                      <span>${product}</span>
+                  </div>
+                  <div class="form-field">
+                      <label>Litres of Diesel:</label>
+                      <span>${diesel}</span>
+                  </div>
+                  <div class="form-field">
+                      <label>Remarks:</label>
+                      <span>No remarks</span>
+                  </div>
+              </fieldset>
+          </div>
+      </body>
+      </html>`
+    })
+  }
+
+
+
   return (
     <Provider>
       <Portal>
@@ -364,6 +439,7 @@ export default function AdHocService({ navigation, route }) {
         style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
         <SideBar all={true} navigation={navigation} />
         <View style={{ flex: 1, padding: 20 }}>
+
           <TouchableOpacity
             onPress={() => {
               navigation.navigate('Main');

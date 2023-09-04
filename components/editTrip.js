@@ -21,7 +21,8 @@ import * as ImagePicker from 'react-native-image-picker';
 import { useTranslation } from 'react-i18next';
 import SideBar from './ui/SideBar';
 import RightInputBar from './ui/RightInputBar';
-import { getVehicle } from './functions/helper';
+import { getVehicle, getDomain } from './functions/helper';
+
 
 const { width } = Dimensions.get('window');
 export default function DeliveryOrder({ navigation, route }) {
@@ -33,6 +34,7 @@ export default function DeliveryOrder({ navigation, route }) {
   const [moreMeterAf, setmoreMeterAf] = useState(false);
   const [moreMeterBe, setmoreMeterBe] = useState(false);
   const [remark, setRemark] = useState('')
+  const domain = getDomain();
 
   const [modalVisible, setModalVisible] = useState(false);
   //after
@@ -44,7 +46,7 @@ export default function DeliveryOrder({ navigation, route }) {
   const [dieselValue, setDieselValue] = useState(0)
 
   const PostJobOrderDelivered = () => {
-    const url = "https://demo.vellas.net:94/pump/api/Values/PostJObOrderDelivered"
+    const url = domain + "/PostJObOrderDelivered"
     const data = {
       "JobNumber": route?.params?.invData.INV_NO,
       "ProdId": route?.params?.invData.PO_NO ? route.params.invData.PO_NO : 0,

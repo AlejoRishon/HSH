@@ -16,7 +16,7 @@ import {
 } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import SideBar from './ui/SideBar';
-import { getVehicle } from './functions/helper';
+import { getVehicle, getDomain } from './functions/helper';
 import RightInputBar from './ui/RightInputBar';
 import RightConfirm from './ui/RightConfirm';
 import { moderateScale, verticalScale } from './styles/Metrics';
@@ -37,10 +37,11 @@ export default function DieselTransfer({ navigation }) {
   const [wareHouseList, setWareHouseList] = useState([])
   const [wareHouseId, setWareHouseId] = useState(null)
   const [loading, setLoading] = useState(true)
+  const domain = getDomain();
 
   const getVehicleList = async () => {
     try {
-      const response = await fetch('https://demo.vellas.net:94/pump/api/Values/GetVehicleList?_token=4B3B5C99-57E8-4593-A0AD-3D4EEA3C2F53');
+      const response = await fetch(domain + '/GetVehicleList?_token=4B3B5C99-57E8-4593-A0AD-3D4EEA3C2F53');
       const json = await response.json();
       setListData(json);
       // setLoading(false)
@@ -52,7 +53,7 @@ export default function DieselTransfer({ navigation }) {
 
   const getWareHouseList = async () => {
     try {
-      const response = await fetch('https://demo.vellas.net:94/pump/api/Values/GetWarehouseList?_token=FF9B60E6-5DB4-4A58-BBA9-4C3F84CE9105')
+      const response = await fetch(domain + '/GetWarehouseList?_token=FF9B60E6-5DB4-4A58-BBA9-4C3F84CE9105')
       const json = await response.json();
       // console.log('Warehouse List:', json)
       setWareHouseList(json);
@@ -85,7 +86,7 @@ export default function DieselTransfer({ navigation }) {
 
   const postTransfer = () => {
     var vehicleData = getVehicle().vehicle;
-    const url = "https://demo.vellas.net:94/pump/api/Values/PostJobTransfer"
+    const url = domain + "/PostJobTransfer"
     const data = {
       "VEHICLE_FROM": vehicleData.VEHICLE_INFO,
       "VEHICLE_TO": selected == 'vehicle' ? checkVehicle : '',

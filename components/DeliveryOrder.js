@@ -19,11 +19,12 @@ import {
   Row,
   Cell,
 } from 'react-native-table-component';
-import { getVehicle } from './functions/helper';
+import { getVehicle, getDomain } from './functions/helper';
 import { moderateScale, verticalScale } from './styles/Metrics';
 import { Checkbox, ActivityIndicator, MD2Colors, Avatar, Button, TextInput } from 'react-native-paper';
 
 export default function DeliveryOrder({ navigation, route }) {
+  const domain = getDomain();
   const { t, i18n } = useTranslation();
   const parameter = getVehicle();
   const [showInput, setshowInput] = useState(false);
@@ -66,7 +67,7 @@ export default function DeliveryOrder({ navigation, route }) {
   const getDeliveryOrder = async (sdate) => {
     setLoading(true)
     try {
-      const response = await fetch(`https://demo.vellas.net:94/pump/api/Values/getJobDetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&driverId=${parameter.vehicle.driver_id}&date=${sdate}`)
+      const response = await fetch(domain + `/getJobDetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&driverId=${parameter.vehicle.driver_id}&date=${sdate}`)
       const json = await response.json();
       console.log(json);
       setOrderList(json);

@@ -43,7 +43,7 @@ export default function Main({ navigation, route }) {
             alignItems: 'center',
           }}>
 
-          <Text style={text}>{parameter.vehicle.VEHICLE_INFO}</Text>
+          <Text style={text}>{parameter?.vehicle?.VEHICLE_INFO}</Text>
           <TouchableOpacity
             style={{
               borderWidth: 1,

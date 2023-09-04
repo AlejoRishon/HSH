@@ -12,6 +12,7 @@ import AdHocService from './components/adHocService';
 import TransferList from './components/TransferList';
 import MasterLogin from './components/MasterLogin';
 import auth from '@react-native-firebase/auth';
+import { setUserDetail } from './components/functions/helper';
 
 const Stack = createNativeStackNavigator();
 const App = () => {
@@ -20,6 +21,8 @@ const App = () => {
   const [user, setUser] = useState();
 
   function onAuthStateChanged(user) {
+    console.log(user);
+    setUserDetail(user);
     setUser(user);
     if (initializing) setInitializing(false);
   }

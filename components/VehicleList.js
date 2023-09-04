@@ -15,13 +15,14 @@ import { setVehicle } from './functions/helper';
 import { useTranslation } from 'react-i18next';
 import { horizontalScale, moderateScale, verticalScale } from './styles/Metrics';
 import { ActivityIndicator, MD2Colors } from 'react-native-paper';
+import { getDomain } from './functions/helper';
 
 const { width } = Dimensions.get('window');
 
 export default function VehicleList({ navigation }) {
 
   const { t } = useTranslation();
-
+  const domain = getDomain();
   const [listData, setListData] = useState([]);
   const [selectedVehicle, setselectedVehicle] = useState(null);
   const [driverId, setDriverId] = useState(null)
@@ -31,7 +32,7 @@ export default function VehicleList({ navigation }) {
 
   const getVehicleList = async () => {
     try {
-      const response = await fetch('https://demo.vellas.net:94/pump/api/Values/GetVehicleList?_token=4B3B5C99-57E8-4593-A0AD-3D4EEA3C2F53');
+      const response = await fetch(domain + '/GetVehicleList?_token=4B3B5C99-57E8-4593-A0AD-3D4EEA3C2F53');
       const json = await response.json();
       setListData(json);
       setLoading(false)

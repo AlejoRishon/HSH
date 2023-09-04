@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Text,
   View,
@@ -14,27 +14,43 @@ import { useTranslation } from 'react-i18next';
 import { horizontalScale, moderateScale, verticalScale } from './styles/Metrics';
 import { ActivityIndicator, MD2Colors } from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
-
+import { getUser, setDomain } from './functions/helper';
+import firestore from '@react-native-firebase/firestore';
 export default function Login({ navigation }) {
-
+  const user = getUser();
   const [lang, setlang] = useState('en');
   const { t, i18n } = useTranslation();
-  const [userName, setUserName] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [userName, setUserName] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [domain, seturl] = useState('');
 
   useState(() => {
     console.log(lang);
     setLoading(false)
   }, [lang]);
 
+  useEffect(() => {
+    setLoading(true);
+    if (user.uid) {
+      // console.log(user.uid);
+      firestore().collection('users').doc(user.uid).get().then(document => {
+        // console.log(document.data().url);
+        setDomain(document.data().url);
+        seturl(document.data().url);
+        setLoading(false);
+      }).catch();
+
+    }
+  }, [])
+
+
   const handleLogin = () => {
-    setLoading(true)
+    setLoading(true);
     const token = 'b95909e1-d33f-469f-90c6-5a2fb1e5627c';
-    const opco = 'Deep';
 
-    const url = `https://demo.vellas.net:94/pump/api/Values/GetUserLogin?_token=${token}&_opco=${opco}&username=${encodeURIComponent(userName)}&pw=${encodeURIComponent(password)}`;
-
+    const url = `${domain}/GetUserLogin?_token=${token}&_opco=&username=${encodeURIComponent(userName)}&pw=${encodeURIComponent(password)}`;
+    console.log(url);
     fetch(url)
       .then(res => res.json())
       .then(data => {

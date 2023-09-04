@@ -23,9 +23,11 @@ import { ActivityIndicator, MD2Colors } from 'react-native-paper';
 import SideBar from './ui/SideBar';
 import RightInputBar from './ui/RightInputBar';
 import RightConfirm from './ui/RightConfirm';
-import { getVehicle } from './functions/helper';
+import { getVehicle, getDomain } from './functions/helper';
+
 import { verticalScale, horizontalScale, moderateScale } from './styles/Metrics';
 import { ScrollView } from 'react-native-gesture-handler';
+
 const { width, height } = Dimensions.get('window');
 
 export default function TankFill({ navigation, route }) {
@@ -45,12 +47,13 @@ export default function TankFill({ navigation, route }) {
   const [wareHouseList, setWareHouseList] = useState([])
   const [wareHouseId, setWareHouseId] = useState(null)
   const [loading, setLoading] = useState(true)
+  const domain = getDomain();
 
   const handleGetInputDiesel = (value) => setDieselValue(value)
 
   const getBrandList = async () => {
     try {
-      const response = await fetch('https://demo.vellas.net:94/pump/api/Values/getBrandList?_token=67E38BF0-4B45-4D93-891D-8E4F60C5485D');
+      const response = await fetch(domain + '/getBrandList?_token=67E38BF0-4B45-4D93-891D-8E4F60C5485D');
       const json = await response.json();
       // console.log(json);
       setListData(json);
@@ -62,7 +65,7 @@ export default function TankFill({ navigation, route }) {
 
   const getWareHouseList = async () => {
     try {
-      const response = await fetch('https://demo.vellas.net:94/pump/api/Values/GetWarehouseList?_token=FF9B60E6-5DB4-4A58-BBA9-4C3F84CE9105')
+      const response = await fetch(domain + '/GetWarehouseList?_token=FF9B60E6-5DB4-4A58-BBA9-4C3F84CE9105')
       const json = await response.json();
       console.log('Warehouse List:', json)
       setWareHouseList(json);
@@ -72,7 +75,7 @@ export default function TankFill({ navigation, route }) {
   };
 
   const postJobPurchase = () => {
-    const url = "https://demo.vellas.net:94/pump/api/Values/PostjobPurchase"
+    const url = domain + "/PostjobPurchase"
     const data = {
       "VEHICLE_CODE": route?.params?.info?.vehicleInfo,
       "DRIVER_ID": route?.params?.info?.driverId,
@@ -107,7 +110,7 @@ export default function TankFill({ navigation, route }) {
 
   const postJobTransfer = () => {
     var vehicleData = getVehicle().vehicle;
-    const url = "https://demo.vellas.net:94/pump/api/Values/PostJobTransfer"
+    const url = domain + "/PostJobTransfer"
     const data = {
       "VEHICLE_FROM": vehicleData.VEHICLE_INFO,
       "VEHICLE_TO": "",

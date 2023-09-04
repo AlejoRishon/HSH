@@ -10,7 +10,7 @@ import React, { useEffect, useState } from 'react';
 import { searchBox, button, buttonText, text } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Check from 'react-native-vector-icons/Ionicons'
-import { setVehicle } from './functions/helper';
+import { getVehicle, getDomain } from './functions/helper';
 import { useTranslation } from 'react-i18next';
 import { horizontalScale, moderateScale, verticalScale } from './styles/Metrics';
 import { ActivityIndicator, MD2Colors } from 'react-native-paper';
@@ -19,7 +19,7 @@ const { width } = Dimensions.get('window');
 
 export default function TransferList({ navigation, route }) {
   const { t } = useTranslation();
-
+  const domain = getDomain();
   const [checkVehicle, setCheckVehicle] = useState([])
   const [checkDriver, setCheckDriver] = useState([])
   const [proceed, setProceed] = useState(false)
@@ -28,7 +28,7 @@ export default function TransferList({ navigation, route }) {
 
   const getVehicleList = async () => {
     try {
-      const response = await fetch('https://demo.vellas.net:94/pump/api/Values/GetVehicleList?_token=4B3B5C99-57E8-4593-A0AD-3D4EEA3C2F53');
+      const response = await fetch(domain + '/GetVehicleList?_token=4B3B5C99-57E8-4593-A0AD-3D4EEA3C2F53');
       const json = await response.json();
       setVehicleList(json);
       setLoading(false)
@@ -39,7 +39,7 @@ export default function TransferList({ navigation, route }) {
   }
 
   const PostJobTransfer = () => {
-    const url = `https://demo.vellas.net:94/pump/api/Values/PostJobTransfer`
+    const url = domain + `/PostJobTransfer`
     const data = {
       "VEHICLE_FROM": route?.params?.info?.vehicle,
       "VEHICLE_TO": "VEHICLE_TO2",
@@ -154,7 +154,7 @@ export default function TransferList({ navigation, route }) {
             text,
             {
               fontSize: moderateScale(15),
-              color: isSelected ? 'green' : '#01315C', 
+              color: isSelected ? 'green' : '#01315C',
             },
           ]}
         >
