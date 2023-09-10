@@ -1,6 +1,6 @@
 var global = {};
 export const setVehicle = vehicle => {
-  // console.log(vehicle);
+  console.log(vehicle);
   global.vehicle = vehicle;
 };
 
@@ -19,4 +19,11 @@ export const setUserDetail = (url) => {
 };
 export const getUser = () => {
   return global.user;
+};
+
+export const setlogUserDetail = (url) => {
+  global.logUser = url;
+};
+export const getlogUser = () => {
+  return global.logUser;
 };

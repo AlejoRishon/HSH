@@ -126,9 +126,9 @@ export default function Main({ navigation, route }) {
       </View>
       <View
         style={{
-          width: width * 0.35,
+          width: width * 0.30,
           backgroundColor: '#EEF7FF',
-          padding: 50,
+          padding: 20,
           justifyContent: 'space-between',
         }}>
         <View style={{ marginTop: verticalScale(40) }}>
@@ -150,7 +150,7 @@ export default function Main({ navigation, route }) {
               alignItems: 'center',
               marginTop: verticalScale(45),
             }}>
-            <Text style={[text, { fontSize: 25 }]}>{parameter.vehicle.VEHICLE_INFO}</Text>
+            <Text style={[text, { fontSize: 25 }]}>{parameter.vehicle?.VEHICLE_INFO}</Text>
           </View>
         </View>
       </View>

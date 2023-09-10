@@ -2,10 +2,10 @@ export default {
   homepage_message: '请选择一辆车以继续',
   login_message: 'Please login to continue.',
 
-  tank_fill_up: '填满柴油',
+  tank_fill_up: '在',
   delivery_order: '交付订单',
   ad_hoc_service: '临时订单',
-  diesel_transfer: '转移柴油',
+  diesel_transfer: '出去',
 
   brand: '填满柴油',
   return: '转移柴油',

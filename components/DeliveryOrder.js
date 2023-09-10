@@ -49,39 +49,68 @@ export default function DeliveryOrder({ navigation, route }) {
 
   const handleConfirm = (date) => {
     // console.warn("A date has been picked: ", formatDate(new Date(date).toLocaleDateString()));
-    getDeliveryOrder(formatDate(new Date(date).toLocaleDateString()))
+    getDeliveryOrder(formatDate(new Date(date)))
     hideDatePicker();
   };
 
   const formatDate = (inputDate) => {
-    const [month, day, year] = inputDate.split('/');
 
-    const formatted = `${day}-${month}-${year}`;
+    let day = inputDate.getDate();
+
+    let month = inputDate.getMonth() + 1;
+
+    let year = inputDate.getFullYear();
+    if (day < 10) {
+      day = '0' + day;
+    }
+
+    if (month < 10) {
+      month = `0${month}`;
+    }
+
+    let formatted = `${year}-${month}-${day}`;
     return formatted;
   };
 
 
 
-  useEffect(() => { getDeliveryOrder(formatDate(new Date().toLocaleDateString())) }, [])
+  useEffect(() => {
+    getDeliveryOrder(formatDate(new Date()))
+
+    return () => {
+      getDeliveryOrder(formatDate(new Date()))
+    }
+
+  }, [])
 
   const getDeliveryOrder = async (sdate) => {
+    setChecked([])
     setLoading(true)
     try {
-      const response = await fetch(domain + `/getJobDetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&driverId=${parameter.vehicle.driver_id}&date=${sdate}`)
+      console.log(domain + `/getJobDetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&PLATE_NO=${parameter.vehicle.VEHICLE_INFO}&date=${sdate}`)
+      const response = await fetch(domain + `/getJobDetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&PLATE_NO=${parameter.vehicle.VEHICLE_INFO}&date=${sdate}`);
+
       const json = await response.json();
       console.log(json);
-      setOrderList(json);
-      const transformedData = json?.map(item => [
-        'Transfer',
-        item?.INV_NO,
-        item?.PRINT_ADDRESS,
-        item?.qty_order,
-        'Pending',
-      ])
-      setdetailData(transformedData)
+      if (json && json.length > 0) {
+        setOrderList(json);
+        const transformedData = json?.map(item => [
+          'Transfer',
+          item?.INV_NO,
+          item?.PRINT_ADDRESS,
+          item?.qty_order,
+          'Pending',
+        ])
+        setdetailData(transformedData)
+      }
+      else {
+        setOrderList([]);
+        setdetailData([])
+      }
       setLoading(false)
     } catch (error) {
-      console.error(error);
+      // console.error(error);
+      setLoading(false)
     }
   }
 
@@ -98,7 +127,7 @@ export default function DeliveryOrder({ navigation, route }) {
     if (checked.includes(index)) {
       setChecked(checked.filter((i) => i !== index))
     } else {
-      setChecked([...checked, index])
+      setChecked([index])
     }
   }
 
@@ -189,6 +218,7 @@ export default function DeliveryOrder({ navigation, route }) {
           </View>
           <View style={{ flexDirection: 'row' }}>
             <TouchableOpacity
+              disabled={checked.length > 0 ? false : true}
               style={{
                 borderWidth: 1,
                 borderColor: '#01315C',
@@ -196,10 +226,18 @@ export default function DeliveryOrder({ navigation, route }) {
                 flexDirection: 'row',
                 alignItems: 'center',
                 padding: 10,
+                opacity: checked.length > 0 ? 1 : 0.4
               }}
-              onPress={() => navigation.navigate('TransferList', {
-                info: route?.params
-              })}>
+              onPress={() => {
+                console.log(orderList[checked[0]]);
+
+                navigation.navigate('TransferList', {
+                  info: route?.params,
+                  job: orderList[checked[0]].INV_NO
+                });
+                setOrderList([]);
+                setdetailData([])
+              }}>
               <Icon name="exchange" color="#01315C" size={20} />
 
               <Text style={[text, { marginLeft: 10 }]}>Transfer</Text>
@@ -243,11 +281,13 @@ export default function DeliveryOrder({ navigation, route }) {
             contentContainerStyle={{
               flexGrow: 1,
             }}>
-            {sortedData?.map((rowData, index) => (
+            {sortedData.length > 0 ? sortedData?.map((rowData, index) => (
               <TouchableOpacity
                 key={index.toString()}
                 onPress={() => {
                   //setshowInput(true)
+                  setOrderList([]);
+                  setdetailData([])
                   navigation.navigate('EditTrip', {
                     driver: orderList[0]?.DRIVER_NAME,
                     inv: orderList[0]?.INV_NO,
@@ -282,7 +322,9 @@ export default function DeliveryOrder({ navigation, route }) {
                   ))}
                 </TableWrapper>
               </TouchableOpacity>
-            ))}
+            )) : <>
+              <Text style={{ color: 'black', fontSize: 20, textAlign: 'center', marginTop: 30, fontWeight: 'bold' }}>No Jobs for this day</Text>
+            </>}
             {/* <Rows data={detailData} textStyle={dataText} /> */}
           </ScrollView>
         </Table>

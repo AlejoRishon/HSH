@@ -115,7 +115,7 @@ export default function VehicleList({ navigation }) {
         style={{
           width: width * 0.35,
           backgroundColor: '#EEF7FF',
-          padding: 50,
+          padding: 20,
           justifyContent: 'space-between',
         }}>
         <View style={{ marginTop: verticalScale(40) }}>

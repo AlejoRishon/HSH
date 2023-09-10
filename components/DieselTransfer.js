@@ -16,7 +16,7 @@ import {
 } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import SideBar from './ui/SideBar';
-import { getVehicle, getDomain } from './functions/helper';
+import { getVehicle, getDomain, getlogUser } from './functions/helper';
 import RightInputBar from './ui/RightInputBar';
 import RightConfirm from './ui/RightConfirm';
 import { moderateScale, verticalScale } from './styles/Metrics';
@@ -85,15 +85,17 @@ export default function DieselTransfer({ navigation }) {
   const handleGetInputDiesel = (value) => setDieselValue(value)
 
   const postTransfer = () => {
+    const userlog = getlogUser();
     var vehicleData = getVehicle().vehicle;
-    const url = domain + "/PostJobTransfer"
+    const url = domain + "/PostJobTransfer";
+    console.log(selected);
     const data = {
       "VEHICLE_FROM": vehicleData.VEHICLE_INFO,
       "VEHICLE_TO": selected == 'vehicle' ? checkVehicle : '',
       "LOCATION_FROM": "",
-      "LOCATION_TO": selected !== 'vehicle' ? selected : wareHouseId,
+      "LOCATION_TO": selected !== 'vehicle' ? wareHouseId : '',
       "REMARK": "",
-      "UPDATE_BY": vehicleData.DRIVER_NAME ? vehicleData.DRIVER_NAME : 'admin',
+      "UPDATE_BY": userlog,
       "PROD_ID": 0,
       "QTY": dieselValue,
       "TRANSFER_TYPE": 1

@@ -29,7 +29,7 @@ export const boxContainer = {
   alignItems: 'center',
 };
 export const text = {
-  fontSize: 16,
+  fontSize: horizontalScale(7),
   color: '#01315C',
   fontWeight: 600,
 };
@@ -37,7 +37,7 @@ export const text = {
 export const button = {
   backgroundColor: '#01315C',
   borderRadius: 8,
-  padding: 14,
+  padding: 10,
 };
 
 export const buttonText = {
@@ -65,4 +65,5 @@ export const remarks = {
   backgroundColor: 'white',
   fontSize: 20,
   marginTop: 20,
+  textAlignVertical: 'top'
 };

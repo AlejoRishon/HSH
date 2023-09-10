@@ -135,14 +135,14 @@ export default function RightInputBar({
                 style={{
                   backgroundColor: '#EAF5FF',
                   width: '30%',
-                  height: verticalScale(65),
+                  height: 25,
                   borderRadius: 8,
                   marginTop: verticalScale(24),
                   justifyContent: 'center',
                 }}>
                 <Text
                   style={{
-                    fontSize: moderateScale(15),
+                    fontSize: width / 35,
                     color: '#01315C',
                     textAlign: 'center',
                   }}>
@@ -154,7 +154,7 @@ export default function RightInputBar({
         </View>
       </View>
 
-      <View style={{ flexDirection: 'row', padding: moderateScale(8) }}>
+      <View style={{ flexDirection: 'row', padding: 10 }}>
         {keepinView ? null : (
           <TouchableOpacity
             onPress={onHide}
@@ -168,8 +168,8 @@ export default function RightInputBar({
               style={{
                 color: '#01315C',
                 textAlign: 'center',
-                fontSize: 20,
-                padding: 10,
+                fontSize: width / 35,
+                padding: 5,
               }}>
               Back
             </Text>
@@ -187,8 +187,8 @@ export default function RightInputBar({
             style={{
               color: '#01315C',
               textAlign: 'center',
-              fontSize: 20,
-              padding: 10,
+              fontSize: width / 35,
+              padding: 5,
             }}>
             Submit
           </Text>
@@ -261,11 +261,11 @@ export const AdhocRightInputBar = ({
       }}>
       <View
         style={{
-          width: width / 2.8,
+          width: width / 3,
           flex: 1,
           borderTopLeftRadius: 15,
           borderBottomLeftRadius: 15,
-          padding: moderateScale(15),
+          padding: 10,
           paddingTop: verticalScale(25),
         }}>
         <Text

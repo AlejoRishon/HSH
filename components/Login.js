@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { horizontalScale, moderateScale, verticalScale } from './styles/Metrics';
 import { ActivityIndicator, MD2Colors } from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
-import { getUser, setDomain } from './functions/helper';
+import { getUser, setDomain, setlogUserDetail } from './functions/helper';
 import firestore from '@react-native-firebase/firestore';
 export default function Login({ navigation }) {
   const user = getUser();
@@ -55,7 +55,8 @@ export default function Login({ navigation }) {
       .then(res => res.json())
       .then(data => {
         if (data.length > 0 && data[0].ACCESS_RIGHT !== null && data[0].CID !== null) {
-          setLoading(false)
+          setlogUserDetail(userName)
+          setLoading(false);
           navigation.navigate('VehicleList')
         }
         else {

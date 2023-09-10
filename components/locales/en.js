@@ -1,10 +1,10 @@
 export default {
   homepage_message: 'Please select a vehicle to proceed.',
   login_message: 'Please login to continue.',
-  tank_fill_up: 'Tank Fill Up',
+  tank_fill_up: 'In',
   delivery_order: 'Delivery Order',
   ad_hoc_service: 'Ad Hoc Service',
-  diesel_transfer: 'Diesel Transfer',
+  diesel_transfer: 'Out',
 
   brand: 'Brand',
   return: 'Return',

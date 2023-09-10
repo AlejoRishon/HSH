@@ -5,12 +5,13 @@ import {
   FlatList,
   TextInput,
   TouchableOpacity,
+  Alert
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { searchBox, button, buttonText, text } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Check from 'react-native-vector-icons/Ionicons'
-import { getVehicle, getDomain } from './functions/helper';
+import { getVehicle, getDomain, getlogUser } from './functions/helper';
 import { useTranslation } from 'react-i18next';
 import { horizontalScale, moderateScale, verticalScale } from './styles/Metrics';
 import { ActivityIndicator, MD2Colors } from 'react-native-paper';
@@ -39,17 +40,16 @@ export default function TransferList({ navigation, route }) {
   }
 
   const PostJobTransfer = () => {
-    const url = domain + `/PostJobTransfer`
-    const data = {
-      "VEHICLE_FROM": route?.params?.info?.vehicle,
-      "VEHICLE_TO": "VEHICLE_TO2",
-      "LOCATION_FROM": "",
-      "LOCATION_TO": "",
-      "REMARK": "your_remark",
-      "UPDATE_BY": route?.params?.info?.name,
-      "PROD_ID": 526,
-      "QTY": 165,
-      "TRANSFER_TYPE": 1
+    const user = getlogUser();
+    console.log(vehicleList[checkVehicle[0]].Vehicle[0].VEHICLE_INFO);
+    console.log(vehicleList[checkDriver[0]].driver_id);
+    console.log(route?.params?.job);
+    const url = domain + `/PostDeliveryTransfer`
+    const data =
+    {
+      "JOB_NO": route?.params?.job,
+      "VECHICLE_NO": vehicleList[checkVehicle[0]].Vehicle[0].VEHICLE_INFO,
+      "DRIVER_ID": vehicleList[checkDriver[0]].driver_id
     }
     fetch(url, {
       method: "POST",
@@ -61,7 +61,9 @@ export default function TransferList({ navigation, route }) {
       .then(response => response.json())
       .then(result => {
         console.log(result);
-        Alert.alert('Success')
+        Alert.alert('Success', 'Transfer Successful', [
+          { text: 'OK', onPress: () => navigation.pop() },
+        ]);
       })
       .catch(error => {
         console.log("Error:", error);
@@ -69,8 +71,9 @@ export default function TransferList({ navigation, route }) {
   }
 
   useEffect(() => {
-    getVehicleList()
-    onPressCheck()
+
+    getVehicleList();
+    onPressCheck();
   }, [checkDriver, checkVehicle])
 
   const [selectedVehicle, setselectedVehicle] = useState(null);
@@ -287,7 +290,8 @@ export default function TransferList({ navigation, route }) {
             style={button}
             onPress={() => {
               // setVehicle(selectedVehicle);
-              navigation.goBack();
+              PostJobTransfer()
+              // navigation.goBack();
             }}>
             <Text style={buttonText}>Proceed</Text>
           </TouchableOpacity>

@@ -23,7 +23,7 @@ import { ActivityIndicator, MD2Colors } from 'react-native-paper';
 import SideBar from './ui/SideBar';
 import RightInputBar from './ui/RightInputBar';
 import RightConfirm from './ui/RightConfirm';
-import { getVehicle, getDomain } from './functions/helper';
+import { getVehicle, getDomain, getlogUser } from './functions/helper';
 
 import { verticalScale, horizontalScale, moderateScale } from './styles/Metrics';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -75,13 +75,14 @@ export default function TankFill({ navigation, route }) {
   };
 
   const postJobPurchase = () => {
+    const userlog = getlogUser();
     const url = domain + "/PostjobPurchase"
     const data = {
-      "VEHICLE_CODE": route?.params?.info?.vehicleInfo,
-      "DRIVER_ID": route?.params?.info?.driverId,
+      "VEHICLE_CODE": parameter.vehicle.VEHICLE_INFO,
+      "DRIVER_ID": parameter.vehicle.driver_id,
       "PROD_ID": prodId,
       "QTY": dieselValue,
-      "UPDATE_BY": route?.params?.info?.driverName
+      "UPDATE_BY": userlog
     }
     console.log(data)
     fetch(url, {
@@ -109,19 +110,21 @@ export default function TankFill({ navigation, route }) {
   }
 
   const postJobTransfer = () => {
+    const userlog = getlogUser();
     var vehicleData = getVehicle().vehicle;
     const url = domain + "/PostJobTransfer"
     const data = {
-      "VEHICLE_FROM": vehicleData.VEHICLE_INFO,
-      "VEHICLE_TO": "",
+      "VEHICLE_FROM": "",
+      "VEHICLE_TO": vehicleData.VEHICLE_INFO,
       "LOCATION_FROM": wareHouseId,
       "LOCATION_TO": "",
       "REMARK": "",
-      "UPDATE_BY": vehicleData.DRIVER_NAME ? vehicleData.DRIVER_NAME : 'admin',
+      "UPDATE_BY": userlog,
       "PROD_ID": 0,
       "QTY": dieselValue,
       "TRANSFER_TYPE": 0
     }
+    console.log("PostJobTransfer", data)
     fetch(url, {
       method: "POST",
       headers: {
@@ -385,9 +388,9 @@ export default function TankFill({ navigation, route }) {
       }
       <View
         style={{
-          width: width * 0.35,
+          width: width * 0.30,
           backgroundColor: '#EEF7FF',
-          padding: 50,
+          padding: 20,
           justifyContent: 'space-between',
         }}>
         <View style={{ marginTop: verticalScale(40) }}>
