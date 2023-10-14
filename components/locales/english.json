@@ -13,6 +13,7 @@
     "signature": "Signature",
     "metre_reading_after": "Metre Reading(After)",
     "metre_reading_before": "Metre Reading(Before)",
-    "remarks": "Remark"
+    "remarks": "Remark",
+    "submit": "Submit"
   }
 }

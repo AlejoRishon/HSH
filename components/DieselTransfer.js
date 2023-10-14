@@ -93,7 +93,7 @@ export default function DieselTransfer({ navigation }) {
       "VEHICLE_FROM": vehicleData.VEHICLE_INFO,
       "VEHICLE_TO": selected == 'vehicle' ? checkVehicle : '',
       "LOCATION_FROM": "",
-      "LOCATION_TO": selected !== 'vehicle' ? wareHouseId : '',
+      "LOCATION_TO": selected != 'vehicle' ? wareHouseId : '',
       "REMARK": "",
       "UPDATE_BY": userlog,
       "PROD_ID": 0,
@@ -143,7 +143,7 @@ export default function DieselTransfer({ navigation }) {
             }}>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate('Main');
+                navigation.navigate('DieselOutTransfer');
               }}>
               <Icon
                 name="chevron-left"

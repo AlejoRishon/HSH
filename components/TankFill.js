@@ -78,6 +78,7 @@ export default function TankFill({ navigation, route }) {
     const userlog = getlogUser();
     const url = domain + "/PostjobPurchase"
     const data = {
+      "UID": '',
       "VEHICLE_CODE": parameter.vehicle.VEHICLE_INFO,
       "DRIVER_ID": parameter.vehicle.driver_id,
       "PROD_ID": prodId,
@@ -95,11 +96,12 @@ export default function TankFill({ navigation, route }) {
       .then(response => response.json())
       .then(result => {
         console.log(result);
-        if (result == 'success') {
+        if (result) {
           setSelected(null);
           setshowInput(false);
           setshowConfirm(true);
           setChecked([]);
+
         } else {
           Alert.alert("Job Failed");
         }
@@ -114,7 +116,7 @@ export default function TankFill({ navigation, route }) {
     var vehicleData = getVehicle().vehicle;
     const url = domain + "/PostJobTransfer"
     const data = {
-      "VEHICLE_FROM": "",
+      "VEHICLE_FROM": '',
       "VEHICLE_TO": vehicleData.VEHICLE_INFO,
       "LOCATION_FROM": wareHouseId,
       "LOCATION_TO": "",
@@ -159,7 +161,7 @@ export default function TankFill({ navigation, route }) {
     return (
       <TouchableOpacity
         style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
-        onPress={() => { setChecked([index]), setProdId(item.Id), setshowInput(true) }}
+        onPress={() => { setChecked([index]), setProdId(item.Id), setDieselValue(0); setshowInput(true) }}
       >
         <Text style={[text, { fontSize: moderateScale(18) }]}>{item.Desc_Eng}</Text>
         {checked.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>}
@@ -187,7 +189,7 @@ export default function TankFill({ navigation, route }) {
             }}>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate('Main');
+                navigation.navigate('DieselTransferList');
               }}>
               <Icon
                 name="chevron-left"
@@ -214,26 +216,26 @@ export default function TankFill({ navigation, route }) {
           </TouchableOpacity>
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-          <TouchableOpacity onPress={() => setShowWareHouse(!showWareHouse)}>
+          <TouchableOpacity onPress={() => { setShowWareHouse(!showWareHouse); setshowInput(false) }}>
             <Text style={[text, { marginTop: verticalScale(20), color: !showWareHouse ? '#fff' : '#01315C', backgroundColor: !showWareHouse ? 'rgba(1, 49, 92, 0.7)' : '#fff', borderRadius: 2, padding: 5 }]}>
               {t('brand')}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setShowWareHouse(true)}>
+          <TouchableOpacity onPress={() => { setShowWareHouse(true); setshowInput(false) }}>
             <Text style={[text, { marginTop: verticalScale(20), marginLeft: horizontalScale(20), color: showWareHouse ? '#fff' : '#01315C', backgroundColor: showWareHouse ? 'rgba(1, 49, 92, 0.7)' : '#fff', borderRadius: 2, padding: 5 }]}>
               {t('Warehouse')}
             </Text>
           </TouchableOpacity>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <View
+          {/* <View
             style={{
               borderBottomWidth: 3,
               borderBottomColor: '#01315C',
               marginVertical: verticalScale(10),
               width: 40,
             }}
-          />
+          /> */}
           <View
             style={{
               borderBottomWidth: 1,
@@ -329,9 +331,9 @@ export default function TankFill({ navigation, route }) {
                     }}
                     style={[
                       boxContainer,
-                      { borderWidth: selected?.name == val.name ? 3 : 0, borderColor: 'green', height: 120 },
+                      { borderWidth: selected?.name == val.name ? 3 : 0, borderColor: 'green' },
                     ]}>
-                    <Image source={imageSource} style={styles.img} />
+                    <Image source={imageSource} style={[styles.img, { height: 120 }]} />
                     <Text style={{ fontSize: width / 35, color: 'red', fontWeight: '900' }}>{val.name}</Text>
                   </TouchableOpacity>
                 </View>
@@ -342,9 +344,9 @@ export default function TankFill({ navigation, route }) {
 
       </View> :
         <View style={{ flex: 1, padding: moderateScale(15) }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
             <TouchableOpacity style={{ alignSelf: 'center' }}
-              onPress={() => { setShowList(false), setshowInput(false) }}>
+              onPress={() => { setShowList(false); setshowInput(false); }}>
               <Icon
                 name="chevron-left"
                 color="#01315C"
@@ -414,6 +416,7 @@ export default function TankFill({ navigation, route }) {
         header="Liters of Diesel Pumped"
         subHeader="Enter quantity of diesel pumped"
         show={showInput}
+        initialValue={dieselValue}
         getInputDiesel={handleGetInputDiesel}
         hide={() => { setshowInput(false), setShowList(false) }}
         onSubmit={() => {

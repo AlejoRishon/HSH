@@ -14,6 +14,7 @@
     "signature": "签名",
     "metre_reading_after": "抄表（之后)",
     "metre_reading_before": "抄表（之前)",
-    "remarks": "评论"
+    "remarks": "评论",
+    "submit": "提交"
   }
 }

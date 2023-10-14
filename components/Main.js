@@ -29,7 +29,7 @@ export default function Main({ navigation, route }) {
   const { t, i18n } = useTranslation();
   const parameter = getVehicle();
 
-  console.log('zjkgnkvrlzkv:', route?.params)
+  // console.log('zjkgnkvrlzkv:', route?.params)
 
   return (
     <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
@@ -86,7 +86,7 @@ export default function Main({ navigation, route }) {
           }}>
           <TouchableOpacity
             style={boxContainer}
-            onPress={() => navigation.navigate('TankFill', {
+            onPress={() => navigation.navigate('DieselTransferList', {
               info: route?.params
             })}>
             <Icons name="truck-fast" color="#01315C" size={moderateScale(20)} />
@@ -118,7 +118,7 @@ export default function Main({ navigation, route }) {
           </TouchableOpacity>
           <TouchableOpacity
             style={boxContainer}
-            onPress={() => navigation.navigate('DieselTransfer')}>
+            onPress={() => navigation.navigate('DieselOutTransfer')}>
             <Icon name="building" color="#01315C" size={moderateScale(17)} />
             <Text style={[text, { fontSize: moderateScale(12) }]}>{t('diesel_transfer')}</Text>
           </TouchableOpacity>

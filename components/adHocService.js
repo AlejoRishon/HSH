@@ -27,7 +27,8 @@ import { Portal, Provider, Modal, Button } from 'react-native-paper';
 import { horizontalScale, moderateScale } from './styles/Metrics';
 import { ActivityIndicator, MD2Colors } from 'react-native-paper';
 import SignatureCapture from 'react-native-signature-capture';
-import { getVehicle, getDomain } from './functions/helper';
+import { getVehicle, getDomain, getlogUser } from './functions/helper';
+
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import RNPrint from 'react-native-print';
 const RNFS = require('react-native-fs');
@@ -68,7 +69,8 @@ export default function AdHocService({ navigation, route }) {
   const [loading, setLoading] = useState(true)
   const [signatureVisible, setSignatureVisible] = useState(false)
   const [show, setShow] = useState(false)
-
+  const [query, setQuery] = useState('');
+  const [fullData, setFullData] = useState([]);
   const showNameModal = () => setNameVisible(true);
   const hideNameModal = () => setNameVisible(false)
 
@@ -82,6 +84,8 @@ export default function AdHocService({ navigation, route }) {
   const hideModal = () => setVisible(false)
 
   const [diesel, setdiesel] = useState(0);
+  const [INV_NO, setINV_NO] = useState(null);
+
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [showCategory, setShowCategory] = useState(false)
 
@@ -90,6 +94,7 @@ export default function AdHocService({ navigation, route }) {
       const response = await fetch(domain + '/getBusinessList?_token=B6D1941E-D2C9-40F5-AF75-1B0558F527C1');
       const json = await response.json();
       setBusinessName(json);
+      setFullData(json);
       setLoading(false)
     } catch (error) {
       console.error(error);
@@ -112,7 +117,8 @@ export default function AdHocService({ navigation, route }) {
       .then(response => response.json())
       .then(result => {
         console.log(result);
-        setProductList(result)
+        var fResult = result.filter(val => val.category !== '')
+        setProductList(fResult)
       })
       .catch(error => console.error(error))
   }
@@ -120,14 +126,23 @@ export default function AdHocService({ navigation, route }) {
   useEffect(() => { getBusinessName(); getBusinessAddress(); getProductList() }, [businessId])
 
   const postJoborder = () => {
+    const userlog = getlogUser();
+    if (!businessCode) {
+      Alert.alert("Select business");
+      return;
+    }
+    if (!sku) {
+      Alert.alert("Enter product");
+      return;
+    }
     if (!diesel) {
       Alert.alert("Enter amount of diesel");
       return;
     }
     setLoading(true);
-    const url = domain + "/postJobOrder";
+    const url = domain + "/PostJobOrder";
     var vehicleData = getVehicle();
-    console.log(vehicleData);
+    console.log(url);
     var formdata = new FormData();
     formdata.append("CUST_CODE", businessCode);
     formdata.append("Location", address);
@@ -170,7 +185,7 @@ export default function AdHocService({ navigation, route }) {
     //   UOM_CODE: "Liter",
     //   REMARKS: remark
     // };
-    // console.log(data);
+    console.log(formdata);
     fetch(url, {
       method: "POST",
       body: formdata
@@ -180,10 +195,11 @@ export default function AdHocService({ navigation, route }) {
         setLoading(false);
         console.log(result);
         if (result) {
+          setINV_NO(result);
           Alert.alert('Success', 'Job Successful', [
             {
               text: 'Print',
-              onPress: () => printHTML(),
+              onPress: () => printHTML(result),
             },
             { text: 'OK', onPress: () => navigation.pop() },
           ]);
@@ -277,6 +293,7 @@ export default function AdHocService({ navigation, route }) {
   };
 
   useEffect(() => {
+    console.log("again")
     setshowInput(true);
   }, []);
 
@@ -291,6 +308,39 @@ export default function AdHocService({ navigation, route }) {
         </Text>
       </TouchableOpacity>
     );
+  };
+
+
+  const headerSearch = ({ item }) => {
+    return (
+      <View
+        style={{
+          backgroundColor: '#fff',
+          padding: 10,
+
+        }}
+      >
+        <TextInput
+          autoCapitalize="none"
+          autoCorrect={false}
+          clearButtonMode="always"
+          value={query}
+          onChangeText={queryText => handleSearch(queryText)}
+          placeholder="Search"
+          placeholderTextColor='black'
+          style={{ backgroundColor: 'rgba(0,0,0,0.1)', paddingHorizontal: 10, borderRadius: 5, color: 'black' }}
+        />
+      </View>
+    );
+  }
+
+  const handleSearch = text => {
+    const formattedQuery = text.toLowerCase();
+    const filteredData = fullData.filter(user => {
+      return user.name.toLowerCase().includes(formattedQuery);
+    });
+    setBusinessName(filteredData);
+    setQuery(text);
   };
 
   const NameView = ({ item }) => {
@@ -380,7 +430,8 @@ export default function AdHocService({ navigation, route }) {
   }
 
 
-  const printHTML = async () => {
+  const printHTML = async (jo) => {
+    var vehicleData = getVehicle();
     await RNPrint.print({
       html: `<html lang="en">
       <head>
@@ -473,10 +524,11 @@ export default function AdHocService({ navigation, route }) {
                 <p style="margin-top: 0px; margin-bottom: 0px">
                   <strong>To: ${name}</strong>
                 </p>
-                <p style="margin-top: 0px">Site: ${address}</p>
+                <p style="margin-top: 0px">Site: ${address == null ? '' : address}</p>
               </div>
     
               <div>
+              <p style="margin-top: 0px; margin-bottom: 0px"><strong>Do no: ${jo}</strong></p>
                 <p style="margin-top: 0px; margin-bottom: 0px">
                   <strong>Date: ${new Date().toLocaleDateString()}</strong>
                 </p>
@@ -543,8 +595,8 @@ export default function AdHocService({ navigation, route }) {
             <p style="border-top: 2px solid black">
               Authorised Name, Signature &amp; Company Stamp
             </p>
-            <p style="border-top: 2px solid black">
-              Hock Seng Heng Transport &amp; Trading Pte Ltd
+            <p >
+            Driver Vehicle:${vehicleData.vehicle.VEHICLE_INFO}
             </p>
           </div>
         </div>
@@ -579,14 +631,33 @@ export default function AdHocService({ navigation, route }) {
         </Modal>
         <Modal visible={nameVisible} onDismiss={hideNameModal} contentContainerStyle={styles.dragDown}>
           <FlatList
+            ListHeaderComponent={<View
+              style={{
+                backgroundColor: '#fff',
+                padding: 10,
+
+              }}
+            >
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                clearButtonMode="always"
+                value={query}
+                onChangeText={queryText => handleSearch(queryText)}
+                placeholder="Search"
+                placeholderTextColor='black'
+                style={{ backgroundColor: 'rgba(0,0,0,0.1)', paddingHorizontal: 10, borderRadius: 5 }}
+              />
+            </View>}
             data={businessName}
             keyExtractor={item => item.code}
             renderItem={NameView}
             showsVerticalScrollIndicator={true}
+            stickyHeaderIndices={[0]}
           />
         </Modal>
 
-        <Modal visible={addressVisible} onDismiss={hideAddressModal} contentContainerStyle={[styles.dragDown, { width: horizontalScale(180), marginRight: '14%' }]}>
+        <Modal visible={addressVisible} onDismiss={hideAddressModal} contentContainerStyle={[styles.dragDown]}>
           <FlatList
             data={businessAddress}
             keyExtractor={item => item.UID}
@@ -612,28 +683,28 @@ export default function AdHocService({ navigation, route }) {
             />
           </TouchableOpacity>
           <ScrollView style={{ width: '55%' }}>
-            <View style={{ height: 150, marginBottom: 10 }}>
+            <View style={{ marginBottom: 10 }}>
               {/* <TouchableOpacity
                 onPress={() => {
                   printHTML();
                 }}>
                 <Text>Print</Text>
               </TouchableOpacity> */}
-              <Text style={{ fontSize: 18, color: '#01315C', marginVertical: 10 }}>
+              <Text style={{ fontSize: width / 40, color: '#01315C', marginVertical: 10 }}>
                 Business Name
               </Text>
               <TouchableOpacity onPress={showNameModal}>
                 <Text
-                  style={{ fontSize: moderateScale(12), color: '#01315C', marginRight: 40, justifyContent: 'center' }}>
+                  style={{ fontSize: width / 40, color: '#01315C', marginRight: 20, justifyContent: 'center' }}>
                   {!name ? `Select Business Name` : name} <Icon name='angle-down' size={18} style={{ alignSelf: 'center' }} />
                 </Text>
               </TouchableOpacity>
-              <Text style={{ fontSize: 18, color: '#01315C', marginVertical: 10 }}>
+              <Text style={{ fontSize: width / 40, color: '#01315C', marginVertical: 10 }}>
                 Business Address
               </Text>
               <TouchableOpacity onPress={showAddressModal}>
                 <Text
-                  style={{ fontSize: moderateScale(12), color: '#01315C', marginRight: 40, justifyContent: 'center' }}>
+                  style={{ fontSize: width / 40, color: '#01315C', marginRight: 20, justifyContent: 'center' }}>
                   {!address ? `Select Business Address` : address} <Icon name='angle-down' size={18} style={{ alignSelf: 'center' }} />
                 </Text>
               </TouchableOpacity>
@@ -644,7 +715,7 @@ export default function AdHocService({ navigation, route }) {
                 borderBottomWidth: 1,
                 borderBottomColor: '#01315C',
                 marginBottom: 20,
-                marginTop: !address ? 0 : address?.length - 15
+                marginTop: 10
               }} />
             <View
               style={{
@@ -689,10 +760,13 @@ export default function AdHocService({ navigation, route }) {
                 marginBottom: 10,
               }}>
               <Text
-                style={{ fontSize: width / 45, color: '#01315C', marginRight: 40 }}>
+                style={{ fontSize: width / 40, color: '#01315C', marginRight: 40 }}>
                 {t('signature')}
               </Text>
-              <Icon name="edit" color="#01315C" size={20} onPress={showSignatureModal} />
+              {/* <Icon name="edit" color="#01315C" size={20} onPress={showSignatureModal} /> */}
+              <TouchableOpacity onPress={showSignatureModal} style={{ backgroundColor: '#01315C', padding: 5, borderRadius: 5 }}>
+                <Text style={{ color: 'white', width: 50, textAlign: 'center' }}>Sign</Text>
+              </TouchableOpacity>
             </View>
             {/* <Text
               style={{
@@ -713,14 +787,14 @@ export default function AdHocService({ navigation, route }) {
               style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
-                marginBottom: 20,
+                marginTop: 10,
               }}>
               <View>
-                <Text style={{ fontSize: 20, color: '#01315C', marginRight: 40 }}>
+                <Text style={{ fontSize: width / 40, color: '#01315C', marginRight: 40 }}>
                   {t('metre_reading_after')}
                 </Text>
               </View>
-              <Icon
+              {/* <Icon
                 onPress={() => {
                   setuploadtype('after');
                   setModalVisible(true);
@@ -728,7 +802,13 @@ export default function AdHocService({ navigation, route }) {
                 name="edit"
                 color="#01315C"
                 size={20}
-              />
+              /> */}
+              <TouchableOpacity onPress={() => {
+                setuploadtype('after');
+                setModalVisible(true);
+              }} style={{ backgroundColor: '#01315C', padding: 5, borderRadius: 5 }}>
+                <Text style={{ color: 'white', width: 50, textAlign: 'center' }}>Upload</Text>
+              </TouchableOpacity>
             </View>
             <Animated.View
               style={{
@@ -753,11 +833,11 @@ export default function AdHocService({ navigation, route }) {
                 marginBottom: 20,
               }}>
               <View>
-                <Text style={{ fontSize: 20, color: '#01315C', marginRight: 40 }}>
+                <Text style={{ fontSize: width / 40, color: '#01315C', marginRight: 40 }}>
                   {t('metre_reading_before')}
                 </Text>
               </View>
-              <Icon
+              {/* <Icon
                 onPress={() => {
                   setuploadtype('before');
                   setModalVisible(true);
@@ -765,7 +845,13 @@ export default function AdHocService({ navigation, route }) {
                 name="edit"
                 color="#01315C"
                 size={20}
-              />
+              /> */}
+              <TouchableOpacity onPress={() => {
+                setuploadtype('before');
+                setModalVisible(true);
+              }} style={{ backgroundColor: '#01315C', padding: 5, borderRadius: 5 }}>
+                <Text style={{ color: 'white', width: 50, textAlign: 'center' }}>Upload</Text>
+              </TouchableOpacity>
             </View>
             <Animated.View
               style={{
@@ -816,9 +902,11 @@ export default function AdHocService({ navigation, route }) {
           subHeader="Enter quantity of diesel sold"
           show={showInput}
           getInputDiesel={getInputDiesel}
+          defaultValue={false}
           keepinView={true}
           hide={() => setshowInput(false)}
-          onSubmit={val => {
+          initialValue={diesel}
+          onSubmit={() => {
             setshowInput(false);
             getInputDiesel(val);
           }}
@@ -972,9 +1060,8 @@ const styles = StyleSheet.create({
   },
   dragDown: {
     backgroundColor: 'white',
-    right: horizontalScale(25),
     margin: '5%',
-    width: horizontalScale(100),
+    width: '80%',
     alignSelf: 'center',
     borderRadius: 5,
     padding: 5

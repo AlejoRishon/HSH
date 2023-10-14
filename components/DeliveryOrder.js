@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Modal,
+  Dimensions
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { tableHeader, text } from './styles/MainStyle';
@@ -12,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import SideBar from './ui/SideBar';
-import RightDeliveryDetails from './ui/RightDeliveryDetails';
+// import RightDeliveryDetails from './ui/RightDeliveryDetails';
 import {
   Table,
   TableWrapper,
@@ -22,6 +23,7 @@ import {
 import { getVehicle, getDomain } from './functions/helper';
 import { moderateScale, verticalScale } from './styles/Metrics';
 import { Checkbox, ActivityIndicator, MD2Colors, Avatar, Button, TextInput } from 'react-native-paper';
+const { width } = Dimensions.get('window');
 
 export default function DeliveryOrder({ navigation, route }) {
   const domain = getDomain();
@@ -34,7 +36,7 @@ export default function DeliveryOrder({ navigation, route }) {
   const [detailData, setdetailData] = useState([])
   const [showDate, setShowDate] = useState(false)
   const headerData = ['     ', 'DO No.', 'Delivery Address', 'Liters', 'Status']
-  const [dateInput, setDateInput] = useState('');
+  const [dateInput, setDateInput] = useState(new Date());
   const [formattedDate, setFormattedDate] = useState('');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
@@ -51,6 +53,8 @@ export default function DeliveryOrder({ navigation, route }) {
     // console.warn("A date has been picked: ", formatDate(new Date(date).toLocaleDateString()));
     getDeliveryOrder(formatDate(new Date(date)))
     hideDatePicker();
+    setDateInput(new Date(date));
+
   };
 
   const formatDate = (inputDate) => {
@@ -93,13 +97,16 @@ export default function DeliveryOrder({ navigation, route }) {
       const json = await response.json();
       console.log(json);
       if (json && json.length > 0) {
+        // json[1].JOB_STATUS_DESC = 'Pending';
+        // json[2].JOB_STATUS_DESC = 'Completed';
         setOrderList(json);
         const transformedData = json?.map(item => [
           'Transfer',
           item?.INV_NO,
           item?.PRINT_ADDRESS,
           item?.qty_order,
-          'Pending',
+          item?.JOB_STATUS_DESC,
+
         ])
         setdetailData(transformedData)
       }
@@ -132,16 +139,17 @@ export default function DeliveryOrder({ navigation, route }) {
   }
 
   const sortedData = detailData?.sort((a, b) => {
-    if (a[4] === 'Pending' && b[4] === 'Completed') {
+    if (a[4] === 'Pending' && b[4] !== 'Pending') {
       return -1
-    } else if (a[4] === 'Completed' && b[4] === 'Pending') {
+    } else if (a[4] !== 'Pending' && b[4] === 'Pending') {
       return 1
     } else {
       return 0
     }
   })
 
-  const element = (data, index) => {
+  const element = (data, index, status) => {
+    console.log("element", status)
     if (data === 'Transfer') {
       return (
         <Text
@@ -151,6 +159,7 @@ export default function DeliveryOrder({ navigation, route }) {
           }}>
           {/* <Icon name="refresh" color="#2196F3" size={22} /> */}
           < Checkbox
+            disabled={status !== 'Pending' && status !== 'Delivered'}
             status={checked.includes(index) ? 'checked' : 'unchecked'}
             onPress={() => onPressCheckbox(index)}
             color='#01315C'
@@ -158,23 +167,14 @@ export default function DeliveryOrder({ navigation, route }) {
         </Text>
       );
     } else {
-      return (
-        <TouchableOpacity
-          style={{
-            padding: moderateScale(7),
-            borderRadius: 15,
-            backgroundColor: statusColor[data]
-              ? statusColor[data].button
-              : 'white',
-          }}>
-          <Text
-            style={{
-              color: statusColor[data] ? statusColor[data].text : 'black',
-              alignSelf: 'center',
-            }}>
-            {data}
-          </Text>
-        </TouchableOpacity>
+      return (<Text
+        style={{
+          color: statusColor[data] ? statusColor[data].text : 'black',
+          alignSelf: 'flex-start',
+          paddingVertical: 10
+        }}>
+        {data}
+      </Text>
       );
     }
   };
@@ -282,13 +282,11 @@ export default function DeliveryOrder({ navigation, route }) {
               flexGrow: 1,
             }}>
             {sortedData.length > 0 ? sortedData?.map((rowData, index) => (
+              // <View key={index.toString()}>
               <TouchableOpacity
                 key={index.toString()}
                 onPress={() => {
-                  //setshowInput(true)
-                  setOrderList([]);
-                  setdetailData([])
-                  navigation.navigate('EditTrip', {
+                  navigation.replace('EditTrip', {
                     driver: orderList[0]?.DRIVER_NAME,
                     inv: orderList[0]?.INV_NO,
                     name: orderList[0]?.NAME,
@@ -298,30 +296,30 @@ export default function DeliveryOrder({ navigation, route }) {
                     invData: orderList.find((val) => val.INV_NO === rowData[1])
                   });
                 }}>
-                <TableWrapper key={index} style={{ flexDirection: 'row' }}>
+                <TableWrapper key={index} style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                   {rowData?.map((cellData, cellIndex) => (
                     <Cell
                       flex={cellIndex == 0 ? 0.5 : cellIndex == 2 ? 2 : 1}
                       key={cellIndex}
                       data={
                         cellIndex === 0
-                          ? element(cellData, index)
+                          ? element(cellData, index, rowData[4])
                           : cellIndex === 4
                             ? element(cellData, index)
                             : cellData
                       }
-                      textStyle={[
+                      textStyle={
                         {
-                          fontSize: 18,
+                          fontSize: width / 50,
                           color: '#01315C',
-                          paddingVertical: 20,
+                          paddingVertical: 10,
                           backgroundColor: 'red',
-                        },
-                      ]}
+                        }}
                     />
                   ))}
                 </TableWrapper>
               </TouchableOpacity>
+              // </View>
             )) : <>
               <Text style={{ color: 'black', fontSize: 20, textAlign: 'center', marginTop: 30, fontWeight: 'bold' }}>No Jobs for this day</Text>
             </>}
@@ -329,8 +327,9 @@ export default function DeliveryOrder({ navigation, route }) {
           </ScrollView>
         </Table>
       </View>
-      <RightDeliveryDetails show={showInput} hide={() => setshowInput(false)} />
+      {/* <RightDeliveryDetails show={showInput} hide={() => setshowInput(false)} /> */}
       <DateTimePickerModal
+        date={dateInput}
         isVisible={isDatePickerVisible}
         mode="date"
         onConfirm={handleConfirm}

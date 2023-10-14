@@ -44,10 +44,14 @@ export default function MasterLoginLogin({ navigation }) {
                 // console.log(JSON.stringify(error));
                 if (error.code === 'auth/invalid-email') {
                     Alert.alert('Email address/password is invalid!');
-                } else {
+                }
+                else if (error.code === 'auth/user-not-found') {
+                    Alert.alert('User not found.');
+                }
+                else {
                     Alert.alert('An error occurred while logging in. Please try again.');
                 }
-                console.error(error);
+                console.log(error);
             });
     };
 

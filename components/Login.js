@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { horizontalScale, moderateScale, verticalScale } from './styles/Metrics';
 import { ActivityIndicator, MD2Colors } from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
-import { getUser, setDomain, setlogUserDetail } from './functions/helper';
+import { getUser, setDomain, setlogUserDetail, setlogUserDetailFull } from './functions/helper';
 import firestore from '@react-native-firebase/firestore';
 export default function Login({ navigation }) {
   const user = getUser();
@@ -55,9 +55,11 @@ export default function Login({ navigation }) {
       .then(res => res.json())
       .then(data => {
         if (data.length > 0 && data[0].ACCESS_RIGHT !== null && data[0].CID !== null) {
-          setlogUserDetail(userName)
+          console.log(data)
+          setlogUserDetail(userName);
+          setlogUserDetailFull(data[0])
           setLoading(false);
-          navigation.navigate('VehicleList')
+          navigation.replace('VehicleList')
         }
         else {
           Alert.alert('Wrong credentials!')

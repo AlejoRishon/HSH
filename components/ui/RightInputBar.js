@@ -5,6 +5,7 @@ import {
   View,
   Animated,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import React, { useRef, useEffect, useState } from 'react';
 import { searchBox, button, buttonText, text } from '../styles/MainStyle';
@@ -41,9 +42,16 @@ export default function RightInputBar({
         setCalVal([8, 0, 0, 0]);
       }
     }
+    else {
+      onHide();
+    }
   }, [show]);
 
   const onShow = () => {
+    // setCalVal([]);
+    if (initialValue == 0) {
+      setCalVal([]);
+    }
     Animated.timing(fadeAnim, {
       toValue: 0,
       duration: 500,
@@ -52,6 +60,7 @@ export default function RightInputBar({
   };
 
   const onHide = () => {
+    setCalVal([]);
     hide();
     Animated.timing(fadeAnim, {
       toValue: -500,
@@ -135,7 +144,6 @@ export default function RightInputBar({
                 style={{
                   backgroundColor: '#EAF5FF',
                   width: '30%',
-                  height: 25,
                   borderRadius: 8,
                   marginTop: verticalScale(24),
                   justifyContent: 'center',
@@ -177,10 +185,17 @@ export default function RightInputBar({
         )}
         <TouchableOpacity
           onPress={() => {
-            onSubmit();
-            if (!keepinView) {
-              onHide();
+            if (calVal.length > 0) {
+              onSubmit();
+              if (!keepinView) {
+                onHide();
+              }
             }
+            else {
+              Alert.alert('Quantity cannot be 0')
+            }
+            // console.log(calVal)
+
           }}
           style={{ backgroundColor: '#EAF5FF', flex: 1, borderRadius: 8 }}>
           <Text
@@ -207,11 +222,18 @@ export const AdhocRightInputBar = ({
   getInputDiesel,
   hide,
   onSubmit,
+  initialValue
 }) => {
   const fadeAnim = useRef(new Animated.Value(-500)).current;
   const numPad = [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, '<'];
   const [calVal, setCalVal] = useState([]);
-
+  useEffect(() => {
+    if (initialValue) {
+      setCalVal(String(initialValue).split("").map((num) => {
+        return Number(num)
+      }))
+    }
+  }, [initialValue]);
   useEffect(() => {
     if (show) {
       onShow();
@@ -314,14 +336,13 @@ export const AdhocRightInputBar = ({
                 style={{
                   backgroundColor: '#EAF5FF',
                   width: '30%',
-                  height: verticalScale(75),
                   borderRadius: 8,
                   marginTop: verticalScale(28),
                   justifyContent: 'center',
                 }}>
                 <Text
                   style={{
-                    fontSize: moderateScale(15),
+                    fontSize: width / 35,
                     color: '#01315C',
                     textAlign: 'center',
                   }}>

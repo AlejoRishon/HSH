@@ -27,3 +27,10 @@ export const setlogUserDetail = (url) => {
 export const getlogUser = () => {
   return global.logUser;
 };
+
+export const setlogUserDetailFull = (url) => {
+  global.logUser = url;
+};
+export const getlogUserFull = () => {
+  return global.logUser;
+};

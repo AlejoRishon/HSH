@@ -30,7 +30,7 @@ const { width } = Dimensions.get('window');
 export default function DeliveryOrder({ navigation, route }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false)
-
+  const editable = route?.params?.invData.JOB_STATUS_DESC !== 'Pending' && route?.params?.invData.JOB_STATUS_DESC !== 'Delivered' ? false : true;
   const [showInput, setshowInput] = useState(!true);
   const heightMeterAfAnim = useRef(new Animated.Value(0)).current;
   const heightMeterBeAnim = useRef(new Animated.Value(0)).current;
@@ -54,7 +54,7 @@ export default function DeliveryOrder({ navigation, route }) {
   const sign = createRef();
   const saveSign = () => sign.current.saveImage();
   const resetSign = () => sign.current.resetImage();
-
+  console.log(route.params.invData)
   const _onSaveEvent = (result) => {
     Alert.alert('Signature Captured Successfully!')
     // console.log(result.encoded);
@@ -164,7 +164,7 @@ export default function DeliveryOrder({ navigation, route }) {
                   <strong>To: ${route?.params?.invData.NAME}</strong>
                 </p>
                 <p style="margin-top: 0px; margin-bottom: 0px">Site: ${route?.params?.invData.ADDRESS2}</p>
-                <p style="margin-top: 0px">Salesperson: ${route?.params?.invData.SALES_PERSON_NAME}</p>
+                <p style="margin-top: 0px">Sales Rep: ${route?.params?.invData.SALES_PERSON_NAME}</p>
               </div>
     
               <div>
@@ -235,8 +235,8 @@ export default function DeliveryOrder({ navigation, route }) {
             <p style="border-top: 2px solid black">
               Authorised Name, Signature &amp; Company Stamp
             </p>
-            <p style="border-top: 2px solid black">
-              Hock Seng Heng Transport &amp; Trading Pte Ltd
+            <p >
+              Driver Vehicle:${route?.params?.invData.PLATE_NO}
             </p>
           </div>
         </div>
@@ -279,7 +279,7 @@ export default function DeliveryOrder({ navigation, route }) {
             text: 'Print',
             onPress: () => printHTML(),
           },
-          { text: 'OK', onPress: () => navigation.pop() },
+          { text: 'OK', onPress: () => navigation.replace('DeliveryOrder') },
         ]);
         setshowInput(false);
       })
@@ -343,7 +343,8 @@ export default function DeliveryOrder({ navigation, route }) {
 
   useEffect(() => {
     setDieselValue(route?.params?.invData.qty_order)
-    setshowInput(true);
+    editable ?
+      setshowInput(true) : setshowInput(false);
   }, []);
   if (signatureVisible) {
     return (
@@ -381,20 +382,33 @@ export default function DeliveryOrder({ navigation, route }) {
         style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
         <SideBar all={true} navigation={navigation} />
         <View style={{ flex: 1, padding: 20 }}>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('DeliveryOrder');
-            }}>
-            <Icon
-              name="chevron-left"
-              color="#01315C"
-              size={30}
-              style={{ marginBottom: 10 }}
-            />
-          </TouchableOpacity>
-          <ScrollView style={{ width: '55%' }}>
+          <View style={{ justifyContent: 'space-between', flexDirection: 'row', width: editable ? '55%' : '100%' }}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('DeliveryOrder');
+              }}>
+              <Icon
+                name="chevron-left"
+                color="#01315C"
+                size={30}
+                style={{ marginBottom: 10 }}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                printHTML()
+              }}>
+              <Icon
+                name="print"
+                color="#01315C"
+                size={30}
+                style={{ marginBottom: 10 }}
+              />
+            </TouchableOpacity>
+          </View>
+          <ScrollView style={{ width: editable ? '55%' : '100%' }}>
             <View>
-              <Text
+              {/* <Text
                 style={{
                   fontSize: width / 40,
                   color: '#01315C',
@@ -402,10 +416,10 @@ export default function DeliveryOrder({ navigation, route }) {
                   marginBottom: 5,
                 }}>
                 {route?.params?.invData.DRIVER_NAME}
-              </Text>
+              </Text> */}
               <Text
                 style={{
-                  fontSize: width / 60,
+                  fontSize: width / 40,
                   color: '#01315C',
                   marginBottom: 10,
                 }}>
@@ -419,17 +433,20 @@ export default function DeliveryOrder({ navigation, route }) {
                 marginBottom: 10,
               }}>
               <Text
-                style={{ fontSize: width / 60, color: '#01315C', marginRight: 40 }}>
+                style={{ fontSize: width / 40, color: '#01315C', marginRight: 40 }}>
                 {route?.params?.invData.NAME}
               </Text>
             </View>
-            <Animated.View style={{ height: 150, marginBottom: 10 }}>
-              <Text style={{ fontSize: 18, color: '#01315C' }}>
+            <Animated.View style={{ marginBottom: 10 }}>
+              {route?.params?.invData.PRINT_ADDRESS && <Text style={{ fontSize: width / 40, color: '#01315C' }}>
                 {route?.params?.invData.PRINT_ADDRESS}
               </Text>
-              <Text style={{ fontSize: 18, color: '#01315C', marginVertical: 10 }}>
-                {route?.params?.invData.ADDRESS2}
-              </Text>
+              }
+              {route?.params?.invData.ADDRESS2 &&
+                <Text style={{ fontSize: width / 40, color: '#01315C', marginBottom: 10 }}>
+                  {route?.params?.invData.ADDRESS2}
+                </Text>
+              }
             </Animated.View>
             <View
               style={{
@@ -492,11 +509,14 @@ export default function DeliveryOrder({ navigation, route }) {
                 style={{ fontSize: width / 45, color: '#01315C', marginRight: 40 }}>
                 {t('signature')}
               </Text>
-              <Icon name="edit" color="#01315C" size={20} onPress={showSignatureModal} />
+              {/* <Icon disabled={!editable} name="edit" color="#01315C" size={20} onPress={showSignatureModal} /> */}
+              <TouchableOpacity disabled={!editable} onPress={showSignatureModal} style={{ backgroundColor: '#01315C', padding: 5, borderRadius: 5 }}>
+                <Text style={{ color: 'white', width: 50, textAlign: 'center' }}>Sign</Text>
+              </TouchableOpacity>
             </View>
             {/* <Text
             style={{
-              fontSize: width / 60,
+              fontSize: width / 40,
               color: '#3DB792',
               marginBottom: 20,
             }}>
@@ -513,7 +533,7 @@ export default function DeliveryOrder({ navigation, route }) {
               style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
-                marginBottom: 20,
+                marginTop: 10,
               }}>
               <View>
                 <Text style={{ fontSize: 20, color: '#01315C', marginRight: 40 }}>
@@ -521,7 +541,7 @@ export default function DeliveryOrder({ navigation, route }) {
                 </Text>
               </View>
 
-              <Icon
+              {/* <Icon disabled={!editable}
                 onPress={() => {
                   setuploadtype('after');
                   setModalVisible(true);
@@ -529,7 +549,13 @@ export default function DeliveryOrder({ navigation, route }) {
                 name="edit"
                 color="#01315C"
                 size={20}
-              />
+              /> */}
+              <TouchableOpacity disabled={!editable} onPress={() => {
+                setuploadtype('after');
+                setModalVisible(true);
+              }} style={{ backgroundColor: '#01315C', padding: 5, borderRadius: 5 }}>
+                <Text style={{ color: 'white', width: 50, textAlign: 'center' }}>Upload</Text>
+              </TouchableOpacity>
             </View>
             <Animated.View
               style={{
@@ -550,14 +576,15 @@ export default function DeliveryOrder({ navigation, route }) {
               style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
-                marginBottom: 20,
+                marginTop: 10,
+                marginBottom: 20
               }}>
               <View>
                 <Text style={{ fontSize: 20, color: '#01315C', marginRight: 40 }}>
                   {t('metre_reading_before')}
                 </Text>
               </View>
-              <Icon
+              {/* <Icon disabled={!editable}
                 onPress={() => {
                   setuploadtype('before');
                   setModalVisible(true);
@@ -565,7 +592,13 @@ export default function DeliveryOrder({ navigation, route }) {
                 name="edit"
                 color="#01315C"
                 size={20}
-              />
+              /> */}
+              <TouchableOpacity disabled={!editable} onPress={() => {
+                setuploadtype('after');
+                setModalVisible(true);
+              }} style={{ backgroundColor: '#01315C', padding: 5, borderRadius: 5 }}>
+                <Text style={{ color: 'white', width: 50, textAlign: 'center' }}>Upload</Text>
+              </TouchableOpacity>
             </View>
             <Animated.View
               style={{
@@ -593,7 +626,7 @@ export default function DeliveryOrder({ navigation, route }) {
             <KeyboardAvoidingView
               style={{ marginBottom: 50 }}
               behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-              <TextInput style={[remarks]} multiline={true} numberOfLines={4} value={remark} onChangeText={text => setRemark(text)} />
+              <TextInput editable={editable} style={[remarks]} multiline={true} numberOfLines={4} value={remark} onChangeText={text => setRemark(text)} />
             </KeyboardAvoidingView>
           </ScrollView>
         </View>
@@ -605,7 +638,7 @@ export default function DeliveryOrder({ navigation, route }) {
           keepinView={true}
           getInputDiesel={handleGetInputDiesel}
           hide={() => setshowInput(false)}
-          initialValue={route?.params?.invData.qty_order}
+          initialValue={dieselValue}
           onSubmit={() => {
             PostJobOrderDelivered()
           }}

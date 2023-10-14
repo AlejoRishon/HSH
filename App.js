@@ -11,6 +11,8 @@ import EditTrip from './components/editTrip';
 import AdHocService from './components/adHocService';
 import TransferList from './components/TransferList';
 import MasterLogin from './components/MasterLogin';
+import DieselTransferList from './components/DieselTransferList';
+import DieselOutTransfer from './components/DieselOutTransfer';
 import auth from '@react-native-firebase/auth';
 import { setUserDetail } from './components/functions/helper';
 
@@ -47,6 +49,8 @@ const App = () => {
         <Stack.Screen name="AdHocService" component={AdHocService} />
         <Stack.Screen name='TransferList' component={TransferList} />
         <Stack.Screen name='MasterLogin' component={MasterLogin} />
+        <Stack.Screen name='DieselTransferList' component={DieselTransferList} />
+        <Stack.Screen name='DieselOutTransfer' component={DieselOutTransfer} />
       </Stack.Navigator>
     </NavigationContainer>
   );
