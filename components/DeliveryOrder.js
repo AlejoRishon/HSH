@@ -4,7 +4,8 @@ import {
   TouchableOpacity,
   ScrollView,
   Modal,
-  Dimensions
+  Dimensions,
+  Alert
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { tableHeader, text } from './styles/MainStyle';
@@ -23,6 +24,9 @@ import {
 import { getVehicle, getDomain } from './functions/helper';
 import { moderateScale, verticalScale } from './styles/Metrics';
 import { Checkbox, ActivityIndicator, MD2Colors, Avatar, Button, TextInput } from 'react-native-paper';
+import NetInfo from "@react-native-community/netinfo";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const { width } = Dimensions.get('window');
 
 export default function DeliveryOrder({ navigation, route }) {
@@ -82,43 +86,77 @@ export default function DeliveryOrder({ navigation, route }) {
     getDeliveryOrder(formatDate(new Date()))
 
     return () => {
-      getDeliveryOrder(formatDate(new Date()))
+      // getDeliveryOrder(formatDate(new Date()))
     }
 
   }, [])
 
   const getDeliveryOrder = async (sdate) => {
     setChecked([])
-    setLoading(true)
-    try {
-      console.log(domain + `/getJobDetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&PLATE_NO=${parameter.vehicle.VEHICLE_INFO}&date=${sdate}`)
-      const response = await fetch(domain + `/getJobDetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&PLATE_NO=${parameter.vehicle.VEHICLE_INFO}&date=${sdate}`);
+    setLoading(true);
+    console.log(sdate)
+    NetInfo.fetch().then(async networkState => {
+      console.log("Is connected? - ", domain + `/getJobDetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&PLATE_NO=${parameter.vehicle.VEHICLE_INFO}&date=${sdate}`);
+      if (networkState.isConnected) {
+        try {
+          const response = await fetch(domain + `/getJobDetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&PLATE_NO=${parameter.vehicle.VEHICLE_INFO}&date=${sdate}`);
 
-      const json = await response.json();
-      console.log(json);
-      if (json && json.length > 0) {
-        // json[1].JOB_STATUS_DESC = 'Pending';
-        // json[2].JOB_STATUS_DESC = 'Completed';
-        setOrderList(json);
-        const transformedData = json?.map(item => [
-          'Transfer',
-          item?.INV_NO,
-          item?.PRINT_ADDRESS,
-          item?.qty_order,
-          item?.JOB_STATUS_DESC,
+          const json = await response.json();
+          console.log(json);
+          if (json && json.length > 0) {
+            // json[1].JOB_STATUS_DESC = 'Pending';
+            // json[2].JOB_STATUS_DESC = 'Completed';
+            if (sdate == formatDate(new Date())) {
+              AsyncStorage.setItem('JOBDATA', JSON.stringify(json));
+            }
+            setOrderList(json);
+            const transformedData = json?.map(item => [
+              'Transfer',
+              item?.INV_NO,
+              `${item?.NAME} \n ${item?.PRINT_ADDRESS}`,
+              item?.qty_order,
+              item?.JOB_STATUS_DESC,
 
-        ])
-        setdetailData(transformedData)
+            ])
+            setdetailData(transformedData)
+          }
+          else {
+            setOrderList([]);
+            setdetailData([])
+          }
+          setLoading(false)
+        } catch (error) {
+          // console.error(error);
+          setLoading(false)
+        }
       }
       else {
-        setOrderList([]);
-        setdetailData([])
+        var localDeliveryData = await AsyncStorage.getItem('JOBDATA');
+        if (localDeliveryData && sdate === formatDate(new Date())) {
+          setLoading(false)
+          Alert.alert('Offline mode', 'Data in offline mode can be outdated');
+          let jsDelivery = JSON.parse(localDeliveryData)
+          setOrderList(jsDelivery);
+
+          const transformedData = jsDelivery?.map(item => [
+            'Transfer',
+            item?.INV_NO,
+            `${item?.NAME} \n ${item?.PRINT_ADDRESS}`,
+            item?.qty_order,
+            item?.JOB_STATUS_DESC,
+
+          ])
+          setdetailData(transformedData)
+        }
+        else {
+          Alert.alert('You are offline');
+          setOrderList([]);
+          setdetailData([])
+          setLoading(false)
+
+        }
       }
-      setLoading(false)
-    } catch (error) {
-      // console.error(error);
-      setLoading(false)
-    }
+    });
   }
 
   const statusColor = {
@@ -149,7 +187,7 @@ export default function DeliveryOrder({ navigation, route }) {
   })
 
   const element = (data, index, status) => {
-    console.log("element", status)
+    // console.log("element", status)
     if (data === 'Transfer') {
       return (
         <Text
@@ -231,7 +269,7 @@ export default function DeliveryOrder({ navigation, route }) {
               onPress={() => {
                 console.log(orderList[checked[0]]);
 
-                navigation.navigate('TransferList', {
+                navigation.replace('TransferList', {
                   info: route?.params,
                   job: orderList[checked[0]].INV_NO
                 });

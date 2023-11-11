@@ -11,7 +11,7 @@ import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
 import com.rnfs.RNFSPackage; 
 import java.util.List;
-
+import com.reactnativecommunity.netinfo.NetInfoPackage;
 public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost =

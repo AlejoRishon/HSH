@@ -37,6 +37,8 @@ export default function MasterLoginLogin({ navigation }) {
         await auth().signInWithEmailAndPassword(userEmail, password)
             .then(() => {
                 console.log('Success');
+                setLoading(false);
+
                 navigation.replace('Login');
             })
             .catch(error => {

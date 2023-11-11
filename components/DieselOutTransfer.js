@@ -12,6 +12,7 @@ import { tableHeader, text, remarks } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useTranslation } from 'react-i18next';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import SideBar from './ui/SideBar';
 // import RightDeliveryDetails from './ui/RightDeliveryDetails';
@@ -50,12 +51,15 @@ export default function DieselOutTransfer({ navigation, route }) {
     const showDatePicker = () => {
         setDatePickerVisibility(true);
     };
-    const postJobTransfer = () => {
+    const postJobTransfer = async () => {
+        var vl = await AsyncStorage.getItem('VehicleLoad');
+        vl = JSON.parse(vl);
         const userlog = getlogUser();
         const url = domain + "/PostJobTransfer"
         const data = transferData[Selected];
         data.QTY = quantity;
         data.UPDATE_BY = userlog;
+        data.VL_UID = vl.VL_UID;
         console.log("PostJobTransfer", data)
         fetch(url, {
             method: "POST",
@@ -252,7 +256,7 @@ export default function DieselOutTransfer({ navigation, route }) {
                         }}>
                         <TouchableOpacity
                             onPress={() => {
-                                navigation.navigate('Main');
+                                navigation.replace('Main');
                             }}>
                             <Icon
                                 name="chevron-left"

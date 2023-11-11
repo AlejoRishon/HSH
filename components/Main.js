@@ -6,6 +6,7 @@ import {
   FlatList,
   TextInput,
   TouchableOpacity,
+  Alert
 } from 'react-native';
 import React, { useState } from 'react';
 import {
@@ -20,6 +21,8 @@ import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SideBar from './ui/SideBar';
 import { useTranslation } from 'react-i18next';
 import { moderateScale, verticalScale } from './styles/Metrics';
+import NetInfo from "@react-native-community/netinfo";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { getVehicle } from './functions/helper';
 
@@ -28,6 +31,17 @@ export default function Main({ navigation, route }) {
 
   const { t, i18n } = useTranslation();
   const parameter = getVehicle();
+
+  // const navButton = (route,params) => {
+  //   NetInfo.fetch().then(async networkState => {
+  //     console.log("Is connected? - ", networkState.isConnected);
+  //     if (networkState.isConnected) {
+  //       navigation.navigate(route);
+  //     }
+  //     else {
+  //       Alert.alert('Offline mode', 'Cannot use this function in offline mode. Connect to the internet.');
+  //     }
+  //   }
 
   // console.log('zjkgnkvrlzkv:', route?.params)
 
@@ -86,9 +100,20 @@ export default function Main({ navigation, route }) {
           }}>
           <TouchableOpacity
             style={boxContainer}
-            onPress={() => navigation.navigate('DieselTransferList', {
-              info: route?.params
-            })}>
+            onPress={() => {
+              NetInfo.fetch().then(async networkState => {
+                console.log("Is connected? - ", networkState.isConnected);
+                if (networkState.isConnected) {
+                  navigation.navigate('DieselTransferList', {
+                    info: route?.params
+                  })
+                }
+                else {
+                  Alert.alert('Offline mode', 'Cannot use this function in offline mode. Connect to the internet.');
+                }
+              })
+            }
+            }>
             <Icons name="truck-fast" color="#01315C" size={moderateScale(20)} />
             <Text style={[text, { fontSize: moderateScale(12) }]}>{t('tank_fill_up')}</Text>
           </TouchableOpacity>
@@ -110,15 +135,47 @@ export default function Main({ navigation, route }) {
             marginRight: 20,
           }}>
           <TouchableOpacity style={boxContainer}
-            onPress={() => navigation.navigate('AdHocService', {
-              info: route?.params
-            })}>
+            onPress={() => {
+              NetInfo.fetch().then(async networkState => {
+                console.log("Is connected? - ", networkState.isConnected);
+                if (networkState.isConnected) {
+                  var vl = await AsyncStorage.getItem('VehicleLoad');
+                  vl = JSON.parse(vl);
+                  if (vl && vl.VL_UID) {
+                    navigation.navigate('AdHocService', {
+                      info: route?.params
+                    })
+                  }
+                  else {
+                    Alert.alert('Kindly fill up first')
+                  }
+                }
+                else {
+                  Alert.alert('Offline mode', 'Cannot use this function in offline mode. Connect to the internet.');
+                }
+              })
+            }
+
+            }>
             <Icon name="file-text" color="#01315C" size={moderateScale(17)} />
             <Text style={[text, { fontSize: moderateScale(12) }]}>{t('ad_hoc_service')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={boxContainer}
-            onPress={() => navigation.navigate('DieselOutTransfer')}>
+            onPress={() => {
+              NetInfo.fetch().then(async networkState => {
+                console.log("Is connected? - ", networkState.isConnected);
+                if (networkState.isConnected) {
+
+                  navigation.navigate('DieselOutTransfer')
+                }
+                else {
+                  Alert.alert('Offline mode', 'Cannot use this function in offline mode. Connect to the internet.');
+                }
+              })
+            }
+
+            }>
             <Icon name="building" color="#01315C" size={moderateScale(17)} />
             <Text style={[text, { fontSize: moderateScale(12) }]}>{t('diesel_transfer')}</Text>
           </TouchableOpacity>

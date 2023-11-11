@@ -12,6 +12,8 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icons from 'react-native-vector-icons/FontAwesome';
 import { verticalScale } from '../styles/Metrics';
+import auth from '@react-native-firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SideBar = props => {
   return (
@@ -38,7 +40,7 @@ const SideBar = props => {
       )}
       {props.all && (
         <TouchableOpacity
-          onPress={() => props.navigation.navigate('TankFill')}
+          onPress={() => props.navigation.navigate('DieselTransferList')}
           style={{
             backgroundColor: '#01315C',
             justifyContent: 'center',
@@ -96,7 +98,7 @@ const SideBar = props => {
       {props.all && (
         <TouchableOpacity
           onPress={() =>
-            props.navigation.navigate('DieselTransfer', {
+            props.navigation.navigate('DieselOutTransfer', {
               vehicle: props.vehicle,
             })
           }
@@ -112,7 +114,15 @@ const SideBar = props => {
         </TouchableOpacity>
       )}
       <TouchableOpacity
-        onPress={() => props.navigation.navigate('Login')}
+        onPress={() => {
+          AsyncStorage.removeItem('vehicleDetails')
+          AsyncStorage.removeItem('JOBDATA')
+          AsyncStorage.removeItem('pendingDelivery')
+          AsyncStorage.removeItem('username')
+          AsyncStorage.removeItem('domainurl')
+          AsyncStorage.removeItem('password');
+          props.navigation.replace('Login');
+        }}
         style={{
           backgroundColor: '#01315C',
           justifyContent: 'center',

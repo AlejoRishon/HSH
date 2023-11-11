@@ -28,6 +28,7 @@ import { horizontalScale, moderateScale } from './styles/Metrics';
 import { ActivityIndicator, MD2Colors } from 'react-native-paper';
 import SignatureCapture from 'react-native-signature-capture';
 import { getVehicle, getDomain, getlogUser } from './functions/helper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import RNPrint from 'react-native-print';
@@ -58,6 +59,7 @@ export default function AdHocService({ navigation, route }) {
   const [visible, setVisible] = useState(false);
   const [product, setProduct] = useState('');
   const [remark, setremark] = useState(null);
+  const [unitcost, setunitcost] = useState(null);
   const [category, setCategory] = useState('')
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
@@ -93,8 +95,17 @@ export default function AdHocService({ navigation, route }) {
     try {
       const response = await fetch(domain + '/getBusinessList?_token=B6D1941E-D2C9-40F5-AF75-1B0558F527C1');
       const json = await response.json();
-      setBusinessName(json);
-      setFullData(json);
+      console.log('Business name', json);
+      var filteredData = [];
+      var uniqueNames = [];
+      json.map(val => {
+        if (uniqueNames.indexOf(val.name) == -1) {
+          uniqueNames.push(val.name);
+          filteredData.push(val)
+        }
+      })
+      setBusinessName([...filteredData]);
+      setFullData([...filteredData]);
       setLoading(false)
     } catch (error) {
       console.error(error);
@@ -125,7 +136,7 @@ export default function AdHocService({ navigation, route }) {
 
   useEffect(() => { getBusinessName(); getBusinessAddress(); getProductList() }, [businessId])
 
-  const postJoborder = () => {
+  const postJoborder = async () => {
     const userlog = getlogUser();
     if (!businessCode) {
       Alert.alert("Select business");
@@ -139,78 +150,92 @@ export default function AdHocService({ navigation, route }) {
       Alert.alert("Enter amount of diesel");
       return;
     }
-    setLoading(true);
-    const url = domain + "/PostJobOrder";
-    var vehicleData = getVehicle();
-    console.log(url);
-    var formdata = new FormData();
-    formdata.append("CUST_CODE", businessCode);
-    formdata.append("Location", address);
-    formdata.append("REC_DATE", new Date().toISOString());
-    formdata.append("VEHICLE_CODE", vehicleData.vehicle.VEHICLE_INFO);
-    formdata.append("DRIVER_ID", vehicleData.vehicle.driver_id);
-    formdata.append("DELIVERED", 1);
-    formdata.append("SKU", sku);
-    formdata.append("Qty", diesel);
-    formdata.append("UOM_CODE", "Liter");
-    formdata.append("REMARKS", remark);
-    formdata.append("SIGNATURE64", signature);
-    formdata.append("METER_BEFORE64", previewImageUri);
-    formdata.append("METER_AFTER64", previewImageUribefore);
-    // // formdata.append("METER_BEFORE", {
-    //   value: signature.filepath,
-    //   options: {
-    //     filename: "METER_BEFORE",
-    //     contentType: null,
-    //   },
-    // });
-    // formdata.append("METER_AFTER", {
-    //   value: signature.filepath,
-    //   options: {
-    //     filename: "METER_AFTER",
-    //     contentType: null,
-    //   },
-    // });
-    // formdata.append("METER_BEFORE", fileInput.files[0], "/C:/Users/hp/Downloads/Testpjp1.pjp.jpg");
-    // formdata.append("METER_AFTER", fileInput.files[0], "/C:/Users/hp/Downloads/image.png");
-    // const data = {
-    //   CUST_CODE: businessCode,
-    //   Location: address,
-    //   REC_DATE: new Date().toISOString(),
-    //   VEHICLE_CODE: vehicleData.vehicle.VEHICLE_INFO,
-    //   DRIVER_ID: vehicleData.vehicle.driver_id,
-    //   DELIVERED: 1,
-    //   SKU: sku,
-    //   Qty: diesel,
-    //   UOM_CODE: "Liter",
-    //   REMARKS: remark
-    // };
-    console.log(formdata);
-    fetch(url, {
-      method: "POST",
-      body: formdata
-    })
-      .then(response => response.json())
-      .then(result => {
-        setLoading(false);
-        console.log(result);
-        if (result) {
-          setINV_NO(result);
-          Alert.alert('Success', 'Job Successful', [
-            {
-              text: 'Print',
-              onPress: () => printHTML(result),
-            },
-            { text: 'OK', onPress: () => navigation.pop() },
-          ]);
-        } else {
-          alert("Job Failed");
-        }
+    if (!unitcost) {
+      Alert.alert("Enter price");
+      return;
+    }
+
+    var vl = await AsyncStorage.getItem('VehicleLoad');
+    vl = JSON.parse(vl);
+    if (vl.VL_UID) {
+      setLoading(true);
+      const url = domain + "/PostJobOrder";
+      var vehicleData = getVehicle();
+      console.log(url);
+      var formdata = new FormData();
+      formdata.append("CUST_CODE", businessCode);
+      formdata.append("VL_UID", vl.VL_UID);
+      formdata.append("Location", address);
+      formdata.append("REC_DATE", new Date().toISOString());
+      formdata.append("VEHICLE_CODE", vehicleData.vehicle.VEHICLE_INFO);
+      formdata.append("DRIVER_ID", vehicleData.vehicle.driver_id);
+      formdata.append("DELIVERED", 1);
+      formdata.append("SKU", sku);
+      formdata.append("Qty", diesel);
+      formdata.append("UOM_CODE", "Liter");
+      formdata.append("REMARKS", remark);
+      formdata.append("UNIT_COST", parseFloat(unitcost));
+      formdata.append("SIGNATURE64", signature);
+      formdata.append("METER_BEFORE64", previewImageUri);
+      formdata.append("METER_AFTER64", previewImageUribefore);
+      // // formdata.append("METER_BEFORE", {
+      //   value: signature.filepath,
+      //   options: {
+      //     filename: "METER_BEFORE",
+      //     contentType: null,
+      //   },
+      // });
+      // formdata.append("METER_AFTER", {
+      //   value: signature.filepath,
+      //   options: {
+      //     filename: "METER_AFTER",
+      //     contentType: null,
+      //   },
+      // });
+      // formdata.append("METER_BEFORE", fileInput.files[0], "/C:/Users/hp/Downloads/Testpjp1.pjp.jpg");
+      // formdata.append("METER_AFTER", fileInput.files[0], "/C:/Users/hp/Downloads/image.png");
+      // const data = {
+      //   CUST_CODE: businessCode,
+      //   Location: address,
+      //   REC_DATE: new Date().toISOString(),
+      //   VEHICLE_CODE: vehicleData.vehicle.VEHICLE_INFO,
+      //   DRIVER_ID: vehicleData.vehicle.driver_id,
+      //   DELIVERED: 1,
+      //   SKU: sku,
+      //   Qty: diesel,
+      //   UOM_CODE: "Liter",
+      //   REMARKS: remark
+      // };
+      console.log(formdata);
+      fetch(url, {
+        method: "POST",
+        body: formdata
       })
-      .catch(error => {
-        setLoading(false);
-        Alert.alert("Error:", error);
-      });
+        .then(response => response.json())
+        .then(result => {
+          setLoading(false);
+          console.log(result);
+          if (result) {
+            setINV_NO(result);
+            Alert.alert('Success', 'Job Successful', [
+              {
+                text: 'Print',
+                onPress: () => printHTML(result),
+              },
+              { text: 'OK', onPress: () => navigation.replace('Main') },
+            ]);
+          } else {
+            alert("Job Failed");
+          }
+        })
+        .catch(error => {
+          setLoading(false);
+          Alert.alert("Error:", error);
+        });
+    }
+    else {
+      Alert.alert('Kindly fill up first')
+    }
   }
 
   const getInputDiesel = diesel => {
@@ -335,10 +360,13 @@ export default function AdHocService({ navigation, route }) {
   }
 
   const handleSearch = text => {
+    console.log('search text', text)
     const formattedQuery = text.toLowerCase();
     const filteredData = fullData.filter(user => {
       return user.name.toLowerCase().includes(formattedQuery);
     });
+    console.log('filtered', filteredData)
+
     setBusinessName(filteredData);
     setQuery(text);
   };
@@ -404,7 +432,7 @@ export default function AdHocService({ navigation, route }) {
   if (signatureVisible) {
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>
-        <Text style={{ fontSize: 20, color: '#01315C', fontWeight: 'bold', margin: '5%', textDecorationLine: 'underline' }}>
+        <Text style={{ fontSize: 20, color: '#01315C', fontWeight: 'bold', margin: 10, textDecorationLine: 'underline' }}>
           Sign here..
         </Text>
         <SignatureCapture
@@ -444,8 +472,8 @@ export default function AdHocService({ navigation, route }) {
             height: 420px;
           }
           .container {
-            width: 100%;
             margin: 0 auto;
+            padding:10px
           }
           fieldset {
             border: 1px solid #ccc;
@@ -540,7 +568,7 @@ export default function AdHocService({ navigation, route }) {
               <tbody>
                 <tr>
                   <th>ITEM</th>
-                  <th width="400px">DESCRIPTION</th>
+                  <th width="300px">DESCRIPTION</th>
                   <th>QTY</th>
                   <th width="50px">UNIT(SGD)</th>
                   <th width="20px">AMOUNT(SGD)</th>
@@ -549,8 +577,8 @@ export default function AdHocService({ navigation, route }) {
                   <td>1</td>
                   <td>${product}</td>
                   <td>${diesel}</td>
-                  <td></td>
-                  <td></td>
+                  <td>${unitcost}</td>
+                  <td>${parseFloat(unitcost) * parseFloat(diesel)}</td>
                 </tr>
                 <tr>
                   <td colspan="3" rowspan="4">
@@ -562,7 +590,7 @@ export default function AdHocService({ navigation, route }) {
                       ">
                       <p>Remarks:</p>
                       <p style="font-size: 12px">
-                        We receive the above goods order and condition
+                        ${remark == null ? '' : remark}
                       </p>
                     </div>
                   </td>
@@ -590,11 +618,15 @@ export default function AdHocService({ navigation, route }) {
               flex-direction: row;
               justify-content: space-between;
               align-items: center;
-              margin-top: 50px;
+              margin-top: 30px;
             ">
+            <div>
+            <img
+            src="${signature == null ? null : signature}" style="width: 130px"/>
             <p style="border-top: 2px solid black">
               Authorised Name, Signature &amp; Company Stamp
             </p>
+            </div>
             <p >
             Driver Vehicle:${vehicleData.vehicle.VEHICLE_INFO}
             </p>
@@ -646,11 +678,11 @@ export default function AdHocService({ navigation, route }) {
                 onChangeText={queryText => handleSearch(queryText)}
                 placeholder="Search"
                 placeholderTextColor='black'
-                style={{ backgroundColor: 'rgba(0,0,0,0.1)', paddingHorizontal: 10, borderRadius: 5 }}
+                style={{ backgroundColor: 'rgba(0,0,0,0.1)', paddingHorizontal: 10, borderRadius: 5, color: 'black' }}
               />
             </View>}
             data={businessName}
-            keyExtractor={item => item.code}
+            keyExtractor={(item, index) => `${item}_${index}`}
             renderItem={NameView}
             showsVerticalScrollIndicator={true}
             stickyHeaderIndices={[0]}
@@ -752,6 +784,20 @@ export default function AdHocService({ navigation, route }) {
               }}>
               {diesel}
             </Text>
+            <Text
+              style={{
+                fontSize: 20,
+                color: '#01315C',
+                marginRight: 40,
+                marginBottom: 10,
+              }}>
+              {'Price'}
+            </Text>
+            {/* <KeyboardAvoidingView
+              style={{ marginBottom: 10 }}
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}> */}
+            <TextInput keyboardType='decimal-pad' style={{ marginBottom: 10, borderWidth: 1, borderColor: 'rgba(0,0,0,0.4)', color: 'black', fontSize: 20 }} value={unitcost} onChangeText={text => setunitcost(text)} />
+            {/* </KeyboardAvoidingView> */}
             <View
               style={{
                 flexDirection: 'row',

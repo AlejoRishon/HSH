@@ -62,7 +62,7 @@ export default function TransferList({ navigation, route }) {
       .then(result => {
         console.log(result);
         Alert.alert('Success', 'Transfer Successful', [
-          { text: 'OK', onPress: () => navigation.pop() },
+          { text: 'OK', onPress: () => navigation.replace('DeliveryOrder') },
         ]);
       })
       .catch(error => {
@@ -177,7 +177,7 @@ export default function TransferList({ navigation, route }) {
           paddingTop: verticalScale(25),
         }}>
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.navigate('DeliveryOrder')}
           style={{
             backgroundColor: '#01315C',
             justifyContent: 'center',

@@ -27,6 +27,7 @@ import { getVehicle, getDomain, getlogUser } from './functions/helper';
 
 import { verticalScale, horizontalScale, moderateScale } from './styles/Metrics';
 import { ScrollView } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -42,8 +43,9 @@ export default function TankFill({ navigation, route }) {
   const [checked, setChecked] = useState([])
   const [listData, setListData] = useState([])
   const [prodId, setProdId] = useState('')
-  const [dieselValue, setDieselValue] = useState(0)
-  const [showWareHouse, setShowWareHouse] = useState(false)
+  const [dieselValue, setDieselValue] = useState(0);
+  console.log(route.params);
+  const [showWareHouse, setShowWareHouse] = useState(route.params.currenttab == 1 ? false : true)
   const [wareHouseList, setWareHouseList] = useState([])
   const [wareHouseId, setWareHouseId] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -59,7 +61,7 @@ export default function TankFill({ navigation, route }) {
       setListData(json);
       setLoading(false)
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   }
 
@@ -70,13 +72,15 @@ export default function TankFill({ navigation, route }) {
       console.log('Warehouse List:', json)
       setWareHouseList(json);
     } catch (error) {
-      console.error('Error fetching warehouse list:', error);
+      console.log('Error fetching warehouse list:', error);
     }
   };
 
-  const postJobPurchase = () => {
+  const postJobPurchase = async () => {
     const userlog = getlogUser();
-    const url = domain + "/PostjobPurchase"
+    const url = domain + "/PostjobPurchase";
+    var vl = await AsyncStorage.getItem('VehicleLoad');
+    vl = JSON.parse(vl);
     const data = {
       "UID": '',
       "VEHICLE_CODE": parameter.vehicle.VEHICLE_INFO,
@@ -84,6 +88,7 @@ export default function TankFill({ navigation, route }) {
       "PROD_ID": prodId,
       "QTY": dieselValue,
       "UPDATE_BY": userlog
+
     }
     console.log(data)
     fetch(url, {
@@ -94,13 +99,22 @@ export default function TankFill({ navigation, route }) {
       body: JSON.stringify(data)
     })
       .then(response => response.json())
-      .then(result => {
+      .then(async result => {
         console.log(result);
         if (result) {
           setSelected(null);
           setshowInput(false);
           setshowConfirm(true);
           setChecked([]);
+          const responseLoad = await fetch(domain + `/GetVehicleLoad?_token=2AF70A0A-A8D8-49D1-9869-D206E7B38103&vehicleCode=${parameter.vehicle.VEHICLE_INFO}`);
+
+          const jsonLoad = await responseLoad.json();
+          console.log('VL Load', jsonLoad);
+          if (jsonLoad && jsonLoad.length > 0 && jsonLoad[0].StatusCode !== 404) {
+            var vl_load = jsonLoad[0];
+            AsyncStorage.setItem('VehicleLoad', JSON.stringify(jsonLoad[0]));
+
+          }
 
         } else {
           Alert.alert("Job Failed");
@@ -111,10 +125,12 @@ export default function TankFill({ navigation, route }) {
       })
   }
 
-  const postJobTransfer = () => {
+  const postJobTransfer = async () => {
     const userlog = getlogUser();
     var vehicleData = getVehicle().vehicle;
-    const url = domain + "/PostJobTransfer"
+    const url = domain + "/PostJobTransfer";
+    var vl = await AsyncStorage.getItem('VehicleLoad');
+    vl = JSON.parse(vl);
     const data = {
       "VEHICLE_FROM": '',
       "VEHICLE_TO": vehicleData.VEHICLE_INFO,
@@ -124,7 +140,8 @@ export default function TankFill({ navigation, route }) {
       "UPDATE_BY": userlog,
       "PROD_ID": 0,
       "QTY": dieselValue,
-      "TRANSFER_TYPE": 0
+      "TRANSFER_TYPE": 0,
+      "VL_UID": vl.VL_UID
     }
     console.log("PostJobTransfer", data)
     fetch(url, {
@@ -281,11 +298,20 @@ export default function TankFill({ navigation, route }) {
                   width: '47%',
                 }}>
                 <TouchableOpacity
-                  onPress={() => {
+                  onPress={async () => {
+                    console.log(val)
+                    var vl = await AsyncStorage.getItem('VehicleLoad');
+                    vl = JSON.parse(vl);
+                    console.log(vl)
+                    // if (val.Brand_Desc === vl.BRAND_DESC) {
                     setshowInput(false);
                     setSelected(val);
                     setShowList(true);
                     setChecked([])
+                    // }
+                    // else {
+                    //   Alert.alert(`You already have ${vl.BRAND_DESC} loaded in your vehicle. Kindly unload before loading ${val.Brand_Desc}`)
+                    // }
                   }}
                   style={[
                     boxContainer,
@@ -312,6 +338,9 @@ export default function TankFill({ navigation, route }) {
                     break;
                   case 3:
                     imageSource = require('../assets/penjuru.jpeg');
+                    break;
+                  case 4:
+                    imageSource = require('../assets/CBStore.jpeg');
                     break;
                   default:
                     imageSource = require('../assets/shell.png');

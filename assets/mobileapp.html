@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile Asset Management App</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      background-color: #f4f7f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+.app-container {
+      width: 100%;
+      max-width: 400px; /* Width of the mobile view */
+      min-height: 600px; /* Height of the mobile view */
+      margin: 0 auto;
+      background-color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+   .container {
+      display: none;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .container.active {
+      display: block;
+    }
+
+    input, select, button {
+      width: calc(100% - 40px); /* full width minus padding */
+      padding: 15px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .table th, .table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    .table th {
+      background-color: #f2f2f2;
+    }
+
+    .red {
+      background-color: #ffcccc;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+ <div class="app-container">
+  <!-- Screen 1: Login -->
+  <div id="loginScreen" class="container active">
+    <h2>Login</h2>
+    <input type="email" placeholder="Email" required>
+    <input type="password" placeholder="Password" required>
+    <button onclick="showScreen('scanScreen')">Login</button>
+  </div>
+
+  <!-- Screen 2: Scan Assets -->
+  <div id="scanScreen" class="container">
+    <h2>Scan Assets</h2>
+    <button onclick="showScreen('scanningScreen')">Scan Asset</button>
+    <button onclick="showScreen('filterScreen')">Get SAP Data</button>
+  </div>
+
+  <!-- Screen 2.1: Scanning Page -->
+  <div id="scanningScreen" class="container">
+    <h2>Scanning</h2>
+    <button>Open Scanner</button>
+    <table class="table">
+      <tr>
+        <th>Asset Tag</th>
+        <th>Asset Name</th>
+        <th>Last Scanned</th>
+      </tr>
+      <!-- Dummy data -->
+      <tr>
+        <td>ASSET001</td>
+        <td>Computer</td>
+        <td>2023-10-04 10:00</td>
+      </tr>
+      <tr>
+        <td>ASSET002</td>
+        <td>Monitor</td>
+        <td>2023-10-04 11:00</td>
+      </tr>
+      <!-- More dummy data can be added here -->
+    </table>
+   <button onclick="showScreen('filterScreen')">Get SAP Data</button>
+  </div>
+
+  <!-- Screen 3: Filters -->
+  <div id="filterScreen" class="container">
+    <h2>Filters</h2>
+    <select>
+      <option value="">Select Plant</option>
+      <!-- Add more options here -->
+    </select>
+ <select>
+      <option value="">Select Component Group</option>
+      <!-- Add more options here -->
+    </select>
+ <select>
+      <option value="">Select Component Material</option>
+      <!-- Add more options here -->
+    </select>
+    <!-- Add more filters here -->
+    <button onclick="showScreen('compareScreen')">Get Asset IDs from SAP</button>
+  </div>
+
+  <!-- Screen 4: Comparison Table -->
+  <div id="compareScreen" class="container">
+    <h2>Compared Data</h2>
+    <table class="table">
+      <tr>
+        <th>Asset ID</th>
+        <th>SAP Data</th>
+        <th>Status</th>
+      </tr>
+<tr>
+        <td>12345</td>
+        <td>12345</td>
+        <td class="green">Available</td>
+      </tr>
+<tr>
+        <td>5679</td>
+        <td></td>
+        <td class="red">Missing</td>
+      </tr>
+      <!-- More rows will be added here -->
+    </table>
+   <button onclick="showScreen('filterScreen')">Save Compared Data</button>
+  </div>
+  </div>
+  <script>
+    function showScreen(screenId) {
+      var screens = document.getElementsByClassName('container');
+      for (var i = 0; i < screens.length; i++) {
+        screens[i].classList.remove('active');
+      }
+      document.getElementById(screenId).classList.add('active');
+    }
+  </script>
+  
+</body>
+</html>

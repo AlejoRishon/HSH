@@ -29,8 +29,8 @@ export const getlogUser = () => {
 };
 
 export const setlogUserDetailFull = (url) => {
-  global.logUser = url;
+  global.logUserFull = url;
 };
 export const getlogUserFull = () => {
-  return global.logUser;
+  return global.logUserFull;
 };

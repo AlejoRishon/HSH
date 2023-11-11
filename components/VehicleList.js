@@ -5,7 +5,7 @@ import {
   FlatList,
   TextInput,
   TouchableOpacity,
-  Modal
+  Modal, Alert, KeyboardAvoidingView
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { searchBox, button, buttonText, text } from './styles/MainStyle';
@@ -16,14 +16,35 @@ import { useTranslation } from 'react-i18next';
 import { horizontalScale, moderateScale, verticalScale } from './styles/Metrics';
 import { ActivityIndicator, MD2Colors } from 'react-native-paper';
 import { getDomain } from './functions/helper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
 export default function VehicleList({ navigation }) {
+  const formatDate = (inputDate) => {
 
+    let day = inputDate.getDate();
+
+    let month = inputDate.getMonth() + 1;
+
+    let year = inputDate.getFullYear();
+    if (day < 10) {
+      day = '0' + day;
+    }
+
+    if (month < 10) {
+      month = `0${month}`;
+    }
+
+    let formatted = `${year}-${month}-${day}`;
+    return formatted;
+  };
   const { t } = useTranslation();
   const domain = getDomain();
+
   const [listData, setListData] = useState([]);
+  const [showDialog, setshowDialog] = useState(false);
+  const [vlload, setvlload] = useState([]);
   const [selectedVehicle, setselectedVehicle] = useState(null);
   const [driverId, setDriverId] = useState(null)
   const [driverName, setDriverName] = useState('')
@@ -147,18 +168,157 @@ export default function VehicleList({ navigation }) {
         {selectedVehicle && (
           <TouchableOpacity
             style={button}
-            onPress={() => {
+            onPress={async () => {
+              setLoading(true);
               setVehicle(selectedVehicle);
-              navigation.navigate('Main', {
-                vehicleInfo: selectedVehicle.VEHICLE_INFO,
-                driverId: driverId,
-                driverName: driverName
-              })
+              AsyncStorage.setItem('vehicleDetails', JSON.stringify(selectedVehicle));
+              const response = await fetch(domain + `/getJobDetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&PLATE_NO=${selectedVehicle.VEHICLE_INFO}&date=${formatDate(new Date())}`);
+
+              const json = await response.json();
+              console.log(json);
+              setLoading(false);
+
+              if (json && json.length > 0) {
+
+                AsyncStorage.setItem('JOBDATA', JSON.stringify(json));
+              }
+
+              const responseLoad = await fetch(domain + `/GetVehicleLoad?_token=2AF70A0A-A8D8-49D1-9869-D206E7B38103&vehicleCode=${selectedVehicle.VEHICLE_INFO}`);
+
+              const jsonLoad = await responseLoad.json();
+              console.log('VL Load', jsonLoad);
+              if (jsonLoad && jsonLoad.length > 0 && jsonLoad[0].StatusCode !== 404) {
+                var vl_load = jsonLoad[0];
+                AsyncStorage.setItem('VehicleLoad', JSON.stringify(jsonLoad[0]));
+                // vl_load.QTY_LOAD = (vl_load.QTY_IN - vl_load.QTY_OUT).toString();
+                // setvlload(vl_load);
+                // setshowDialog(true);
+                navigation.navigate('Main', {
+                  vehicleInfo: selectedVehicle.VEHICLE_INFO,
+                  driverId: driverId,
+                  driverName: driverName
+                })
+              }
+              else {
+                AsyncStorage.removeItem('VehicleLoad');
+                navigation.navigate('Main', {
+                  vehicleInfo: selectedVehicle.VEHICLE_INFO,
+                  driverId: driverId,
+                  driverName: driverName
+                })
+              }
+
             }}>
             <Text style={buttonText}>Proceed</Text>
           </TouchableOpacity>
         )}
       </View>
+
+      <Modal
+        animationType='none'
+        transparent={true}
+        visible={showDialog}
+
+      >
+        <View style={{ justifyContent: 'center', display: 'flex', width: '100%', height: '100%', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.4)' }}>
+          <View style={{ width: '50%', backgroundColor: 'white', padding: 20, borderRadius: 8 }}>
+            <Text
+              style={{
+                fontSize: 20,
+                color: '#01315C',
+                lineHeight: 30
+              }}>
+              {`Your vehicle - ${vlload.VEHICLE_INFO} has ${vlload.QTY_IN - vlload.QTY_OUT} litres of ${vlload.BRAND_DESC}(${vlload.DISPLAY_NAME})`}
+            </Text>
+            <KeyboardAvoidingView
+              style={{ marginBottom: 10, marginTop: 10 }}
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+              <TextInput style={{ backgroundColor: 'rgba(0,0,0,0.2)', fontSize: 20, borderRadius: 4, color: 'black' }} value={(vlload.QTY_LOAD)} onChangeText={text => setvlload({ ...vlload, QTY_LOAD: text })} />
+            </KeyboardAvoidingView>
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+              }}>
+              <TouchableOpacity
+                style={{ backgroundColor: '#01315C', padding: 10, borderRadius: 8, marginRight: 5 }}
+                onPress={async () => {
+                  if (vlload.QTY_LOAD > (vlload.QTY_IN - vlload.QTY_OUT)) {
+                    console.log((parseFloat(vlload.QTY_LOAD) - (vlload.QTY_IN - vlload.QTY_OUT)), 'IN');
+                    const responseLoad = await fetch(domain + `/PostTopUpVehicle`, {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json"
+                      },
+                      body: JSON.stringify({
+                        "VL_UID": vlload.VL_UID,
+                        "QTY_IN": ((parseFloat(vlload.QTY_LOAD) - (vlload.QTY_IN - vlload.QTY_OUT))).toString()
+                      })
+                    });
+
+                    const jsonLoad = await responseLoad.json();
+                    console.log(jsonLoad);
+                    setshowDialog(false);
+                    navigation.navigate('Main', {
+                      vehicleInfo: selectedVehicle.VEHICLE_INFO,
+                      driverId: driverId,
+                      driverName: driverName
+                    })
+                  }
+                  else if (vlload.QTY_LOAD < (vlload.QTY_IN - vlload.QTY_OUT)) {
+                    console.log((vlload.QTY_IN - vlload.QTY_OUT) - parseFloat(vlload.QTY_LOAD), 'OUT');
+                    const responseLoad = await fetch(domain + `/PostVehicleUnload`, {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json"
+                      },
+                      body: JSON.stringify({
+                        "VL_UID": vlload.VL_UID,
+                        "QTY_OUT": ((vlload.QTY_IN - vlload.QTY_OUT) - parseFloat(vlload.QTY_LOAD)).toString()
+                      })
+                    });
+
+                    const jsonLoad = await responseLoad.json();
+                    console.log(jsonLoad);
+                    setshowDialog(false);
+                    navigation.navigate('Main', {
+                      vehicleInfo: selectedVehicle.VEHICLE_INFO,
+                      driverId: driverId,
+                      driverName: driverName
+                    })
+                  }
+                  else if (vlload.QTY_LOAD == (vlload.QTY_IN - vlload.QTY_OUT)) {
+                    setshowDialog(false);
+                    navigation.navigate('Main', {
+                      vehicleInfo: selectedVehicle.VEHICLE_INFO,
+                      driverId: driverId,
+                      driverName: driverName
+                    })
+                  }
+
+
+                }}>
+                <Text style={{}}>{'Update'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ padding: 10, borderRadius: 8, }}
+                onPress={() => {
+                  setshowDialog(false);
+                  navigation.navigate('Main', {
+                    vehicleInfo: selectedVehicle.VEHICLE_INFO,
+                    driverId: driverId,
+                    driverName: driverName
+                  })
+                }}>
+                <Text style={{ color: '#01315C' }}>{'Skip'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+      </Modal>
     </View >
   );
 }

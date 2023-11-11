@@ -332,7 +332,7 @@ export default function DieselTransferList({ navigation, route }) {
                         }}>
                         <TouchableOpacity
                             onPress={() => {
-                                navigation.replace('TankFill');
+                                navigation.replace('TankFill', { currenttab: CurrentTab });
                             }}>
                             <Icon
                                 name="plus"

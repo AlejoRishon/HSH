@@ -15,7 +15,8 @@ import DieselTransferList from './components/DieselTransferList';
 import DieselOutTransfer from './components/DieselOutTransfer';
 import auth from '@react-native-firebase/auth';
 import { setUserDetail } from './components/functions/helper';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from "@react-native-community/netinfo";
 const Stack = createNativeStackNavigator();
 const App = () => {
 
@@ -29,9 +30,16 @@ const App = () => {
     if (initializing) setInitializing(false);
   }
 
+
+
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
+
+
+    return (() => {
+      subscriber();
+
+    });
   }, []);
 
   if (initializing) return null;

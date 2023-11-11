@@ -25,7 +25,8 @@ import RightInputBar from './ui/RightInputBar';
 import { getVehicle, getDomain, getlogUser } from './functions/helper';
 import RNPrint from 'react-native-print';
 import SignatureCapture from 'react-native-signature-capture';
-
+import NetInfo from "@react-native-community/netinfo";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const { width } = Dimensions.get('window');
 export default function DeliveryOrder({ navigation, route }) {
   const { t } = useTranslation();
@@ -49,7 +50,7 @@ export default function DeliveryOrder({ navigation, route }) {
   const [imagePreviewbefore, setimagePreviewbefore] = useState(false);
   const [dieselValue, setDieselValue] = useState(0)
   const [signatureVisible, setSignatureVisible] = useState(false);
-  const [signature, setsignature] = useState(null);
+  const [signature, setsignature] = useState("");
   const showSignatureModal = () => setSignatureVisible(true);
   const sign = createRef();
   const saveSign = () => sign.current.saveImage();
@@ -71,6 +72,7 @@ export default function DeliveryOrder({ navigation, route }) {
 
 
   const printHTML = async () => {
+    console.log('signature', signature)
     await RNPrint.print({
       html: `<html lang="en">
       <head>
@@ -83,8 +85,8 @@ export default function DeliveryOrder({ navigation, route }) {
             height: 420px;
           }
           .container {
-            width: 100%;
             margin: 0 auto;
+            padding:10px
           }
           fieldset {
             border: 1px solid #ccc;
@@ -202,7 +204,7 @@ export default function DeliveryOrder({ navigation, route }) {
                       ">
                       <p>Remarks:</p>
                       <p style="font-size: 12px">
-                        We receive the above goods order and condition
+                      ${remark == null ? '' : remark}
                       </p>
                     </div>
                   </td>
@@ -230,11 +232,15 @@ export default function DeliveryOrder({ navigation, route }) {
               flex-direction: row;
               justify-content: space-between;
               align-items: center;
-              margin-top: 50px;
+              margin-top: 30px;
             ">
+            <div>
+            ${signature == '' ? '' : ` <img src="${signature == null ? null : signature}" style="width: 130px"/>`}
+           
             <p style="border-top: 2px solid black">
               Authorised Name, Signature &amp; Company Stamp
             </p>
+            </div>
             <p >
               Driver Vehicle:${route?.params?.invData.PLATE_NO}
             </p>
@@ -262,32 +268,63 @@ export default function DeliveryOrder({ navigation, route }) {
       METER_BEFORE64: previewImageUribefore,
       METER_AFTER64: previewImageUri
     }
-    console.log(data);
-    fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    })
-      .then(response => response.json())
-      .then(result => {
-        setLoading(false);
-        console.log(result);
-        Alert.alert('Success', 'Job Successful', [
-          {
-            text: 'Print',
-            onPress: () => printHTML(),
+    console.log(url, data);
+    NetInfo.fetch().then(async networkState => {
+      console.log("Is connected? - ", networkState.isConnected);
+      if (networkState.isConnected) {
+        fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
           },
-          { text: 'OK', onPress: () => navigation.replace('DeliveryOrder') },
-        ]);
-        setshowInput(false);
-      })
-      .catch(error => {
+          body: JSON.stringify(data)
+        })
+          .then(response => response.json())
+          .then(result => {
+            setLoading(false);
+            console.log("Job updated", result);
+            Alert.alert('Success', 'Job Successful', [
+              {
+                text: 'Print',
+                onPress: () => printHTML(),
+              },
+              { text: 'OK', onPress: () => navigation.replace('DeliveryOrder') },
+            ]);
+            setshowInput(false);
+          })
+          .catch(error => {
+            setLoading(false);
+            console.log("Error:", error);
+            Alert.alert("Job Failed");
+          })
+      }
+      else {
         setLoading(false);
-        console.log("Error:", error);
-        Alert.alert("Job Failed");
-      })
+        var pending = await AsyncStorage.getItem('pendingDelivery');
+        var pendingJ = JSON.parse(pending);
+        if (pendingJ) {
+          pendingJ.push({
+            url: url,
+            data: data
+          });
+          AsyncStorage.setItem('pendingDelivery', JSON.stringify(pendingJ));
+          console.log('pending Data', pendingJ)
+
+        }
+        else {
+          AsyncStorage.setItem('pendingDelivery', JSON.stringify([{
+            url: url,
+            data: data
+          }]));
+
+        }
+
+        Alert.alert('Offline Mode', 'Data is saved locally. Will be uploaded when you are back online', [
+          { text: 'OK', onPress: () => navigation.replace('DeliveryOrder') },
+        ])
+      }
+    });
+
   }
 
   const openGallery = async (type, section) => {
@@ -339,17 +376,71 @@ export default function DeliveryOrder({ navigation, route }) {
     setmoreMeterBe(!moreMeterBe);
   };
 
+
+  const getFiles = (uid) => {
+    setLoading(true);
+    var myHeaders = new Headers();
+    myHeaders.append('Accept', 'application/json');
+    myHeaders.append("Content-Type", "application/json");
+    var requestOptions = {
+      method: 'GET',
+      headers: myHeaders
+    };
+    console.log(`${domain}/GetJobFiles?_token=CDAC498B-116F-4346-AD72-C3F65A902FFD&_uid=${uid}`)
+    fetch(
+      `${domain}/GetJobFiles?_Token=CDAC498B-116F-4346-AD72-C3F65A902FFD&_uid=${uid}`,
+      requestOptions,
+    )
+      .then(response => response.text())
+      .then(result => {
+        setLoading(false);
+        try {
+          var packet = JSON.parse(result);
+          console.log('Files', packet);
+          if (packet.METER_AFTER64_String[0]) {
+            setpreviewImageUri(packet.METER_AFTER64_String[0]);
+            setimagePreview(true);
+            onToggleMoreAf(80);
+          }
+          if (packet.METER_BEFORE64_String[0]) {
+            setpreviewImageUribefore(packet.METER_BEFORE64_String[0]);
+            setimagePreviewbefore(true);
+            onToggleMoreBe(80);
+          }
+          if (packet.SIGNATURE64_String[0]) {
+            setsignature(packet.SIGNATURE64_String[0]);
+          }
+
+
+
+          // var temp = { ...res };
+          // temp.PAC_PAGD_String = packet.PAC_PAGD_String;
+          // setpacheck({ ...temp })
+        }
+        catch (e) {
+          setLoading(false);
+          console.log(e, 'Function error');
+        }
+      })
+      .catch(error => {
+        setLoading(false);
+        console.log(error, 'Function error');
+      });
+  }
+
   const handleGetInputDiesel = (value) => setDieselValue(value)
 
   useEffect(() => {
-    setDieselValue(route?.params?.invData.qty_order)
+    getFiles(route?.params?.invData.UID);
+    setDieselValue(route?.params?.invData.qty_order);
+    setRemark(route?.params?.invData.REMARK);
     editable ?
       setshowInput(true) : setshowInput(false);
   }, []);
   if (signatureVisible) {
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>
-        <Text style={{ fontSize: 20, color: '#01315C', fontWeight: 'bold', margin: '5%', textDecorationLine: 'underline' }}>
+        <Text style={{ fontSize: 20, color: '#01315C', fontWeight: 'bold', margin: 10, textDecorationLine: 'underline' }}>
           Sign here..
         </Text>
         <SignatureCapture
@@ -385,7 +476,7 @@ export default function DeliveryOrder({ navigation, route }) {
           <View style={{ justifyContent: 'space-between', flexDirection: 'row', width: editable ? '55%' : '100%' }}>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate('DeliveryOrder');
+                navigation.replace('DeliveryOrder');
               }}>
               <Icon
                 name="chevron-left"
@@ -522,7 +613,7 @@ export default function DeliveryOrder({ navigation, route }) {
             }}>
             Uploaded
           </Text> */}
-            {signature == null ? null : (
+            {signature == "" ? null : (
               <Image
                 style={{ height: 80, flex: 1, borderWidth: 1, borderColor: 'black', marginBottom: 10 }}
                 source={{ uri: signature }}

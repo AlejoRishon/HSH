@@ -7,7 +7,8 @@ import {
   Image,
   Alert,
   StyleSheet,
-  Modal
+  Modal,
+  ScrollView
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import {
@@ -21,6 +22,7 @@ import RightInputBar from './ui/RightInputBar';
 import RightConfirm from './ui/RightConfirm';
 import { moderateScale, verticalScale } from './styles/Metrics';
 import { ActivityIndicator, MD2Colors } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 export default function DieselTransfer({ navigation }) {
@@ -43,7 +45,9 @@ export default function DieselTransfer({ navigation }) {
     try {
       const response = await fetch(domain + '/GetVehicleList?_token=4B3B5C99-57E8-4593-A0AD-3D4EEA3C2F53');
       const json = await response.json();
-      setListData(json);
+      console.log(json)
+      var filteredList = json.filter(val => val.Vehicle[0].VEHICLE_INFO !== parameter.vehicle.VEHICLE_INFO)
+      setListData(filteredList);
       // setLoading(false)
     } catch (error) {
       console.error(error);
@@ -55,6 +59,7 @@ export default function DieselTransfer({ navigation }) {
     try {
       const response = await fetch(domain + '/GetWarehouseList?_token=FF9B60E6-5DB4-4A58-BBA9-4C3F84CE9105')
       const json = await response.json();
+      json.push('Vehicle')
       // console.log('Warehouse List:', json)
       setWareHouseList(json);
       setLoading(false)
@@ -84,11 +89,12 @@ export default function DieselTransfer({ navigation }) {
 
   const handleGetInputDiesel = (value) => setDieselValue(value)
 
-  const postTransfer = () => {
+  const postTransfer = async () => {
     const userlog = getlogUser();
     var vehicleData = getVehicle().vehicle;
     const url = domain + "/PostJobTransfer";
-    console.log(selected);
+    var vl = await AsyncStorage.getItem('VehicleLoad');
+    vl = JSON.parse(vl);
     const data = {
       "VEHICLE_FROM": vehicleData.VEHICLE_INFO,
       "VEHICLE_TO": selected == 'vehicle' ? checkVehicle : '',
@@ -98,9 +104,10 @@ export default function DieselTransfer({ navigation }) {
       "UPDATE_BY": userlog,
       "PROD_ID": 0,
       "QTY": dieselValue,
-      "TRANSFER_TYPE": 1
+      "TRANSFER_TYPE": 1,
+      "VL_UID": vl.VL_UID
     }
-    console.log(data)
+    console.log("OUT", data)
     fetch(url, {
       method: "POST",
       headers: {
@@ -192,57 +199,76 @@ export default function DieselTransfer({ navigation }) {
             <ActivityIndicator animating={true} color={MD2Colors.red800} style={{ position: 'absolute', alignSelf: 'center' }} size='large' />
           </View>
         </Modal>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: 'row',
-            margin: moderateScale(5),
-            marginRight: 20,
-            flexWrap: 'wrap',
-            alignItems: 'center'
-          }}>
-          {wareHouseList.length > 0 && wareHouseList?.map((val, index) => {
-            let imageSource
+        <ScrollView>
+          <View
+            style={{
+              flexDirection: 'row',
+              margin: moderateScale(5),
+              marginRight: 20,
+              flexWrap: 'wrap',
+              alignItems: 'center'
+            }}>
+            {wareHouseList.length > 0 && wareHouseList?.map((val, index) => {
+              let imageSource
 
-            switch (val.id) {
-              case 1:
-                imageSource = require('../assets/jin.png');
-                break;
-              case 2:
-                imageSource = require('../assets/chin.png');
-                break;
-              case 3:
-                imageSource = require('../assets/penjuru.jpeg');
-                break;
-              default:
-                imageSource = require('../assets/shell.png');
-            }
-            return <View
-              key={index}
-              style={{
-                marginVertical: verticalScale(10),
-                width: '50%',
-                height: '95%'
-              }}>
-              <TouchableOpacity
-                onPress={() => {
-                  setshowInput(true);
-                  setSelected(val);
-                  setCheckVehicle('')
-                  setWareHouseId(val?.id)
-                }}
-                style={[
-                  boxContainer,
-                  { borderWidth: selected?.name == val.name ? 3 : 0, borderColor: 'green', height: 120 },
-                ]}>
+              switch (val.id) {
+                case 1:
+                  imageSource = require('../assets/jin.png');
+                  break;
+                case 2:
+                  imageSource = require('../assets/chin.png');
+                  break;
+                case 3:
+                  imageSource = require('../assets/penjuru.jpeg');
+                  break;
+                case 4:
+                  imageSource = require('../assets/CBStore.jpeg');
+                  break;
+                default:
+                  imageSource = require('../assets/shell.png');
+              }
+              return <View
+                key={index}
+                style={{
+                  marginVertical: verticalScale(10),
+                  width: '50%',
+                  height: 150
+                }}>
+                {index === wareHouseList.length - 1 ? <TouchableOpacity
+                  onPress={() => {
+                    setshowInput(false);
+                    setShowList(true);
+                    setSelected('vehicle');
+                    setCheckVehicle('');
+                  }}
+                  style={[
+                    boxContainer,
+                    { borderWidth: selected == 'vehicle' ? 3 : 0, borderColor: 'green' },
+                  ]}>
+                  <Icon name='truck' size={20} color='#01315C' />
+                  <Text
+                    style={[text, { fontSize: moderateScale(12) }]}>{`Vehicle`}</Text>
+                </TouchableOpacity> : <TouchableOpacity
+                  onPress={() => {
+                    setshowInput(true);
+                    setSelected(val);
+                    setCheckVehicle('')
+                    setWareHouseId(val?.id)
+                  }}
+                  style={[
+                    boxContainer,
+                    { borderWidth: selected?.name == val.name ? 3 : 0, borderColor: 'green', height: 120 },
+                  ]}>
 
-                <Image source={imageSource} style={styles.img} />
-                <Text style={{ fontSize: width / 35, color: 'red', fontWeight: '900' }}>{val.name}</Text>
-              </TouchableOpacity>
-            </View>
-          })}
+                  <Image source={imageSource} style={styles.img} />
+                  <Text style={{ fontSize: width / 35, color: 'red', fontWeight: '900' }}>{val.name}</Text>
+                </TouchableOpacity>}
 
-        </View>
+              </View>
+            })}
+
+          </View>
+        </ScrollView>
         <View
           style={{
             flex: 1,
@@ -250,21 +276,7 @@ export default function DieselTransfer({ navigation }) {
             marginRight: 20,
             alignSelf: 'flex-end',
           }}>
-          <TouchableOpacity
-            onPress={() => {
-              setshowInput(false);
-              setShowList(true);
-              setSelected('vehicle');
-              setCheckVehicle('');
-            }}
-            style={[
-              boxContainer,
-              { borderWidth: selected == 'vehicle' ? 3 : 0, borderColor: 'green' },
-            ]}>
-            <Icon name='truck' size={20} color='#01315C' />
-            <Text
-              style={[text, { fontSize: moderateScale(12) }]}>{`Vehicle`}</Text>
-          </TouchableOpacity>
+
         </View>
       </View>
 
