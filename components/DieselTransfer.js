@@ -29,7 +29,10 @@ export default function DieselTransfer({ navigation }) {
   const parameter = getVehicle();
   const [selected, setSelected] = useState(null);
   const [showInput, setshowInput] = useState(false);
+  const [productListVisible, setproductListVisible] = useState(false);
+  const [WarehouseProductList, setWarehouseProductList] = useState([]);
   const [showConfirm, setshowConfirm] = useState(false);
+  const [productSelected, setproductSelected] = useState(null);
   const [selectedButton, setSelectedButton] = useState(null);
   const [checkVehicle, setCheckVehicle] = useState([])
   const [checkDriver, setCheckDriver] = useState([])
@@ -68,16 +71,37 @@ export default function DieselTransfer({ navigation }) {
     }
   }
 
+  getWareHouseProductList = () => {
+    fetch(domain + '/getProductList?_token=FAEB7E31-0DE5-48BE-9EC9-8D97D21EF8B3')
+      .then(response => response.json())
+      .then(result => {
+
+        var fResult = result.filter(val => val.category === 'Bulk');
+        console.log('Product list', JSON.stringify(fResult[0]));
+        if (fResult && fResult.length > 0) {
+          var productData = [];
+          fResult[0].product.map(val => {
+            productData.push({ "Desc_Eng": val.desc, "Id": val.id })
+          })
+          setWarehouseProductList(productData)
+        }
+        // setProductList(fResult);
+        // 
+      })
+      .catch(error => console.error(error))
+  }
+
   useEffect(() => {
     getVehicleList()
     getWareHouseList()
+    getWareHouseProductList()
   }, [])
 
   const ItemView = ({ item, index }) => {
     return (
       <TouchableOpacity
         style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
-        onPress={() => { setCheckDriver([index]), setshowInput(true), setShowList(false); setCheckVehicle(item?.Vehicle[0]?.VEHICLE_INFO) }}
+        onPress={() => { setCheckDriver([index]), setproductListVisible(true); setShowList(false); setCheckVehicle(item?.Vehicle[0]?.VEHICLE_INFO) }}
       >
         <Text style={[text, { fontSize: moderateScale(15) }]}>{item?.Vehicle[0]?.VEHICLE_INFO}</Text>
         {/* {checkDriver.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>} */}
@@ -93,8 +117,6 @@ export default function DieselTransfer({ navigation }) {
     const userlog = getlogUser();
     var vehicleData = getVehicle().vehicle;
     const url = domain + "/PostJobTransfer";
-    var vl = await AsyncStorage.getItem('VehicleLoad');
-    vl = JSON.parse(vl);
     const data = {
       "VEHICLE_FROM": vehicleData.VEHICLE_INFO,
       "VEHICLE_TO": selected == 'vehicle' ? checkVehicle : '',
@@ -102,10 +124,10 @@ export default function DieselTransfer({ navigation }) {
       "LOCATION_TO": selected != 'vehicle' ? wareHouseId : '',
       "REMARK": "",
       "UPDATE_BY": userlog,
-      "PROD_ID": 0,
+      "PROD_ID": productSelected,
       "QTY": dieselValue,
       "TRANSFER_TYPE": 1,
-      "VL_UID": vl.VL_UID
+      "VL_UID": 0
     }
     console.log("OUT", data)
     fetch(url, {
@@ -128,6 +150,15 @@ export default function DieselTransfer({ navigation }) {
         console.log("Error:", error);
         Alert.alert('Job Failed!')
       })
+  }
+  const renderItem = ({ item }) => {
+    return (
+      <TouchableOpacity style={{ justifyContent: 'center', borderBottomWidth: 1, borderColor: '#0465bd', padding: 6 }}
+        onPress={() => { console.log(item); setproductSelected(item.Id), setshowInput(true); setproductListVisible(false) }}
+      >
+        <Text style={[text, { fontSize: moderateScale(12), alignSelf: 'center', color: '#0465bd' }]} >{item.Desc_Eng}</Text>
+      </TouchableOpacity >
+    )
   }
 
   return (
@@ -199,6 +230,16 @@ export default function DieselTransfer({ navigation }) {
             <ActivityIndicator animating={true} color={MD2Colors.red800} style={{ position: 'absolute', alignSelf: 'center' }} size='large' />
           </View>
         </Modal>
+
+        <Modal transparent={true} visible={productListVisible} onDismiss={() => setproductListVisible(false)} >
+          <View style={{ width: '100%', backgroundColor: 'rgba(0,0,0,0.4)', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ backgroundColor: 'white', width: '40%' }}>
+              <FlatList
+                data={WarehouseProductList}
+                renderItem={renderItem}
+                keyExtractor={(item, index) => `${item}_${index}`}
+              /></View></View>
+        </Modal>
         <ScrollView>
           <View
             style={{
@@ -250,7 +291,8 @@ export default function DieselTransfer({ navigation }) {
                     style={[text, { fontSize: moderateScale(12) }]}>{`Vehicle`}</Text>
                 </TouchableOpacity> : <TouchableOpacity
                   onPress={() => {
-                    setshowInput(true);
+                    // setshowInput(true);
+                    setproductListVisible(true);
                     setSelected(val);
                     setCheckVehicle('')
                     setWareHouseId(val?.id)

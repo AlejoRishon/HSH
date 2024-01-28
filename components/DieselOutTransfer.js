@@ -52,14 +52,12 @@ export default function DieselOutTransfer({ navigation, route }) {
         setDatePickerVisibility(true);
     };
     const postJobTransfer = async () => {
-        var vl = await AsyncStorage.getItem('VehicleLoad');
-        vl = JSON.parse(vl);
         const userlog = getlogUser();
         const url = domain + "/PostJobTransfer"
         const data = transferData[Selected];
         data.QTY = quantity;
         data.UPDATE_BY = userlog;
-        data.VL_UID = vl.VL_UID;
+        data.VL_UID = 0;
         console.log("PostJobTransfer", data)
         fetch(url, {
             method: "POST",

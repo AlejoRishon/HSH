@@ -182,39 +182,18 @@ export default function VehicleList({ navigation }) {
 
                 AsyncStorage.setItem('JOBDATA', JSON.stringify(json));
               }
-
-              const responseLoad = await fetch(domain + `/GetVehicleLoad?_token=2AF70A0A-A8D8-49D1-9869-D206E7B38103&vehicleCode=${selectedVehicle.VEHICLE_INFO}`);
-
-              const jsonLoad = await responseLoad.json();
-              console.log('VL Load', jsonLoad);
-              if (jsonLoad && jsonLoad.length > 0 && jsonLoad[0].StatusCode !== 404) {
-                var vl_load = jsonLoad[0];
-                AsyncStorage.setItem('VehicleLoad', JSON.stringify(jsonLoad[0]));
-                // vl_load.QTY_LOAD = (vl_load.QTY_IN - vl_load.QTY_OUT).toString();
-                // setvlload(vl_load);
-                // setshowDialog(true);
-                navigation.navigate('Main', {
-                  vehicleInfo: selectedVehicle.VEHICLE_INFO,
-                  driverId: driverId,
-                  driverName: driverName
-                })
-              }
-              else {
-                AsyncStorage.removeItem('VehicleLoad');
-                navigation.navigate('Main', {
-                  vehicleInfo: selectedVehicle.VEHICLE_INFO,
-                  driverId: driverId,
-                  driverName: driverName
-                })
-              }
-
+              navigation.navigate('Main', {
+                vehicleInfo: selectedVehicle.VEHICLE_INFO,
+                driverId: driverId,
+                driverName: driverName
+              })
             }}>
             <Text style={buttonText}>Proceed</Text>
           </TouchableOpacity>
         )}
       </View>
 
-      <Modal
+      {/* <Modal
         animationType='none'
         transparent={true}
         visible={showDialog}
@@ -318,7 +297,7 @@ export default function VehicleList({ navigation }) {
           </View>
         </View>
 
-      </Modal>
+      </Modal> */}
     </View >
   );
 }

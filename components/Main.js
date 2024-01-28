@@ -139,16 +139,9 @@ export default function Main({ navigation, route }) {
               NetInfo.fetch().then(async networkState => {
                 console.log("Is connected? - ", networkState.isConnected);
                 if (networkState.isConnected) {
-                  var vl = await AsyncStorage.getItem('VehicleLoad');
-                  vl = JSON.parse(vl);
-                  if (vl && vl.VL_UID) {
-                    navigation.navigate('AdHocService', {
-                      info: route?.params
-                    })
-                  }
-                  else {
-                    Alert.alert('Kindly fill up first')
-                  }
+                  navigation.navigate('AdHocService', {
+                    info: route?.params
+                  })
                 }
                 else {
                   Alert.alert('Offline mode', 'Cannot use this function in offline mode. Connect to the internet.');

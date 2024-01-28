@@ -18,7 +18,6 @@ import { getUser, setDomain, setlogUserDetail, setlogUserDetailFull, setVehicle 
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from "@react-native-community/netinfo";
-import firestore from '@react-native-firebase/firestore';
 
 export default function Login({ navigation }) {
   const user = getUser();
@@ -165,8 +164,15 @@ export default function Login({ navigation }) {
       })
       .catch(e => {
         console.log('error:', e)
-        Alert.alert('Access Denied!')
-        setLoading(false)
+        Alert.alert('Access Denied!');
+        setLoading(false);
+
+        // AsyncStorage.setItem('username', un);
+        // AsyncStorage.setItem('password', pass);
+        // setlogUserDetail(un);
+        // setlogUserDetailFull({ "CID": 3, "ACCESS_RIGHT": 0 })
+        // setLoading(false);
+        // navigation.replace('VehicleList')
       })
   }
 

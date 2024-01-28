@@ -44,9 +44,10 @@ export default function TankFill({ navigation, route }) {
   const [listData, setListData] = useState([])
   const [prodId, setProdId] = useState('')
   const [dieselValue, setDieselValue] = useState(0);
-  console.log(route.params);
+  // console.log(route.params);
   const [showWareHouse, setShowWareHouse] = useState(route.params.currenttab == 1 ? false : true)
-  const [wareHouseList, setWareHouseList] = useState([])
+  const [wareHouseList, setWareHouseList] = useState([]);
+  const [WarehouseProductList, setWarehouseProductList] = useState([]);
   const [wareHouseId, setWareHouseId] = useState(null)
   const [loading, setLoading] = useState(true)
   const domain = getDomain();
@@ -57,7 +58,7 @@ export default function TankFill({ navigation, route }) {
     try {
       const response = await fetch(domain + '/getBrandList?_token=67E38BF0-4B45-4D93-891D-8E4F60C5485D');
       const json = await response.json();
-      // console.log(json);
+      console.log("Brands", JSON.stringify(json));
       setListData(json);
       setLoading(false)
     } catch (error) {
@@ -69,8 +70,27 @@ export default function TankFill({ navigation, route }) {
     try {
       const response = await fetch(domain + '/GetWarehouseList?_token=FF9B60E6-5DB4-4A58-BBA9-4C3F84CE9105')
       const json = await response.json();
-      console.log('Warehouse List:', json)
+      console.log('Warehouse List:', json);
       setWareHouseList(json);
+      fetch(domain + '/getProductList?_token=FAEB7E31-0DE5-48BE-9EC9-8D97D21EF8B3')
+        .then(response => response.json())
+        .then(result => {
+
+          var fResult = result.filter(val => val.category === 'Bulk');
+          console.log('Product list', JSON.stringify(fResult[0]));
+          if (fResult && fResult.length > 0) {
+            var productData = [];
+            fResult[0].product.map(val => {
+              productData.push({ "Desc_Eng": val.desc, "Id": val.id })
+            })
+            setWarehouseProductList({ productList: productData })
+          }
+          // setProductList(fResult);
+          // 
+        })
+        .catch(error => console.error(error))
+
+
     } catch (error) {
       console.log('Error fetching warehouse list:', error);
     }
@@ -79,8 +99,7 @@ export default function TankFill({ navigation, route }) {
   const postJobPurchase = async () => {
     const userlog = getlogUser();
     const url = domain + "/PostjobPurchase";
-    var vl = await AsyncStorage.getItem('VehicleLoad');
-    vl = JSON.parse(vl);
+
     const data = {
       "UID": '',
       "VEHICLE_CODE": parameter.vehicle.VEHICLE_INFO,
@@ -106,15 +125,7 @@ export default function TankFill({ navigation, route }) {
           setshowInput(false);
           setshowConfirm(true);
           setChecked([]);
-          const responseLoad = await fetch(domain + `/GetVehicleLoad?_token=2AF70A0A-A8D8-49D1-9869-D206E7B38103&vehicleCode=${parameter.vehicle.VEHICLE_INFO}`);
 
-          const jsonLoad = await responseLoad.json();
-          console.log('VL Load', jsonLoad);
-          if (jsonLoad && jsonLoad.length > 0 && jsonLoad[0].StatusCode !== 404) {
-            var vl_load = jsonLoad[0];
-            AsyncStorage.setItem('VehicleLoad', JSON.stringify(jsonLoad[0]));
-
-          }
 
         } else {
           Alert.alert("Job Failed");
@@ -129,8 +140,6 @@ export default function TankFill({ navigation, route }) {
     const userlog = getlogUser();
     var vehicleData = getVehicle().vehicle;
     const url = domain + "/PostJobTransfer";
-    var vl = await AsyncStorage.getItem('VehicleLoad');
-    vl = JSON.parse(vl);
     const data = {
       "VEHICLE_FROM": '',
       "VEHICLE_TO": vehicleData.VEHICLE_INFO,
@@ -138,10 +147,10 @@ export default function TankFill({ navigation, route }) {
       "LOCATION_TO": "",
       "REMARK": "",
       "UPDATE_BY": userlog,
-      "PROD_ID": 0,
+      "PROD_ID": prodId,
       "QTY": dieselValue,
       "TRANSFER_TYPE": 0,
-      "VL_UID": vl.VL_UID
+      "VL_UID": 0
     }
     console.log("PostJobTransfer", data)
     fetch(url, {
@@ -170,7 +179,15 @@ export default function TankFill({ navigation, route }) {
   }, [])
 
   const getProductListForBrand = () => {
-    const selectedBrandData = selected
+
+    var selectedBrandData;
+    if (showWareHouse) {
+      selectedBrandData = WarehouseProductList
+    }
+    else {
+      selectedBrandData = selected
+    }
+    console.log(selectedBrandData);
     return selectedBrandData ? selectedBrandData.productList : [];
   }
 
@@ -272,7 +289,7 @@ export default function TankFill({ navigation, route }) {
         </Modal>
         {!showWareHouse ? <ScrollView style={{ flex: 1 }}>
           <View style={{ flexWrap: 'wrap', flexDirection: 'row', }}>
-            {listData.length > 0 && listData?.slice(2)?.map((val, index) => {
+            {listData.length > 0 && listData?.filter(val => val.Brand_Desc != 'Chevron Normal' && val.Brand_Desc != 'Chevron Special').map((val, index) => {
               let imageSource;
 
               switch (val.Brand_Desc) {
@@ -300,9 +317,7 @@ export default function TankFill({ navigation, route }) {
                 <TouchableOpacity
                   onPress={async () => {
                     console.log(val)
-                    var vl = await AsyncStorage.getItem('VehicleLoad');
-                    vl = JSON.parse(vl);
-                    console.log(vl)
+
                     // if (val.Brand_Desc === vl.BRAND_DESC) {
                     setshowInput(false);
                     setSelected(val);
@@ -353,10 +368,12 @@ export default function TankFill({ navigation, route }) {
                   }}>
                   <TouchableOpacity
                     onPress={() => {
-                      setshowInput(true);
+                      // setshowInput(true);
                       setSelected(val);
                       setChecked([])
-                      setWareHouseId(val?.id)
+                      setWareHouseId(val?.id);
+                      setShowList(true);
+
                     }}
                     style={[
                       boxContainer,
