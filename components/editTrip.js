@@ -60,15 +60,18 @@ export default function DeliveryOrder({ navigation, route }) {
   //before
   const [previewImageUribefore, setpreviewImageUribefore] = useState('');
   const [imagePreviewbefore, setimagePreviewbefore] = useState(false);
-  const [dieselValue, setDieselValue] = useState(0)
+  const [dieselValue, setDieselValue] = useState(0);
+  const dieselValueCopy = useRef(0);
+  // const [dieselValueCopy, setDieselValueCopy] = useState(0);
   const [signatureVisible, setSignatureVisible] = useState(false);
   const [signature, setsignature] = useState("");
   const [signatureURL, setsignatureURL] = useState("");
+  const signatureURLCopy = useRef();
   const showSignatureModal = () => setSignatureVisible(true);
   const sign = createRef();
   const saveSign = () => sign.current.saveImage();
   const resetSign = () => sign.current.resetImage();
-  console.log(route.params)
+  // console.log(route.params)
   const _onSaveEvent = (result) => {
     Alert.alert('Signature Captured Successfully!')
     // console.log(result.encoded);
@@ -133,6 +136,7 @@ export default function DeliveryOrder({ navigation, route }) {
               break;
             case RESULTS.BLOCKED:
               alert('Bluetooth is denied and not requestable anymore');
+              navigation.replace('DeliveryOrder');
               break;
           }
 
@@ -153,11 +157,15 @@ export default function DeliveryOrder({ navigation, route }) {
       // alert(JSON.stringify(result));
       printBL()
     }).catch(error => {
-      alert('error', error)
+      alert('error', error);
+      navigation.replace('DeliveryOrder')
     });
   }
 
   const printBL = async () => {
+    console.log("dieselValue", dieselValueCopy.current);
+    console.log("signatureURL", signatureURLCopy.current);
+    // alert('priniting for diesel ' + dieselValueCopy.current + ' for signature : ' + signatureURLCopy.current);
     try {
       BLEPrinter.init().then(() => {
         BLEPrinter.getDeviceList().then((data) => {
@@ -166,20 +174,23 @@ export default function DeliveryOrder({ navigation, route }) {
           setprintModal(true)
         }).catch(e => {
           console.log(e);
-
+          // Alert.alert('Error: ' + e)
+          // navigation.replace('DeliveryOrder')
         });
       }).catch(e => {
-        Alert.alert("Bluetooth not supported: " + e)
+        Alert.alert("Bluetooth not supported: " + e);
+        navigation.replace('DeliveryOrder')
       });
     }
     catch (e) {
-      alert("device list failed catch block " + e)
+      alert("device list failed catch block " + e);
+      navigation.replace('DeliveryOrder')
     }
   }
 
   const _connectPrinter = (printer) => {
     //connect printer
-    alert('priniting in ' + printer.inner_mac_address)
+    // alert('priniting for diesel ' + dieselValueCopy.current + ' for signature : ' + signatureURLCopy.current);
     try {
       const BOLD_ON = COMMANDS.TEXT_FORMAT.TXT_BOLD_ON;
       const BOLD_OFF = COMMANDS.TEXT_FORMAT.TXT_BOLD_OFF;
@@ -213,8 +224,8 @@ export default function DeliveryOrder({ navigation, route }) {
        ${OFF_CENTER}<D>Site: ${route?.params?.invData.ADDRESS2.replaceAll('\n', " ")}</D>\n
        ${OFF_CENTER}<D>Product: \n </D>
        ${OFF_CENTER}<D>${route?.params?.invData.DISPLAY_NAME}</D>
-       ${OFF_CENTER}<D>UOM: Litre</D>
-       ${OFF_CENTER}<D>QTY: ${dieselValue}</D>
+       ${OFF_CENTER}<D>UOM: Litre</D>\n
+       ${OFF_CENTER}<D>QTY: ${BOLD_ON}${dieselValueCopy.current}${BOLD_OFF}</D>\n
        ${OFF_CENTER}<D>AMOUNT: $${route?.params?.invData.UNIT_AMT}</D>\n
        ${OFF_CENTER}<D>ZERO-RATED: $ 00.0</D>
        ${OFF_CENTER}<D>TAXABLE: $ ${route?.params?.invData.TAXABLE_AMT}</D>
@@ -225,9 +236,9 @@ export default function DeliveryOrder({ navigation, route }) {
         //   imageWidth: 300,
         //   imageHeight: 300,
         // });
-        if (signatureURL) {
+        if (signatureURLCopy.current) {
           BLEPrinter.printImage(
-            signatureURL,
+            signatureURLCopy.current,
             {
               imageWidth: 300,
               imageHeight: 100,
@@ -508,8 +519,9 @@ export default function DeliveryOrder({ navigation, route }) {
     })
   }
 
-  const PostJobOrderDelivered = () => {
+  const PostJobOrderDelivered = (dieselVal) => {
     setLoading(true);
+    dieselValueCopy.current = dieselVal;
     const userLog = getlogUser();
     const url = domain + "/PostJObOrderDelivered"
     const data = {
@@ -518,7 +530,7 @@ export default function DeliveryOrder({ navigation, route }) {
       "PumpPrevious": 0,
       "PumpNow": 0,
       "Remark": remark,
-      "QTY": dieselValue,
+      "QTY": dieselVal,
       "UpdatedBy": userLog,
       SIGNATURE64: signature,
       METER_BEFORE64: previewImageUribefore,
@@ -652,7 +664,7 @@ export default function DeliveryOrder({ navigation, route }) {
         setLoading(false);
         try {
           var packet = JSON.parse(result);
-          console.log('Files', packet);
+          // console.log('Files', packet);
           if (packet.METER_AFTER64_String[0]) {
             setpreviewImageUri(packet.METER_AFTER64_String[0]);
             setimagePreview(true);
@@ -667,6 +679,7 @@ export default function DeliveryOrder({ navigation, route }) {
             // console.log(packet.SIGNATURE64_String[0])
             setsignature(packet.SIGNATURE64_String[0]);
             setsignatureURL("https://hsh.vellas.net:90/hshpump/signature/JOB_ORDER/" + uid + "/Signature.png");
+
 
           }
 
@@ -687,11 +700,13 @@ export default function DeliveryOrder({ navigation, route }) {
       });
   }
 
-  const handleGetInputDiesel = (value) => setDieselValue(value)
+  const handleGetInputDiesel = (value) => { setDieselValue(value); }
 
   useEffect(() => {
     getFiles(route?.params?.invData.UID);
     setDieselValue(route?.params?.invData.qty_order);
+    dieselValueCopy.current = route?.params?.invData.qty_order;
+    signatureURLCopy.current = "https://hsh.vellas.net:90/hshpump/signature/JOB_ORDER/" + route?.params?.invData.UID + "/Signature.png";
     setRemark(route?.params?.invData.REMARK);
     editable ?
       setshowInput(true) : setshowInput(false);
@@ -990,8 +1005,8 @@ export default function DeliveryOrder({ navigation, route }) {
           getInputDiesel={handleGetInputDiesel}
           hide={() => setshowInput(false)}
           initialValue={dieselValue}
-          onSubmit={() => {
-            PostJobOrderDelivered()
+          onSubmit={(dieselVal) => {
+            PostJobOrderDelivered(dieselVal)
           }}
         />
         <Modal

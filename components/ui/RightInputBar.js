@@ -80,7 +80,7 @@ export default function RightInputBar({
   useEffect(() => {
     const dieselValue = parseInt(calVal.join('')) || 0;
     getInputDiesel(dieselValue);
-  }, [calVal, getInputDiesel]);
+  }, [calVal]);
 
   return (
     <Animated.View
@@ -186,7 +186,7 @@ export default function RightInputBar({
         <TouchableOpacity
           onPress={() => {
             if (calVal.length > 0) {
-              onSubmit();
+              onSubmit(parseInt(calVal.join('')));
               if (!keepinView) {
                 onHide();
               }
@@ -226,7 +226,7 @@ export const AdhocRightInputBar = ({
 }) => {
   const fadeAnim = useRef(new Animated.Value(-500)).current;
   const numPad = [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, '<'];
-  const [calVal, setCalVal] = useState([]);
+  const [calVal, setCalVal] = useState([0]);
   useEffect(() => {
     if (initialValue) {
       setCalVal(String(initialValue).split("").map((num) => {

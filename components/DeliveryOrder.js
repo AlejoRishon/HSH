@@ -34,6 +34,7 @@ export default function DeliveryOrder({ navigation, route }) {
   const { t, i18n } = useTranslation();
   const parameter = getVehicle();
   const [showInput, setshowInput] = useState(false);
+  const [TotalLitres, setTotalLitres] = useState(0);
   const [checked, setChecked] = useState([])
   const [orderList, setOrderList] = useState([])
   const [loading, setLoading] = useState(true)
@@ -102,7 +103,7 @@ export default function DeliveryOrder({ navigation, route }) {
           const response = await fetch(domain + `/getJobDetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&PLATE_NO=${parameter.vehicle.VEHICLE_INFO}&date=${sdate}`);
 
           const json = await response.json();
-          console.log(json);
+          // console.log(json);
           if (json && json.length > 0) {
             // json[1].JOB_STATUS_DESC = 'Pending';
             // json[2].JOB_STATUS_DESC = 'Completed';
@@ -110,14 +111,20 @@ export default function DeliveryOrder({ navigation, route }) {
               AsyncStorage.setItem('JOBDATA', JSON.stringify(json));
             }
             setOrderList(json);
-            const transformedData = json?.map(item => [
-              'Transfer',
-              item?.INV_NO,
-              `${item?.NAME} \n ${item?.PRINT_ADDRESS}`,
-              item?.qty_order,
-              item?.JOB_STATUS_DESC,
 
-            ])
+            var totalLitres = 0;
+            const transformedData = json?.map(item => {
+              totalLitres += parseFloat(item?.qty_order);
+              return [
+                'Transfer',
+                item?.INV_NO,
+                `${item?.NAME} \n ${item?.PRINT_ADDRESS}`,
+                item?.qty_order,
+                item?.JOB_STATUS_DESC,
+
+              ]
+            })
+            setTotalLitres(totalLitres);
             setdetailData(transformedData)
           }
           else {
@@ -285,9 +292,12 @@ export default function DeliveryOrder({ navigation, route }) {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <Text style={[text, { marginTop: verticalScale(15) }]}>
             {t('trips')}
+          </Text>
+          <Text style={[text, { marginTop: verticalScale(15) }]}>
+            Total litres:{TotalLitres}
           </Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
