@@ -10,9 +10,15 @@ import {
 import React, { useState, useEffect } from 'react';
 import { tableHeader, text } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import IconE from 'react-native-vector-icons/Entypo';
 import { useTranslation } from 'react-i18next';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-
+import { check, PERMISSIONS, request, requestMultiple, RESULTS } from 'react-native-permissions';
+import {
+  BLEPrinter,
+  ColumnAlignment,
+  COMMANDS,
+} from 'react-native-thermal-receipt-printer-image-qr';
 import SideBar from './ui/SideBar';
 // import RightDeliveryDetails from './ui/RightDeliveryDetails';
 import {
@@ -26,6 +32,7 @@ import { moderateScale, verticalScale } from './styles/Metrics';
 import { Checkbox, ActivityIndicator, MD2Colors, Avatar, Button, TextInput } from 'react-native-paper';
 import NetInfo from "@react-native-community/netinfo";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import DialogComp from './DialogComp'
 
 const { width } = Dimensions.get('window');
 
@@ -223,9 +230,129 @@ export default function DeliveryOrder({ navigation, route }) {
       );
     }
   };
+
+
+  const [printers, setPrinters] = useState([]);
+  const [printModal, setprintModal] = useState([]);
+
+  const printHTML = async () => {
+    try {
+      check(PERMISSIONS.ANDROID.BLUETOOTH_CONNECT)
+        .then((result) => {
+          switch (result) {
+            case RESULTS.UNAVAILABLE:
+              requestPerm();
+              break;
+            case RESULTS.DENIED:
+              requestPerm();
+
+              break;
+            case RESULTS.LIMITED:
+              // alert('Bluetooth is limited: some actions are possible');
+              // printBL();
+              requestPerm();
+              break;
+            case RESULTS.GRANTED:
+              // alert('Bluetooth is granted');
+              printBL()
+              break;
+            case RESULTS.BLOCKED:
+              alert('Bluetooth is denied and not requestable anymore');
+              navigation.replace('DeliveryOrder');
+              break;
+          }
+
+        })
+        .catch((error) => {
+          // …
+        });
+
+
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+
+  const requestPerm = () => {
+    requestMultiple([PERMISSIONS.ANDROID.BLUETOOTH_CONNECT, PERMISSIONS.ANDROID.BLUETOOTH_SCAN, PERMISSIONS.ANDROID.BLUETOOTH, PERMISSIONS.ANDROID.BLUETOOTH_ADMIN]).then((result) => {
+      console.log('requested')
+      // alert(JSON.stringify(result));
+      printBL()
+    }).catch(error => {
+      alert('error', error);
+      navigation.replace('DeliveryOrder')
+    });
+  }
+
+  const printBL = async () => {
+    try {
+      BLEPrinter.init().then(() => {
+        BLEPrinter.getDeviceList().then((data) => {
+          console.log(data);
+          setPrinters([...data]);
+          setprintModal(true)
+        }).catch(e => {
+          console.log(e);
+          // Alert.alert('Error: ' + e)
+          // navigation.replace('DeliveryOrder')
+        });
+      }).catch(e => {
+        Alert.alert("Bluetooth not supported: " + e);
+        navigation.replace('DeliveryOrder')
+      });
+    }
+    catch (e) {
+      alert("device list failed catch block " + e);
+      navigation.replace('DeliveryOrder')
+    }
+  }
+
+  const _connectPrinter = (printer) => {
+    //connect printer
+    // alert('priniting for diesel ' + dieselValueCopy.current + ' for signature : ' + signatureURLCopy.current);
+    try {
+      const BOLD_ON = COMMANDS.TEXT_FORMAT.TXT_BOLD_ON;
+      const BOLD_OFF = COMMANDS.TEXT_FORMAT.TXT_BOLD_OFF;
+      const CENTER = COMMANDS.TEXT_FORMAT.TXT_ALIGN_CT;
+      const OFF_CENTER = COMMANDS.TEXT_FORMAT.TXT_ALIGN_LT;
+      const LEFT_MARGIN = COMMANDS.MARGINS.LEFT;
+      const setLeftMarginCommand = '\x1b\x6c\x00';
+
+      // Set right margin to 0
+      const setRightMarginCommand = '\x1b\x51\x00';
+      BLEPrinter.connectPrinter(printer.inner_mac_address).then((data) => {
+        BLEPrinter.printImage(
+          `https://vellas.net/wp-content/uploads/2024/01/hshlogo3-1.webp`,
+          {
+            imageWidth: 300,
+            imageHeight: 100,
+          },
+        );
+        BLEPrinter.printText(`${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<M>Hock Seng Heng Transport & Trading Pte Ltd. </M>${BOLD_OFF}\n
+       ${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<D>Delivery Order</D>${BOLD_OFF}\n
+       ${setLeftMarginCommand}${setRightMarginCommand}<M>9 Jalan Besut Singapore 619563</M>
+       ${setLeftMarginCommand}${setRightMarginCommand}<M>Tel: 6261-6101 Fax: 6261-1037</M>\n\n\n`);
+
+        BLEPrinter.printText(`${CENTER}${BOLD_ON}<D>Thank You</D>${BOLD_OFF}\n\n`);
+
+
+        setprintModal(false);
+      }
+      ).catch(e => {
+        // alert("connecting failed then catch block " + e)
+      })
+    }
+    catch (e) {
+      alert("connecting failed catch block " + e)
+    }
+
+  }
+
+
+
   return (
     <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
-      <SideBar all={true} navigation={navigation} />
+      {/* <SideBar all={true} navigation={navigation} /> */}
       <Modal
         animationType='none'
         transparent={true}
@@ -261,7 +388,12 @@ export default function DeliveryOrder({ navigation, route }) {
             </TouchableOpacity>
             <Text style={text}>{parameter.vehicle.VEHICLE_INFO}</Text>
           </View>
-          <View style={{ flexDirection: 'row' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <TouchableOpacity onPress={() => {
+              printHTML()
+            }} style={{ marginRight: 10 }}>
+              <IconE name="print" color="#01315C" size={20} />
+            </TouchableOpacity>
             <TouchableOpacity
               disabled={checked.length > 0 ? false : true}
               style={{
@@ -341,6 +473,7 @@ export default function DeliveryOrder({ navigation, route }) {
                     qty: orderList[0]?.qty_order,
                     address1: orderList[0]?.ADDRESS2,
                     address2: orderList[0]?.PRINT_ADDRESS,
+                    PLATE_NO: parameter.vehicle.VEHICLE_INFO,
                     invData: orderList.find((val) => val.INV_NO === rowData[1])
                   });
                 }}>
@@ -375,6 +508,15 @@ export default function DeliveryOrder({ navigation, route }) {
           </ScrollView>
         </Table>
       </View>
+      <DialogComp visible={printModal} onClose={(val) => setprintModal(false)}>
+        {
+          printers.map((printer, index) => (
+            <TouchableOpacity style={{ padding: 10, borderBottomWidth: 1, width: '100%' }} key={printer.inner_mac_address} onPress={() => _connectPrinter(printer)}>
+              <Text style={{ color: 'black', fontSize: 15, textAlign: 'center' }}>{`${printer.device_name}(${printer.inner_mac_address})`}</Text>
+            </TouchableOpacity>
+          ))
+        }
+      </DialogComp>
       {/* <RightDeliveryDetails show={showInput} hide={() => setshowInput(false)} /> */}
       <DateTimePickerModal
         date={dateInput}

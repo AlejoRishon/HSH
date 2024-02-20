@@ -6,7 +6,8 @@ import {
   FlatList,
   TextInput,
   TouchableOpacity,
-  Alert
+  Alert,
+  Modal
 } from 'react-native';
 import React, { useState } from 'react';
 import {
@@ -32,22 +33,21 @@ export default function Main({ navigation, route }) {
   const { t, i18n } = useTranslation();
   const parameter = getVehicle();
 
-  // const navButton = (route,params) => {
-  //   NetInfo.fetch().then(async networkState => {
-  //     console.log("Is connected? - ", networkState.isConnected);
-  //     if (networkState.isConnected) {
-  //       navigation.navigate(route);
-  //     }
-  //     else {
-  //       Alert.alert('Offline mode', 'Cannot use this function in offline mode. Connect to the internet.');
-  //     }
-  //   }
-
-  // console.log('zjkgnkvrlzkv:', route?.params)
+  const [onLogOut, setonLogOut] = useState(false)
+  const LogOut = () => {
+    AsyncStorage.removeItem('vehicleDetails')
+    AsyncStorage.removeItem('JOBDATA')
+    AsyncStorage.removeItem('pendingDelivery')
+    AsyncStorage.removeItem('username')
+    AsyncStorage.removeItem('domainurl')
+    AsyncStorage.removeItem('password');
+    navigation.replace('Login');
+    setonLogOut(false);
+  }
 
   return (
     <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
-      <SideBar all={true} navigation={navigation} />
+      <SideBar all={true} navigation={navigation} onLog={() => setonLogOut(true)} />
       <View style={{ flex: 1, padding: 20 }}>
         <View
           style={{
@@ -204,6 +204,21 @@ export default function Main({ navigation, route }) {
           </View>
         </View>
       </View>
+      <Modal transparent={true} visible={onLogOut} style={{ position: 'absolute', width: '100%' }}>
+        <View style={{ backgroundColor: 'rgba(0,0,0,0.5)', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: 'white', padding: 20, margin: 20, borderRadius: 8, alignItems: 'center' }}>
+            <Text style={{ color: 'black', fontWeight: 'bold', fontSize: width / 30 }}>Are you sure you want to Log Out ?</Text>
+            <View style={{ flexDirection: 'row', marginTop: 20 }}>
+              <TouchableOpacity onPress={LogOut} style={[button, { backgroundColor: 'white', }]}>
+                <Text style={[buttonText, { color: 'black', paddingHorizontal: 10 }]}>Yes</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setonLogOut(false)} style={[button, { marginLeft: 20 }]}>
+                <Text style={[buttonText, { paddingHorizontal: 10 }]}>No</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

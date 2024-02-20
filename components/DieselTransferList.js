@@ -234,7 +234,7 @@ export default function DieselTransferList({ navigation, route }) {
 
     return (
         <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
-            <SideBar all={true} navigation={navigation} />
+            {/* <SideBar all={true} navigation={navigation} /> */}
             <Modal
                 animationType='none'
                 transparent={true}

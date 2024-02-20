@@ -163,7 +163,7 @@ export default function DieselTransfer({ navigation }) {
 
   return (
     <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
-      <SideBar all={true} navigation={navigation} />
+      {/* <SideBar all={true} navigation={navigation} /> */}
       <View style={{ flex: 1, padding: 20, paddingBottom: 0 }}>
         <View
           style={{

@@ -18,7 +18,10 @@ import { check, PERMISSIONS, request, requestMultiple, RESULTS } from 'react-nat
 import {
   text,
   remarks,
+  button,
+  buttonText
 } from './styles/MainStyle';
+import AwesomeAlert from 'react-native-awesome-alerts';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import * as ImagePicker from 'react-native-image-picker';
 import { useTranslation } from 'react-i18next';
@@ -43,7 +46,7 @@ const { width } = Dimensions.get('window');
 export default function AdHocService({ navigation, route }) {
   const { t } = useTranslation();
   const domain = getDomain();
-
+  const [visiblePint, setvisiblePint] = useState(false);
   const [showInput, setshowInput] = useState(!true);
   const heightMeterAfAnim = useRef(new Animated.Value(0)).current;
   const heightMeterBeAnim = useRef(new Animated.Value(0)).current;
@@ -195,13 +198,14 @@ export default function AdHocService({ navigation, route }) {
         console.log(result);
         if (result) {
           setINV_NO(result);
-          Alert.alert('Success', 'Job Successful', [
-            {
-              text: 'Print',
-              onPress: () => getSign(result),
-            },
-            { text: 'OK', onPress: () => navigation.replace('Main') },
-          ]);
+          setvisiblePint(true)
+          // Alert.alert('Success', 'Job Successful', [
+          //   {
+          //     text: 'Print',
+          //     onPress: () => getSign(result),
+          //   },
+          //   { text: 'OK', onPress: () => navigation.replace('Main') },
+          // ]);
         } else {
           alert("Job Failed");
         }
@@ -237,6 +241,7 @@ export default function AdHocService({ navigation, route }) {
 
   const getSign = async (jo) => {
     setLoading(true);
+    console.log(INV_NO)
     var vehicleData = getVehicle();
     var sdate = formatDate(new Date());
     try {
@@ -245,7 +250,7 @@ export default function AdHocService({ navigation, route }) {
       const json = await response.json();
       console.log(json, "jobs");
       if (json && json.length > 0) {
-        var auid = json.filter(val => val.INV_NO === jo);
+        var auid = json.filter(val => val.INV_NO === INV_NO);
         if (auid.length > 0) {
           console.log('get call', `${domain}/GetJobFiles?_Token=CDAC498B-116F-4346-AD72-C3F65A902FFD&_uid=${auid[0].UID}`)
 
@@ -254,7 +259,7 @@ export default function AdHocService({ navigation, route }) {
             setsignatureURL("https://hsh.vellas.net:90/hshpump/signature/JOB_ORDER/" + auid[0].UID + "/Signature.png");
 
           }
-          printHTML(jo);
+          printHTML(INV_NO);
         }
         else {
           setLoading(false);
@@ -373,7 +378,17 @@ export default function AdHocService({ navigation, route }) {
     );
   };
 
-
+  const [onLogOut, setonLogOut] = useState(false)
+  const LogOut = () => {
+    AsyncStorage.removeItem('vehicleDetails')
+    AsyncStorage.removeItem('JOBDATA')
+    AsyncStorage.removeItem('pendingDelivery')
+    AsyncStorage.removeItem('username')
+    AsyncStorage.removeItem('domainurl')
+    AsyncStorage.removeItem('password');
+    navigation.replace('Login');
+    setonLogOut(false);
+  }
   const headerSearch = ({ item }) => {
     return (
       <View
@@ -563,6 +578,7 @@ export default function AdHocService({ navigation, route }) {
   const _connectPrinter = (printer) => {
     //connect printer
     // alert('priniting in ' + printer.inner_mac_address);
+    var vehicleData = getVehicle();
     console.log(jobNumber, "jobNumber");
     console.log(signatureURL, "signatureURL");
     try {
@@ -789,7 +805,7 @@ export default function AdHocService({ navigation, route }) {
       </Portal>
       <Animated.View
         style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
-        <SideBar all={true} navigation={navigation} />
+        {/* <SideBar all={true} navigation={navigation} onLog={() => setonLogOut(true)} /> */}
         <View style={{ flex: 1, padding: 20 }}>
 
           <TouchableOpacity
@@ -1156,6 +1172,53 @@ export default function AdHocService({ navigation, route }) {
           }
         </DialogComp>
       </Animated.View>
+      <AwesomeAlert
+        show={visiblePint}
+        showProgress={false}
+        title="Job Successful"
+        message="Do you want to print this job?"
+        closeOnTouchOutside={false}
+        closeOnHardwareBackPress={false}
+        showCancelButton={true}
+        showConfirmButton={true}
+        cancelText="No"
+        confirmText="Print"
+        confirmButtonColor="#01315C"
+        cancelButtonTextStyle={{ color: 'black', fontSize: 15 }}
+        confirmButtonTextStyle={{ fontSize: 20 }}
+        confirmButtonStyle={{ marginLeft: 30 }}
+        titleStyle={{ color: 'black' }}
+        messageStyle={{ color: 'black' }}
+        onCancelPressed={() => {
+          // this.hideAlert();
+          setvisiblePint(false);
+          navigation.replace('Main');
+        }}
+        onConfirmPressed={() => {
+          // this.hideAlert();
+          setvisiblePint(false);
+          setTimeout(() => {
+            getSign(INV_NO);
+          }, 500)
+
+
+        }}
+      />
+      <Modal transparent={true} visible={onLogOut} style={{ position: 'absolute', width: '100%' }}>
+        <View style={{ backgroundColor: 'rgba(0,0,0,0.5)', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: 'white', padding: 20, margin: 20, borderRadius: 8, alignItems: 'center' }}>
+            <Text style={{ color: 'black', fontWeight: 'bold', fontSize: width / 30 }}>Are you sure you want to Log Out ?</Text>
+            <View style={{ flexDirection: 'row', marginTop: 20 }}>
+              <TouchableOpacity onPress={LogOut} style={[button, { backgroundColor: 'white', }]}>
+                <Text style={[buttonText, { color: 'black', paddingHorizontal: 10 }]}>Yes</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setonLogOut(false)} style={[button, { marginLeft: 20 }]}>
+                <Text style={[buttonText, { paddingHorizontal: 10 }]}>No</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </Provider >
   );
 }

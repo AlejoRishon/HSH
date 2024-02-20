@@ -205,7 +205,7 @@ export default function TankFill({ navigation, route }) {
 
   return (
     <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
-      <SideBar all={true} navigation={navigation} />
+      {/* <SideBar all={true} navigation={navigation} /> */}
       {!showList ? <View style={{ flex: 1, padding: 20 }}>
         <View
           style={{

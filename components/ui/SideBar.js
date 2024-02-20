@@ -14,6 +14,7 @@ import Icons from 'react-native-vector-icons/FontAwesome';
 import { verticalScale } from '../styles/Metrics';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Modal } from 'react-native-paper';
 
 const SideBar = props => {
   return (
@@ -114,17 +115,9 @@ const SideBar = props => {
         </TouchableOpacity>
       )}
       <TouchableOpacity
-        onPress={() => {
-          AsyncStorage.removeItem('vehicleDetails')
-          AsyncStorage.removeItem('JOBDATA')
-          AsyncStorage.removeItem('pendingDelivery')
-          AsyncStorage.removeItem('username')
-          AsyncStorage.removeItem('domainurl')
-          AsyncStorage.removeItem('password');
-          props.navigation.replace('Login');
-        }}
+        onPress={props.onLog}
         style={{
-          backgroundColor: '#01315C',
+          backgroundColor: '#bd2d2d',
           justifyContent: 'center',
           alignItems: 'center',
           padding: 10,
@@ -133,6 +126,7 @@ const SideBar = props => {
         }}>
         <Icon name="power" color="white" style={{ padding: 5 }} size={20} />
       </TouchableOpacity>
+
     </View>
   );
 };

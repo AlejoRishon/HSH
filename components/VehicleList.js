@@ -21,6 +21,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const { width } = Dimensions.get('window');
 
 export default function VehicleList({ navigation }) {
+
   const formatDate = (inputDate) => {
 
     let day = inputDate.getDate();
@@ -85,11 +86,21 @@ export default function VehicleList({ navigation }) {
   const filteredListData = listData.filter((item) =>
     item?.Vehicle[0]?.VEHICLE_INFO.toLowerCase().includes(search.toLowerCase())
   );
-
+  const [onLogOut, setonLogOut] = useState(false)
+  const LogOut = () => {
+    AsyncStorage.removeItem('vehicleDetails')
+    AsyncStorage.removeItem('JOBDATA')
+    AsyncStorage.removeItem('pendingDelivery')
+    AsyncStorage.removeItem('username')
+    AsyncStorage.removeItem('domainurl')
+    AsyncStorage.removeItem('password');
+    navigation.replace('Login');
+    setonLogOut(false);
+  }
 
   return (
     <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
-      <SideBar all={false} navigation={navigation} />
+      <SideBar all={false} navigation={navigation} onLog={() => setonLogOut(true)} />
       <View style={{ flex: 1, padding: moderateScale(15) }}>
         <View style={searchBox}>
           <Icon name="search" color="#01315C" size={20} />
@@ -192,112 +203,21 @@ export default function VehicleList({ navigation }) {
           </TouchableOpacity>
         )}
       </View>
-
-      {/* <Modal
-        animationType='none'
-        transparent={true}
-        visible={showDialog}
-
-      >
-        <View style={{ justifyContent: 'center', display: 'flex', width: '100%', height: '100%', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.4)' }}>
-          <View style={{ width: '50%', backgroundColor: 'white', padding: 20, borderRadius: 8 }}>
-            <Text
-              style={{
-                fontSize: 20,
-                color: '#01315C',
-                lineHeight: 30
-              }}>
-              {`Your vehicle - ${vlload.VEHICLE_INFO} has ${vlload.QTY_IN - vlload.QTY_OUT} litres of ${vlload.BRAND_DESC}(${vlload.DISPLAY_NAME})`}
-            </Text>
-            <KeyboardAvoidingView
-              style={{ marginBottom: 10, marginTop: 10 }}
-              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-              <TextInput style={{ backgroundColor: 'rgba(0,0,0,0.2)', fontSize: 20, borderRadius: 4, color: 'black' }} value={(vlload.QTY_LOAD)} onChangeText={text => setvlload({ ...vlload, QTY_LOAD: text })} />
-            </KeyboardAvoidingView>
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-              }}>
-              <TouchableOpacity
-                style={{ backgroundColor: '#01315C', padding: 10, borderRadius: 8, marginRight: 5 }}
-                onPress={async () => {
-                  if (vlload.QTY_LOAD > (vlload.QTY_IN - vlload.QTY_OUT)) {
-                    console.log((parseFloat(vlload.QTY_LOAD) - (vlload.QTY_IN - vlload.QTY_OUT)), 'IN');
-                    const responseLoad = await fetch(domain + `/PostTopUpVehicle`, {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json"
-                      },
-                      body: JSON.stringify({
-                        "VL_UID": vlload.VL_UID,
-                        "QTY_IN": ((parseFloat(vlload.QTY_LOAD) - (vlload.QTY_IN - vlload.QTY_OUT))).toString()
-                      })
-                    });
-
-                    const jsonLoad = await responseLoad.json();
-                    console.log(jsonLoad);
-                    setshowDialog(false);
-                    navigation.navigate('Main', {
-                      vehicleInfo: selectedVehicle.VEHICLE_INFO,
-                      driverId: driverId,
-                      driverName: driverName
-                    })
-                  }
-                  else if (vlload.QTY_LOAD < (vlload.QTY_IN - vlload.QTY_OUT)) {
-                    console.log((vlload.QTY_IN - vlload.QTY_OUT) - parseFloat(vlload.QTY_LOAD), 'OUT');
-                    const responseLoad = await fetch(domain + `/PostVehicleUnload`, {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json"
-                      },
-                      body: JSON.stringify({
-                        "VL_UID": vlload.VL_UID,
-                        "QTY_OUT": ((vlload.QTY_IN - vlload.QTY_OUT) - parseFloat(vlload.QTY_LOAD)).toString()
-                      })
-                    });
-
-                    const jsonLoad = await responseLoad.json();
-                    console.log(jsonLoad);
-                    setshowDialog(false);
-                    navigation.navigate('Main', {
-                      vehicleInfo: selectedVehicle.VEHICLE_INFO,
-                      driverId: driverId,
-                      driverName: driverName
-                    })
-                  }
-                  else if (vlload.QTY_LOAD == (vlload.QTY_IN - vlload.QTY_OUT)) {
-                    setshowDialog(false);
-                    navigation.navigate('Main', {
-                      vehicleInfo: selectedVehicle.VEHICLE_INFO,
-                      driverId: driverId,
-                      driverName: driverName
-                    })
-                  }
-
-
-                }}>
-                <Text style={{}}>{'Update'}</Text>
+      <Modal transparent={true} visible={onLogOut} style={{ position: 'absolute', width: '100%' }}>
+        <View style={{ backgroundColor: 'rgba(0,0,0,0.5)', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: 'white', padding: 20, margin: 20, borderRadius: 8, alignItems: 'center' }}>
+            <Text style={{ color: 'black', fontWeight: 'bold', fontSize: width / 30 }}>Are you sure you want to Log Out ?</Text>
+            <View style={{ flexDirection: 'row', marginTop: 20 }}>
+              <TouchableOpacity onPress={LogOut} style={[button, { backgroundColor: 'white', }]}>
+                <Text style={[buttonText, { color: 'black', paddingHorizontal: 10 }]}>Yes</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={{ padding: 10, borderRadius: 8, }}
-                onPress={() => {
-                  setshowDialog(false);
-                  navigation.navigate('Main', {
-                    vehicleInfo: selectedVehicle.VEHICLE_INFO,
-                    driverId: driverId,
-                    driverName: driverName
-                  })
-                }}>
-                <Text style={{ color: '#01315C' }}>{'Skip'}</Text>
+              <TouchableOpacity onPress={() => setonLogOut(false)} style={[button, { marginLeft: 20 }]}>
+                <Text style={[buttonText, { paddingHorizontal: 10 }]}>No</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
-
-      </Modal> */}
+      </Modal>
     </View >
   );
 }

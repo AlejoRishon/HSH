@@ -17,9 +17,10 @@ import {
 // } from "react-native-thermal-receipt-printer";
 import React, { useEffect, useRef, useState, createRef } from 'react';
 import { check, PERMISSIONS, request, requestMultiple, RESULTS } from 'react-native-permissions';
-
+import AwesomeAlert from 'react-native-awesome-alerts';
 import {
   remarks,
+  button, buttonText
 } from './styles/MainStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Portal, Provider, Modal, Button, MD2Colors } from 'react-native-paper';
@@ -83,9 +84,11 @@ export default function DeliveryOrder({ navigation, route }) {
   // const _onDragEvent = () => console.log('dragged')
 
   const [printers, setPrinters] = useState([]);
+  const [visiblePint, setvisiblePint] = useState(false);
   const [printModal, setprintModal] = useState([]);
 
   const printHTML = async () => {
+    console.log(route.params.PLATE_NO);
     try {
       check(PERMISSIONS.ANDROID.BLUETOOTH_CONNECT)
         .then((result) => {
@@ -174,7 +177,7 @@ export default function DeliveryOrder({ navigation, route }) {
           setprintModal(true)
         }).catch(e => {
           console.log(e);
-          // Alert.alert('Error: ' + e)
+          Alert.alert('Error: ' + e)
           // navigation.replace('DeliveryOrder')
         });
       }).catch(e => {
@@ -214,6 +217,7 @@ export default function DeliveryOrder({ navigation, route }) {
         //   imageHeight: 300,
         // });
         BLEPrinter.printText(`${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<M>Hock Seng Heng Transport & Trading Pte Ltd. </M>${BOLD_OFF}\n
+       ${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<D>${route?.params?.PLATE_NO}</D>${BOLD_OFF}\n
        ${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<D>Delivery Order</D>${BOLD_OFF}\n
        ${setLeftMarginCommand}${setRightMarginCommand}<M>9 Jalan Besut Singapore 619563</M>
        ${setLeftMarginCommand}${setRightMarginCommand}<M>Tel: 6261-6101 Fax: 6261-1037</M>
@@ -551,13 +555,14 @@ export default function DeliveryOrder({ navigation, route }) {
           .then(result => {
             setLoading(false);
             console.log("Job updated", result);
-            Alert.alert('Success', 'Job Successful', [
-              {
-                text: 'Print',
-                onPress: () => printHTML(),
-              },
-              { text: 'OK', onPress: () => navigation.replace('DeliveryOrder') },
-            ]);
+            setvisiblePint(true)
+            // Alert.alert('Success', 'Job Successful', [
+            //   {
+            //     text: 'Print',
+            //     onPress: () => printHTML()
+            //   },
+            //   { text: 'OK', onPress: () => navigation.replace('DeliveryOrder') },
+            // ]);
             setshowInput(false);
           })
           .catch(error => {
@@ -745,7 +750,7 @@ export default function DeliveryOrder({ navigation, route }) {
       </Portal>
       <Animated.View
         style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
-        <SideBar all={true} navigation={navigation} />
+        {/* <SideBar all={true} navigation={navigation} /> */}
         <View style={{ flex: 1, padding: 20 }}>
           <View style={{ justifyContent: 'space-between', flexDirection: 'row', width: editable ? '55%' : '100%' }}>
             <TouchableOpacity
@@ -763,6 +768,14 @@ export default function DeliveryOrder({ navigation, route }) {
               style={{ backgroundColor: '#01315C', flexDirection: 'row', padding: 5, paddingHorizontal: 10, justifyContent: "center", alignItems: 'center', gap: 5, borderRadius: 8 }}
               onPress={() => {
                 printHTML()
+                // Alert.alert('Success', 'Job Successful', [
+                //   {
+                //     text: 'Print',
+                //     onPress: () => printHTML()
+                //   },
+                //   { text: 'OK', onPress: () => navigation.replace('DeliveryOrder') },
+                // ]);
+
               }}>
               <Text style={{ color: 'white' }}>Print</Text>
               <Icon
@@ -1118,6 +1131,37 @@ export default function DeliveryOrder({ navigation, route }) {
             ))
           }
         </DialogComp>
+        <AwesomeAlert
+          show={visiblePint}
+          showProgress={false}
+          title="Job Successful"
+          message="Do you want to print this job?"
+          closeOnTouchOutside={false}
+          closeOnHardwareBackPress={false}
+          showCancelButton={true}
+          showConfirmButton={true}
+          cancelText="No"
+          confirmText="Print"
+          confirmButtonColor="#01315C"
+          cancelButtonTextStyle={{ color: 'black', fontSize: 15 }}
+          confirmButtonTextStyle={{ fontSize: 20 }}
+          confirmButtonStyle={{ marginLeft: 30 }}
+          titleStyle={{ color: 'black' }}
+          messageStyle={{ color: 'black' }}
+          onCancelPressed={() => {
+            // this.hideAlert();
+            setvisiblePint(false);
+            navigation.replace('DeliveryOrder');
+          }}
+          onConfirmPressed={() => {
+            // this.hideAlert();
+            setvisiblePint(false);
+            setTimeout(() => {
+              printHTML();
+            }, 500)
+
+          }}
+        />
       </Animated.View>
     </Provider>
   );

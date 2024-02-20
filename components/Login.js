@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Alert,
-  Modal
+  Modal,
+  Dimensions
 } from 'react-native';
 import { inputBox, button, buttonText, text } from './styles/MainStyle';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +19,7 @@ import { getUser, setDomain, setlogUserDetail, setlogUserDetailFull, setVehicle 
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from "@react-native-community/netinfo";
+const { width } = Dimensions.get('window');
 
 export default function Login({ navigation }) {
   const user = getUser();
@@ -176,6 +178,12 @@ export default function Login({ navigation }) {
       })
   }
 
+  const [onLogOut, setonLogOut] = useState(false)
+  const LogOut = () => {
+    auth().signOut().then(() => navigation.replace('MasterLogin'))
+    setonLogOut(false);
+  }
+
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior="height">
       <View style={{ flexDirection: 'row', flex: 1 }}>
@@ -189,8 +197,9 @@ export default function Login({ navigation }) {
             <View
               style={{
                 width: horizontalScale(100),
-                justifyContent: 'flex-start',
+                justifyContent: 'space-between',
                 alignSelf: 'flex-start',
+                flex: 1
               }}>
               <View
                 style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -202,8 +211,8 @@ export default function Login({ navigation }) {
                   <Text
                     style={[
                       lang === 'en' && {
-                        borderWidth: 1,
-                        borderColor: 'cornflowerblue',
+                        borderBottomWidth: 3,
+                        borderColor: 'black',
                       },
                       {
                         color: '#000',
@@ -223,8 +232,8 @@ export default function Login({ navigation }) {
                   <Text
                     style={[
                       lang === 'ch' && {
-                        borderWidth: 1,
-                        borderColor: 'cornflowerblue',
+                        borderBottomWidth: 3,
+                        borderColor: 'black',
                       },
                       {
                         color: '#000',
@@ -237,6 +246,19 @@ export default function Login({ navigation }) {
                   </Text>
                 </TouchableOpacity>
               </View>
+              <TouchableOpacity
+                style={[button, {
+                  width: horizontalScale(50),
+                  height: verticalScale(70),
+                  padding: 0,
+                  justifyContent: 'center',
+                  marginBottom: 40,
+                  backgroundColor: '#bd2d2d'
+                }]}
+                onPress={() => setonLogOut(true)}
+              >
+                <Text style={[buttonText, { fontSize: moderateScale(10) }]}>Log Out</Text>
+              </TouchableOpacity>
             </View>
           </ImageBackground>
         </ImageBackground>
@@ -254,19 +276,7 @@ export default function Login({ navigation }) {
             padding: moderateScale(25),
             justifyContent: 'space-around',
           }}>
-          <TouchableOpacity
-            style={[button, {
-              width: horizontalScale(50),
-              height: verticalScale(70),
-              position: 'absolute',
-              right: 5,
-              padding: 0,
-              justifyContent: 'center'
-            }]}
-            onPress={() => auth().signOut().then(() => navigation.replace('MasterLogin'))}
-          >
-            <Text style={[buttonText, { fontSize: moderateScale(10) }]}>Log Out</Text>
-          </TouchableOpacity>
+
           <View style={{ marginTop: verticalScale(20) }}>
             <Text style={text}>{`Welcome back,\n${t('login_message')}`}</Text>
             <View
@@ -299,6 +309,21 @@ export default function Login({ navigation }) {
             <Text style={buttonText}>Login</Text>
           </TouchableOpacity>
         </View>
+        <Modal transparent={true} visible={onLogOut} style={{ position: 'absolute', width: '100%' }}>
+          <View style={{ backgroundColor: 'rgba(0,0,0,0.5)', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ backgroundColor: 'white', padding: 20, margin: 20, borderRadius: 8, alignItems: 'center' }}>
+              <Text style={{ color: 'black', fontWeight: 'bold', fontSize: width / 30 }}>Are you sure you want to Log Out ?</Text>
+              <View style={{ flexDirection: 'row', marginTop: 20 }}>
+                <TouchableOpacity onPress={LogOut} style={[button, { backgroundColor: 'white', }]}>
+                  <Text style={[buttonText, { color: 'black', paddingHorizontal: 10 }]}>Yes</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setonLogOut(false)} style={[button, { marginLeft: 20 }]}>
+                  <Text style={[buttonText, { paddingHorizontal: 10 }]}>No</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     </KeyboardAvoidingView >
   );
