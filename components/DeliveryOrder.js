@@ -42,6 +42,7 @@ export default function DeliveryOrder({ navigation, route }) {
   const parameter = getVehicle();
   const [showInput, setshowInput] = useState(false);
   const [TotalLitres, setTotalLitres] = useState(0);
+  const [minDate, setminDate] = useState(null);
   const [checked, setChecked] = useState([])
   const [orderList, setOrderList] = useState([])
   const [loading, setLoading] = useState(true)
@@ -92,7 +93,20 @@ export default function DeliveryOrder({ navigation, route }) {
 
   useEffect(() => {
     getDeliveryOrder(formatDate(new Date()))
+    var currentDate = new Date();
 
+    // Subtract 14 days (2 weeks)
+    var twoWeeksAgo = new Date(currentDate.getTime() - (14 * 24 * 60 * 60 * 1000));
+
+    // Extract the year, month, and day
+    var year = twoWeeksAgo.getFullYear();
+    var month = twoWeeksAgo.getMonth() + 1; // Month is zero-based
+    var day = twoWeeksAgo.getDate();
+
+    // Format the date as desired (e.g., YYYY-MM-DD)
+    var formattedDate = year + '-' + (month < 10 ? '0' : '') + month + '-' + (day < 10 ? '0' : '') + day;
+    console.log("formattedDate", formattedDate);
+    setminDate(new Date(formattedDate));
     return () => {
       // getDeliveryOrder(formatDate(new Date()))
     }
@@ -524,6 +538,8 @@ export default function DeliveryOrder({ navigation, route }) {
         mode="date"
         onConfirm={handleConfirm}
         onCancel={hideDatePicker}
+        minimumDate={minDate}
+        maximumDate={new Date()}
       />
     </View>
   );

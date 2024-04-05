@@ -26,12 +26,53 @@ export default function TransferList({ navigation, route }) {
   const [proceed, setProceed] = useState(false)
   const [loading, setLoading] = useState(true)
   const [vehicleList, setVehicleList] = useState([]);
+  const [DriverList, setDriverList] = useState([]);
+  const extractUniqueVehicleInfo = (data) => {
+    const uniqueVehicleInfo = new Set(); // Using Set to ensure uniqueness
 
+
+    // Loop through the JSON data and extract unique VEHICLE_INFO values
+    data.forEach(entry => {
+      entry.Vehicle.forEach(vehicle => {
+        uniqueVehicleInfo.add(vehicle.VEHICLE_INFO);
+      });
+    });
+    // Convert Set to array
+    return Array.from(uniqueVehicleInfo).map((info, index) => ({ "VEHICLE_INFO": info, id: index }));
+  }
+  const extractUniqueDriverInfo = (data) => {
+    const uniqueVehicleInfo = new Map();  // Using Set to ensure uniqueness
+
+
+    // Loop through the JSON data and extract unique VEHICLE_INFO values
+    data.forEach(entry => {
+      entry.Vehicle.forEach(vehicle => {
+        const vehicleInfo = vehicle.driver_name;
+        const driverId = entry.driver_id;
+        // Store the vehicle info along with driver_id in the map
+        if (!uniqueVehicleInfo.has(vehicleInfo)) {
+          uniqueVehicleInfo.set(vehicleInfo, driverId);
+        }
+      });
+    });
+    console.log("uniqueVehicleInfo", uniqueVehicleInfo);
+    const resultArray = [];
+    uniqueVehicleInfo.forEach((driverId, vehicleInfo) => {
+      resultArray.push({ "driver_name": vehicleInfo, "driver_id": driverId });
+    });
+    return resultArray;
+    // Convert Set to array
+    // return Array.from(uniqueVehicleInfo).map((info, index) => ({ "driver_name": info, id: index }));
+  }
   const getVehicleList = async () => {
     try {
       const response = await fetch(domain + '/GetVehicleList?_token=4B3B5C99-57E8-4593-A0AD-3D4EEA3C2F53');
       const json = await response.json();
-      setVehicleList(json);
+      var b = extractUniqueVehicleInfo(json);
+      var c = extractUniqueDriverInfo(json);
+      console.log('driver', c)
+      setVehicleList(b);
+      setDriverList(c);
       setLoading(false)
     } catch (error) {
       console.error(error);
@@ -41,16 +82,18 @@ export default function TransferList({ navigation, route }) {
 
   const PostJobTransfer = () => {
     const user = getlogUser();
-    console.log(vehicleList[checkVehicle[0]].Vehicle[0].VEHICLE_INFO);
-    console.log(vehicleList[checkDriver[0]].driver_id);
+    console.log(vehicleList[checkVehicle[0]].VEHICLE_INFO);
+    console.log(DriverList[checkDriver[0]].driver_id);
     console.log(route?.params?.job);
     const url = domain + `/PostDeliveryTransfer`
     const data =
     {
       "JOB_NO": route?.params?.job,
-      "VECHICLE_NO": vehicleList[checkVehicle[0]].Vehicle[0].VEHICLE_INFO,
-      "DRIVER_ID": vehicleList[checkDriver[0]].driver_id
+      "VECHICLE_NO": vehicleList[checkVehicle[0]].VEHICLE_INFO,
+      "DRIVER_ID": DriverList[checkDriver[0]].driver_id
     }
+
+    console.log(data, "data")
     fetch(url, {
       method: "POST",
       headers: {
@@ -72,46 +115,24 @@ export default function TransferList({ navigation, route }) {
 
   useEffect(() => {
 
-    getVehicleList();
+    // getVehicleList();
     onPressCheck();
-  }, [checkDriver, checkVehicle])
+  }, [checkDriver, checkVehicle]);
+  useEffect(() => {
+
+    getVehicleList();
+  }, [])
 
   const [selectedVehicle, setselectedVehicle] = useState(null);
 
   const onPressCheck = () => {
-    if (checkVehicle.length === 1 && checkDriver.length === 0) {
-      setCheckDriver([checkVehicle[0]]);
-      setProceed(true);
-    } else if (checkVehicle.length === 1 && checkDriver.length === 1) {
+    if (checkVehicle.length === 1 && checkDriver.length === 1) {
       setProceed(true);
     } else {
       setProceed(false);
     }
   };
 
-
-  // const DriverView = ({ item, index }) => {
-  //   return (
-  //     <TouchableOpacity
-  //       style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
-  //       onPress={() => setCheckDriver([index])}
-  //     >
-  //       <Text style={[text, { fontSize: moderateScale(15) }]}>{item?.Vehicle[0]?.driver_name}</Text>
-  //       {checkDriver.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>}
-  //     </TouchableOpacity>
-  //   );
-  // }
-
-  // const VehicleView = ({ item, index }) => {
-  //   return (
-  //     <TouchableOpacity
-  //       style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
-  //       onPress={() => { setCheckVehicle([index]); setCheckDriver([index]) }}>
-  //       <Text style={[text, { fontSize: moderateScale(15) }]}>{item?.Vehicle[0]?.VEHICLE_INFO}</Text>
-  //       {checkVehicle.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>}
-  //     </TouchableOpacity>
-  //   );
-  // }
   const DriverView = ({ item, index }) => {
     const isSelected = checkDriver.includes(index);
 
@@ -132,7 +153,7 @@ export default function TransferList({ navigation, route }) {
             },
           ]}
         >
-          {item?.Vehicle[0]?.driver_name}
+          {item?.driver_name}
         </Text>
       </TouchableOpacity>
     );
@@ -149,7 +170,7 @@ export default function TransferList({ navigation, route }) {
         }}
         onPress={() => {
           setCheckVehicle([index]);
-          setCheckDriver([index]);
+          // setCheckDriver([index]);
         }}
       >
         <Text
@@ -161,7 +182,7 @@ export default function TransferList({ navigation, route }) {
             },
           ]}
         >
-          {item?.Vehicle[0]?.VEHICLE_INFO}
+          {item?.VEHICLE_INFO}
         </Text>
       </TouchableOpacity>
     );
@@ -244,7 +265,7 @@ export default function TransferList({ navigation, route }) {
                   }} />
               </View>
               <FlatList
-                data={vehicleList}
+                data={DriverList}
                 renderItem={DriverView}
                 keyExtractor={(item, index) => index.toString()}
               />

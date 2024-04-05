@@ -199,9 +199,17 @@ export default function Main({ navigation, route }) {
               flexDirection: 'row',
               alignItems: 'center',
               marginTop: verticalScale(45),
+              marginBottom: verticalScale(45),
             }}>
             <Text style={[text, { fontSize: 25 }]}>{parameter.vehicle?.VEHICLE_INFO}</Text>
+
           </View>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('InOut')}
+            style={button}>
+            <Text style={buttonText}>In/Out</Text>
+          </TouchableOpacity>
+
         </View>
       </View>
       <Modal transparent={true} visible={onLogOut} style={{ position: 'absolute', width: '100%' }}>

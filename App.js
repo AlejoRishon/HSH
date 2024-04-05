@@ -13,6 +13,7 @@ import TransferList from './components/TransferList';
 import MasterLogin from './components/MasterLogin';
 import DieselTransferList from './components/DieselTransferList';
 import DieselOutTransfer from './components/DieselOutTransfer';
+import InOut from './components/InOut';
 import auth from '@react-native-firebase/auth';
 import { setUserDetail } from './components/functions/helper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -55,6 +56,7 @@ const App = () => {
         <Stack.Screen name="DeliveryOrder" component={DeliveryOrder} />
         <Stack.Screen name="EditTrip" component={EditTrip} />
         <Stack.Screen name="AdHocService" component={AdHocService} />
+        <Stack.Screen name='InOut' component={InOut} />
         <Stack.Screen name='TransferList' component={TransferList} />
         <Stack.Screen name='MasterLogin' component={MasterLogin} />
         <Stack.Screen name='DieselTransferList' component={DieselTransferList} />

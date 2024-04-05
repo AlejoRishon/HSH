@@ -88,7 +88,7 @@ export default function DeliveryOrder({ navigation, route }) {
   const [printModal, setprintModal] = useState([]);
 
   const printHTML = async () => {
-    console.log(route.params.PLATE_NO);
+    console.log(route.params);
     try {
       check(PERMISSIONS.ANDROID.BLUETOOTH_CONNECT)
         .then((result) => {
@@ -230,9 +230,8 @@ export default function DeliveryOrder({ navigation, route }) {
        ${OFF_CENTER}<D>${route?.params?.invData.DISPLAY_NAME}</D>
        ${OFF_CENTER}<D>UOM: Litre</D>\n
        ${OFF_CENTER}<D>QTY: ${BOLD_ON}${dieselValueCopy.current}${BOLD_OFF}</D>\n
-       ${OFF_CENTER}<D>AMOUNT: $${route?.params?.invData.UNIT_AMT}</D>\n
-       ${OFF_CENTER}<D>ZERO-RATED: $ 00.0</D>
-       ${OFF_CENTER}<D>TAXABLE: $ ${route?.params?.invData.TAXABLE_AMT}</D>
+       ${OFF_CENTER}<D>UNIT PRICE: $${route?.params?.invData.UNIT_AMT}</D>\n
+       ${OFF_CENTER}<D>SUB TOTAL: $ ${route?.params?.invData.TAXABLE_AMT}</D>
        ${OFF_CENTER}<D>9% GST: $ ${route?.params?.invData.VAT_AMT}</D>
        ${OFF_CENTER}<D>TOTAl: $ ${route?.params?.invData.TOTAL_PAYABLE}</D>\n
        ${OFF_CENTER}<D>Remarks: ${remark == null ? '' : remark.replaceAll('\n', " ")}</D>\n\n\n`);
@@ -712,6 +711,7 @@ export default function DeliveryOrder({ navigation, route }) {
     setDieselValue(route?.params?.invData.qty_order);
     dieselValueCopy.current = route?.params?.invData.qty_order;
     signatureURLCopy.current = "https://hsh.vellas.net:90/hshpump/signature/JOB_ORDER/" + route?.params?.invData.UID + "/Signature.png";
+    console.log(signatureURLCopy.current)
     setRemark(route?.params?.invData.REMARK);
     editable ?
       setshowInput(true) : setshowInput(false);
@@ -787,15 +787,6 @@ export default function DeliveryOrder({ navigation, route }) {
           </View>
           <ScrollView style={{ width: editable ? '55%' : '100%' }}>
             <View>
-              {/* <Text
-                style={{
-                  fontSize: width / 40,
-                  color: '#01315C',
-                  fontWeight: 600,
-                  marginBottom: 5,
-                }}>
-                {route?.params?.invData.DRIVER_NAME}
-              </Text> */}
               <Text
                 style={{
                   fontSize: width / 40,

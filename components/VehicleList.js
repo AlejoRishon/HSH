@@ -15,7 +15,8 @@ import { setVehicle } from './functions/helper';
 import { useTranslation } from 'react-i18next';
 import { horizontalScale, moderateScale, verticalScale } from './styles/Metrics';
 import { ActivityIndicator, MD2Colors } from 'react-native-paper';
-import { getDomain } from './functions/helper';
+import { getDomain, getlogUser, getlogUserFull } from './functions/helper';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
@@ -56,7 +57,16 @@ export default function VehicleList({ navigation }) {
     try {
       const response = await fetch(domain + '/GetVehicleList?_token=4B3B5C99-57E8-4593-A0AD-3D4EEA3C2F53');
       const json = await response.json();
-      setListData(json);
+      console.log(JSON.stringify(json));
+      const logUser = getlogUserFull();
+      var logDriver = json.filter(val => val.driver_id == logUser.CID);
+
+      var b = [];
+      logDriver[0].Vehicle.map((val, index) => {
+        b.push({ "VEHICLE_INFO": val.VEHICLE_INFO, driver_id: logDriver[0].Vehicle[0].driver_id, driver_name: logDriver[0].Vehicle[0].driver_name, id: index })
+      })
+      console.log("b", JSON.stringify(b));
+      setListData(b);
       setLoading(false)
     } catch (error) {
       console.error(error);
@@ -64,27 +74,44 @@ export default function VehicleList({ navigation }) {
     }
   }
 
-  useEffect(() => { getVehicleList() }, [])
+  useEffect(() => { getVehicleList(); }, [])
+  const extractUniqueVehicleInfo = (data) => {
+    const uniqueVehicleInfo = new Set(); // Using Set to ensure uniqueness
 
+
+    // Loop through the JSON data and extract unique VEHICLE_INFO values
+    data.forEach(entry => {
+      entry.Vehicle.forEach(vehicle => {
+        uniqueVehicleInfo.add(vehicle.VEHICLE_INFO);
+      });
+    });
+    const logUser = getlogUserFull();
+    console.log("logUser", logUser)
+    var logDriver = data.filter(val => val.driver_id == logUser.CID);
+    console.log("logDriver", logDriver)
+
+    // Convert Set to array
+    return Array.from(uniqueVehicleInfo).map((info, index) => ({ "VEHICLE_INFO": info, driver_id: logDriver[0].driver_id, driver_name: logDriver[0].Vehicle[0].driver_name, id: index }));
+  }
   const ItemView = ({ item }) => {
     return (
       <TouchableOpacity
         style={{ marginVertical: verticalScale(20) }}
         onPress={() => {
 
-          var vehicleData = { ...item?.Vehicle[0], driver_id: item?.driver_id };
+          var vehicleData = { ...item, driver_id: item?.driver_id };
           console.log(vehicleData);
           setselectedVehicle(vehicleData),
             setDriverId(item?.driver_id),
-            setDriverName(item?.Vehicle[0]?.driver_name)
+            setDriverName(item?.driver_name)
         }}>
-        <Text style={[text, { fontSize: moderateScale(18) }]}>{item?.Vehicle[0]?.VEHICLE_INFO}</Text>
+        <Text style={[text, { fontSize: moderateScale(18) }]}>{item?.VEHICLE_INFO}</Text>
       </TouchableOpacity>
     );
   };
 
   const filteredListData = listData.filter((item) =>
-    item?.Vehicle[0]?.VEHICLE_INFO.toLowerCase().includes(search.toLowerCase())
+    item?.VEHICLE_INFO.toLowerCase().includes(search.toLowerCase())
   );
   const [onLogOut, setonLogOut] = useState(false)
   const LogOut = () => {
@@ -133,7 +160,7 @@ export default function VehicleList({ navigation }) {
           data={search ? filteredListData : listData}
           showsVerticalScrollIndicator={true}
           renderItem={ItemView}
-          keyExtractor={item => item?.driver_id}
+          keyExtractor={item => item?.id}
         />
       </View>
       <Modal

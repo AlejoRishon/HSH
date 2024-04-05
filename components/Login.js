@@ -246,19 +246,22 @@ export default function Login({ navigation }) {
                   </Text>
                 </TouchableOpacity>
               </View>
-              <TouchableOpacity
-                style={[button, {
-                  width: horizontalScale(50),
-                  height: verticalScale(70),
-                  padding: 0,
-                  justifyContent: 'center',
-                  marginBottom: 40,
-                  backgroundColor: '#bd2d2d'
-                }]}
-                onPress={() => setonLogOut(true)}
-              >
-                <Text style={[buttonText, { fontSize: moderateScale(10) }]}>Log Out</Text>
-              </TouchableOpacity>
+              <View>
+                <Text style={{ fontSize: moderateScale(10), color: "black", marginBottom: 10 }}>Version 8</Text>
+                <TouchableOpacity
+                  style={[button, {
+                    width: horizontalScale(50),
+                    height: verticalScale(70),
+                    padding: 0,
+                    justifyContent: 'center',
+                    marginBottom: 40,
+                    backgroundColor: '#bd2d2d'
+                  }]}
+                  onPress={() => setonLogOut(true)}
+                >
+                  <Text style={[buttonText, { fontSize: moderateScale(10) }]}>Log Out</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </ImageBackground>
         </ImageBackground>
