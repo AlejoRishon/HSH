@@ -129,6 +129,7 @@ export default function AdHocService({ navigation, route }) {
     try {
       const response = await fetch(domain + `/getBusinessAddressByBusinessId?_token=BDB47BFE-A891-4D77-AFBB-27928083D777&custId=${businessId}`);
       const json = await response.json();
+      console.log("address", json)
       setBusinessAddress(json);
       setLoading(false)
     } catch (error) {

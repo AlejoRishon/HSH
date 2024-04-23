@@ -48,8 +48,9 @@ export default function DieselTransfer({ navigation }) {
     try {
       const response = await fetch(domain + '/GetVehicleList?_token=4B3B5C99-57E8-4593-A0AD-3D4EEA3C2F53');
       const json = await response.json();
-      console.log(json)
-      var filteredList = json.filter(val => val.Vehicle[0].VEHICLE_INFO !== parameter.vehicle.VEHICLE_INFO)
+      console.log(JSON.stringify(json))
+      var filteredList = extractUniqueVehicleInfo(json)
+      // var filteredList = json.filter(val => val.Vehicle[0].VEHICLE_INFO !== parameter.vehicle.VEHICLE_INFO)
       setListData(filteredList);
       // setLoading(false)
     } catch (error) {
@@ -96,14 +97,26 @@ export default function DieselTransfer({ navigation }) {
     getWareHouseList()
     getWareHouseProductList()
   }, [])
+  const extractUniqueVehicleInfo = (data) => {
+    const uniqueVehicleInfo = new Set(); // Using Set to ensure uniqueness
 
+
+    // Loop through the JSON data and extract unique VEHICLE_INFO values
+    data.forEach(entry => {
+      entry.Vehicle.forEach(vehicle => {
+        uniqueVehicleInfo.add(vehicle.VEHICLE_INFO);
+      });
+    });
+    // Convert Set to array
+    return Array.from(uniqueVehicleInfo).map((info, index) => ({ "VEHICLE_INFO": info, id: index }));
+  }
   const ItemView = ({ item, index }) => {
     return (
       <TouchableOpacity
         style={{ marginVertical: verticalScale(20), flexDirection: 'row' }}
-        onPress={() => { setCheckDriver([index]), setproductListVisible(true); setShowList(false); setCheckVehicle(item?.Vehicle[0]?.VEHICLE_INFO) }}
+        onPress={() => { setCheckDriver([index]), setproductListVisible(true); setShowList(false); setCheckVehicle(item.VEHICLE_INFO) }}
       >
-        <Text style={[text, { fontSize: moderateScale(15) }]}>{item?.Vehicle[0]?.VEHICLE_INFO}</Text>
+        <Text style={[text, { fontSize: moderateScale(15) }]}>{item.VEHICLE_INFO}</Text>
         {/* {checkDriver.includes(index) ? <Check name="md-checkmark-sharp" color="green" size={28} /> : <></>} */}
       </TouchableOpacity>
     );
@@ -140,7 +153,6 @@ export default function DieselTransfer({ navigation }) {
       .then(response => response.json())
       .then(result => {
         console.log(result);
-        // Alert.alert('Success')
         setshowInput(false);
         setshowConfirm(true);
         setCheckVehicle('');
