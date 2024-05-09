@@ -247,7 +247,7 @@ export default function Login({ navigation }) {
                 </TouchableOpacity>
               </View>
               <View>
-                <Text style={{ fontSize: moderateScale(10), color: "black", marginBottom: 10 }}>Version 9</Text>
+                <Text style={{ fontSize: moderateScale(10), color: "black", marginBottom: 10 }}>Version 10</Text>
                 <TouchableOpacity
                   style={[button, {
                     width: horizontalScale(50),

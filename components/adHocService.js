@@ -86,7 +86,7 @@ export default function AdHocService({ navigation, route }) {
   const showNameModal = () => setNameVisible(true);
   const hideNameModal = () => setNameVisible(false)
   const [signatureURL, setsignatureURL] = useState("");
-
+  const [latestJob, setlatestJob] = useState({});
   const showAddressModal = () => setAddressVisible(true);
   const hideAddressModal = () => setAddressVisible(false)
 
@@ -261,6 +261,7 @@ export default function AdHocService({ navigation, route }) {
 
           }
           printHTML(INV_NO);
+          setlatestJob(auid[0])
         }
         else {
           setLoading(false);
@@ -575,7 +576,18 @@ export default function AdHocService({ navigation, route }) {
       alert("device list failed catch block " + e)
     }
   }
+  const getCurrentDate = () => {
+    var date = new Date();
 
+    // Get the date components
+    var day = date.getDate().toString().padStart(2, '0');
+    var month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is zero-indexed
+    var year = date.getFullYear();
+
+    // Concatenate the components in the desired format
+    var englishDateString = day + '/' + month + '/' + year;
+    return englishDateString
+  }
   const _connectPrinter = (printer) => {
     //connect printer
     // alert('priniting in ' + printer.inner_mac_address);
@@ -607,7 +619,8 @@ export default function AdHocService({ navigation, route }) {
        ${setLeftMarginCommand}${setRightMarginCommand}<M>9 Jalan Besut Singapore 619563</M>
        ${setLeftMarginCommand}${setRightMarginCommand}<M>Tel: 6261-6101 Fax: 6261-1037</M>
        ${setLeftMarginCommand}${setRightMarginCommand}<M>${BOLD_ON}Do no: ${jobNumber}${BOLD_OFF}</M>
-       ${setLeftMarginCommand}${setRightMarginCommand}<M>Date: ${new Date().toLocaleDateString()}</M>\n
+       ${setLeftMarginCommand}${setRightMarginCommand}<M>Sales Rep: ${latestJob.SALES_PERSON_NAME}</M>
+       ${setLeftMarginCommand}${setRightMarginCommand}<M>Date: ${getCurrentDate()}</M>\n
        ${setLeftMarginCommand}${setRightMarginCommand}<D>${BOLD_ON}To: ${name}${BOLD_OFF}</D>\n
        ${OFF_CENTER}<D>Site: ${address == null ? '' : address.replaceAll('\n', " ")}</D>\n
        ${OFF_CENTER}<D>Product: \n </D>
@@ -635,6 +648,7 @@ export default function AdHocService({ navigation, route }) {
 
         BLEPrinter.printText(`${CENTER}${BOLD_ON}<D>Thank You</D>${BOLD_OFF}\n\n`);
         setprintModal(false);
+        setvisiblePint(true);
       }
       ).catch(e => {
         alert("connecting failed then catch block " + e)
