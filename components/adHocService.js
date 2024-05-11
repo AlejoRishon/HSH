@@ -615,6 +615,7 @@ export default function AdHocService({ navigation, route }) {
           },
         );
         BLEPrinter.printText(`${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<M>Hock Seng Heng Transport & Trading Pte Ltd. </M>${BOLD_OFF}\n
+        ${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<D>${vehicleData.vehicle.VEHICLE_INFO}</D>${BOLD_OFF}\n
        ${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<D>Delivery Order</D>${BOLD_OFF}\n
        ${setLeftMarginCommand}${setRightMarginCommand}<M>9 Jalan Besut Singapore 619563</M>
        ${setLeftMarginCommand}${setRightMarginCommand}<M>Tel: 6261-6101 Fax: 6261-1037</M>
