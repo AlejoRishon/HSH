@@ -615,6 +615,7 @@ export default function AdHocService({ navigation, route }) {
           },
         );
         BLEPrinter.printText(`${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<M>Hock Seng Heng Transport & Trading Pte Ltd. </M>${BOLD_OFF}\n
+        ${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<D>${vehicleData.vehicle.VEHICLE_INFO}</D>${BOLD_OFF}\n
        ${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<D>Delivery Order</D>${BOLD_OFF}\n
        ${setLeftMarginCommand}${setRightMarginCommand}<M>9 Jalan Besut Singapore 619563</M>
        ${setLeftMarginCommand}${setRightMarginCommand}<M>Tel: 6261-6101 Fax: 6261-1037</M>
@@ -624,7 +625,7 @@ export default function AdHocService({ navigation, route }) {
        ${setLeftMarginCommand}${setRightMarginCommand}<D>${BOLD_ON}To: ${name}${BOLD_OFF}</D>\n
        ${OFF_CENTER}<D>Site: ${address == null ? '' : address.replaceAll('\n', " ")}</D>\n
        ${OFF_CENTER}<D>Product: \n </D>
-       ${OFF_CENTER}<D>${product}</D>
+       ${OFF_CENTER}<D>D004 - ${product}</D>
        ${OFF_CENTER}<D>UOM: Litre</D>\n
        ${OFF_CENTER}<D>QTY: ${BOLD_ON}${diesel}${BOLD_OFF}</D>\n
        ${OFF_CENTER}<D>UNIT PRICE: $ ${unitcost}</D>\n
