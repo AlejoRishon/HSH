@@ -625,7 +625,7 @@ export default function AdHocService({ navigation, route }) {
        ${setLeftMarginCommand}${setRightMarginCommand}<D>${BOLD_ON}To: ${name}${BOLD_OFF}</D>\n
        ${OFF_CENTER}<D>Site: ${address == null ? '' : address.replaceAll('\n', " ")}</D>\n
        ${OFF_CENTER}<D>Product: \n </D>
-       ${OFF_CENTER}<D>D004 - ${product}</D>
+       ${OFF_CENTER}<D>${product}</D>
        ${OFF_CENTER}<D>UOM: Litre</D>\n
        ${OFF_CENTER}<D>QTY: ${BOLD_ON}${diesel}${BOLD_OFF}</D>\n
        ${OFF_CENTER}<D>UNIT PRICE: $ ${unitcost}</D>\n
