@@ -597,6 +597,8 @@ export default function AdHocService({ navigation, route }) {
     try {
       var totalval = parseFloat(unitcost) * parseFloat(diesel);
       var gstval = (0.09 * totalval).toFixed(2);
+
+      
       const BOLD_ON = COMMANDS.TEXT_FORMAT.TXT_BOLD_ON;
       const BOLD_OFF = COMMANDS.TEXT_FORMAT.TXT_BOLD_OFF;
       const CENTER = COMMANDS.TEXT_FORMAT.TXT_ALIGN_CT;
@@ -628,10 +630,10 @@ export default function AdHocService({ navigation, route }) {
        ${OFF_CENTER}<D>${product}</D>
        ${OFF_CENTER}<D>UOM: Litre</D>\n
        ${OFF_CENTER}<D>QTY: ${BOLD_ON}${diesel}${BOLD_OFF}</D>\n
-       ${OFF_CENTER}<D>UNIT PRICE: $ ${unitcost}</D>\n
-       ${OFF_CENTER}<D>SUB TOTAL: $ ${totalval}</D>
-       ${OFF_CENTER}<D>9% GST: $ ${gstval}</D>
-       ${OFF_CENTER}<D>TOTAL: $ ${parseFloat(totalval) + parseFloat(gstval)}</D>\n
+       ${OFF_CENTER}<D>UNIT PRICE: $ ${parseFloat(unitcost).toFixed(3)}</D>\n
+       ${OFF_CENTER}<D>SUB TOTAL: $ ${(parseFloat(unitcost) * parseFloat(diesel)).toFixed(2)}</D>
+       ${OFF_CENTER}<D>9% GST: $ ${(parseFloat(unitcost) * parseFloat(diesel)*0.09).toFixed(2)}</D>
+       ${OFF_CENTER}<D>TOTAL: $ ${((parseFloat(unitcost) * parseFloat(diesel)) + (parseFloat(unitcost) * parseFloat(diesel)*0.09)).toFixed(2)}</D>\n
        ${OFF_CENTER}<D>Remarks: ${remark == null ? '' : remark.replaceAll('\n', " ")}</D>\n\n\n`);
         if (signatureURL) {
           BLEPrinter.printImage(
