@@ -134,7 +134,7 @@ export default function DeliveryOrder({ navigation, route }) {
             setOrderList(json);
 
             var totalLitres = 0;
-            const transformedData = json?.map(item => {
+            const transformedData = removeDuplicatesAndMerge(json)?.map(item => {
               totalLitres += parseFloat(item?.qty_order);
               return [
                 'Transfer',
@@ -142,7 +142,6 @@ export default function DeliveryOrder({ navigation, route }) {
                 `${item?.NAME} \n ${item?.PRINT_ADDRESS}`,
                 item?.qty_order,
                 item?.JOB_STATUS_DESC,
-
               ]
             })
             setTotalLitres(totalLitres);
@@ -186,6 +185,38 @@ export default function DeliveryOrder({ navigation, route }) {
       }
     });
   }
+  
+  function removeDuplicatesAndMerge(arr) {
+    const uniqueObjects = {};
+
+    // Iterate through the array
+    arr.forEach(obj => {
+        // Check if UID already exists in uniqueObjects
+        if (!uniqueObjects[obj.UID]) {
+            // If UID doesn't exist, add the object
+            uniqueObjects[obj.UID] = obj;
+        } else {
+            // If UID exists, merge the objects
+            const existingObj = uniqueObjects[obj.UID];
+            // Give preference to fields from the first object
+            Object.keys(obj).forEach(key => {
+                // Only merge if the field is not already present in the existing object
+                if (!existingObj.hasOwnProperty(key) && key !== 'UNIT_AMT') {
+                    existingObj[key] = obj[key];
+                }
+            });
+            // Give preference to UNIT_AMT from the second object
+            if (obj.hasOwnProperty('UNIT_AMT')) {
+                existingObj['UNIT_AMT'] = obj['UNIT_AMT'];
+            }
+        }
+    });
+
+    // Convert uniqueObjects back to an array
+    const uniqueArray = Object.values(uniqueObjects);
+
+    return uniqueArray;
+}
 
   const statusColor = {
     Pending: { text: '#EA631D', button: 'rgba(255, 181, 114, 0.47)' },
