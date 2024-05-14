@@ -232,7 +232,6 @@ export default function DeliveryOrder({ navigation, route }) {
        ${OFF_CENTER}<D>UOM: Litre</D>\n
        ${OFF_CENTER}<D>QTY: ${BOLD_ON}${dieselValueCopy.current}${BOLD_OFF}</D>\n
        ${OFF_CENTER}<D>UNIT PRICE: $${route?.params?.invData.UNIT_AMT}</D>\n
-       ${OFF_CENTER}<D>Transport Fee: $${route?.params?.invData.UNIT_AMT}</D>\n
        ${OFF_CENTER}<D>SUB TOTAL: $ ${route?.params?.invData.TAXABLE_AMT}</D>
        ${OFF_CENTER}<D>9% GST: $ ${route?.params?.invData.VAT_AMT}</D>
        ${OFF_CENTER}<D>TOTAl: $ ${route?.params?.invData.TOTAL_PAYABLE}</D>\n
