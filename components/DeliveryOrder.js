@@ -91,6 +91,7 @@ export default function DeliveryOrder({ navigation, route }) {
   };
 
 
+  useEffect(() => {console.log("This is unique object array ---->",uniqueOrdersArray);}, [uniqueOrdersArray])
 
   useEffect(() => {
     getDeliveryOrder(formatDate(new Date()))
@@ -509,7 +510,7 @@ export default function DeliveryOrder({ navigation, route }) {
                     address1: orderList[0]?.ADDRESS2,
                     address2: orderList[0]?.PRINT_ADDRESS,
                     PLATE_NO: parameter.vehicle.VEHICLE_INFO,
-                    invData: orderList.find((val) => val.INV_NO === rowData[1]), // this will only send the first one // so no issue
+                    invData: uniqueOrdersArray.find((val) => val.INV_NO === rowData[1]), // this will only send the first one // so no issue
                     products: uniqueOrdersArray.find(val => val.INV_NO === rowData[1]).products
                   });
                 }}>
