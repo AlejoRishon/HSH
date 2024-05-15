@@ -229,7 +229,7 @@ export default function DeliveryOrder({ navigation, route }) {
        ${OFF_CENTER}<D>Site: ${route?.params?.invData.ADDRESS2.replaceAll('\n', " ")}</D>\n
        ${OFF_CENTER}<D>Product: \n </D>`)
 
-       await route?.params?.products.forEach(product => {
+       route?.params?.products.reverse().forEach(product => {
         BLEPrinter.printText(`${OFF_CENTER}<D>${product.DISPLAY_NAME}</D>\n
         ${OFF_CENTER}<D>UOM: ${product.UOM_CODE}</D>\n
         ${OFF_CENTER}<D>QTY: ${BOLD_ON}${product.QTY}${BOLD_OFF}</D>\n
