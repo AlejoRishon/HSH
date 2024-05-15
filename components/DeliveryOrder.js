@@ -52,6 +52,7 @@ export default function DeliveryOrder({ navigation, route }) {
   const [dateInput, setDateInput] = useState(new Date());
   const [formattedDate, setFormattedDate] = useState('');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [uniqueOrdersArray, setUniqueOrdersArray] = useState([])
 
   const showDatePicker = () => {
     console.log(parameter)
@@ -113,6 +114,25 @@ export default function DeliveryOrder({ navigation, route }) {
 
   }, [])
 
+  const removeDuplicates = (array) => {
+        var uniqueUIDs = [];
+        var uniqueArray = [];
+        array.forEach(val => {
+        var pos = uniqueUIDs.indexOf(val.UID);
+          if( pos == -1)
+          {
+              val.products=[{DISPLAY_NAME:val.DISPLAY_NAME, UNIT_AMT:val.UNIT_AMT, UOM_CODE: val.UOM_CODE, QTY:val.qty_order}]; // adding the properties here.
+              uniqueArray.push(val);
+              uniqueUIDs.push(val.UID);
+          }
+          else
+          {
+              uniqueArray[pos].products.push({DISPLAY_NAME:val.DISPLAY_NAME, UNIT_AMT:val.UNIT_AMT, UOM_CODE: val.UOM_CODE, QTY:val.qty_order});
+          }
+        })
+        setUniqueOrdersArray(uniqueArray)
+        return uniqueArray
+  }
   const getDeliveryOrder = async (sdate) => {
     setChecked([])
     setLoading(true);
@@ -134,7 +154,7 @@ export default function DeliveryOrder({ navigation, route }) {
             setOrderList(json);
 
             var totalLitres = 0;
-            const transformedData = removeDuplicatesAndMerge(json)?.map(item => {
+            const transformedData = removeDuplicates(json)?.map(item => {
               totalLitres += parseFloat(item?.qty_order);
               return [
                 'Transfer',
@@ -186,37 +206,7 @@ export default function DeliveryOrder({ navigation, route }) {
     });
   }
   
-  function removeDuplicatesAndMerge(arr) {
-    const uniqueObjects = {};
-
-    // Iterate through the array
-    arr.forEach(obj => {
-        // Check if UID already exists in uniqueObjects
-        if (!uniqueObjects[obj.UID]) {
-            // If UID doesn't exist, add the object
-            uniqueObjects[obj.UID] = obj;
-        } else {
-            // If UID exists, merge the objects
-            const existingObj = uniqueObjects[obj.UID];
-            // Give preference to fields from the first object
-            Object.keys(obj).forEach(key => {
-                // Only merge if the field is not already present in the existing object
-                if (!existingObj.hasOwnProperty(key) && key !== 'UNIT_AMT') {
-                    existingObj[key] = obj[key];
-                }
-            });
-            // Give preference to UNIT_AMT from the second object
-            if (obj.hasOwnProperty('UNIT_AMT')) {
-                existingObj['UNIT_AMT'] = obj['UNIT_AMT'];
-            }
-        }
-    });
-
-    // Convert uniqueObjects back to an array
-    const uniqueArray = Object.values(uniqueObjects);
-
-    return uniqueArray;
-}
+  
 
   const statusColor = {
     Pending: { text: '#EA631D', button: 'rgba(255, 181, 114, 0.47)' },
@@ -519,7 +509,8 @@ export default function DeliveryOrder({ navigation, route }) {
                     address1: orderList[0]?.ADDRESS2,
                     address2: orderList[0]?.PRINT_ADDRESS,
                     PLATE_NO: parameter.vehicle.VEHICLE_INFO,
-                    invData: orderList.find((val) => val.INV_NO === rowData[1])
+                    invData: orderList.find((val) => val.INV_NO === rowData[1]), // this will only send the first one // so no issue
+                    products: uniqueOrdersArray.find(val => val.INV_NO === rowData[1]).products
                   });
                 }}>
                 <TableWrapper key={index} style={{ flexDirection: 'row', alignItems: 'flex-start' }}>

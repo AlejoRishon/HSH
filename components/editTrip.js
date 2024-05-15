@@ -42,7 +42,7 @@ import {
 import DialogComp from './DialogComp'
 const { width } = Dimensions.get('window');
 export default function DeliveryOrder({ navigation, route }) {
-  console.log("This is the invoice data ===>---->",route?.params?.invData);
+  console.log("This is the products data ===>---->",route?.params?.products);
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false)
   const editable = route?.params?.invData.JOB_STATUS_DESC !== 'Pending' && route?.params?.invData.JOB_STATUS_DESC !== 'Delivered' ? false : true;
@@ -227,12 +227,17 @@ export default function DeliveryOrder({ navigation, route }) {
        ${setLeftMarginCommand}${setRightMarginCommand}<M>Date: ${route?.params?.invData.REC_DATE}</M>\n
        ${setLeftMarginCommand}${setRightMarginCommand}<D>${BOLD_ON}To: ${route?.params?.invData.NAME}${BOLD_OFF}</D>\n
        ${OFF_CENTER}<D>Site: ${route?.params?.invData.ADDRESS2.replaceAll('\n', " ")}</D>\n
-       ${OFF_CENTER}<D>Product: \n </D>
-       ${OFF_CENTER}<D>${route?.params?.invData.DISPLAY_NAME}</D>
-       ${OFF_CENTER}<D>UOM: Litre</D>\n
-       ${OFF_CENTER}<D>QTY: ${BOLD_ON}${dieselValueCopy.current}${BOLD_OFF}</D>\n
-       ${OFF_CENTER}<D>UNIT PRICE: $${route?.params?.invData.UNIT_AMT}</D>\n
-       ${OFF_CENTER}<D>SUB TOTAL: $ ${route?.params?.invData.TAXABLE_AMT}</D>
+       ${OFF_CENTER}<D>Product: \n </D>`)
+
+       // Loop through products and print their details
+      route?.params?.products.forEach(product => {
+        BLEPrinter.printText(`${OFF_CENTER}<D>${product.DISPLAY_NAME}</D>\n
+        ${OFF_CENTER}<D>UOM: ${product.UOM_CODE}</D>\n
+        ${OFF_CENTER}<D>QTY: ${BOLD_ON}${product.QTY}${BOLD_OFF}</D>\n
+        ${OFF_CENTER}<D>UNIT PRICE: $${product.UNIT_AMT}</D>\n`);
+      });
+      
+       BLEPrinter.printText(`${OFF_CENTER}<D>SUB TOTAL: $ ${route?.params?.invData.TAXABLE_AMT}</D>
        ${OFF_CENTER}<D>9% GST: $ ${route?.params?.invData.VAT_AMT}</D>
        ${OFF_CENTER}<D>TOTAl: $ ${route?.params?.invData.TOTAL_PAYABLE}</D>\n
        ${OFF_CENTER}<D>Remarks: ${remark == null ? '' : remark.replaceAll('\n', " ")}</D>\n\n\n`);
