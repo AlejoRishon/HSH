@@ -42,7 +42,7 @@ import {
 import DialogComp from './DialogComp'
 const { width } = Dimensions.get('window');
 export default function DeliveryOrder({ navigation, route }) {
-  console.log("This is the products data ===>---->",route?.params?.products);
+  // console.log("This is the Invoice data ----->===>---->",route?.params?.invData);
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false)
   const editable = route?.params?.invData.JOB_STATUS_DESC !== 'Pending' && route?.params?.invData.JOB_STATUS_DESC !== 'Delivered' ? false : true;
@@ -205,7 +205,7 @@ export default function DeliveryOrder({ navigation, route }) {
 
       // Set right margin to 0
       const setRightMarginCommand = '\x1b\x51\x00';
-      BLEPrinter.connectPrinter(printer.inner_mac_address).then((data) => {
+      BLEPrinter.connectPrinter(printer.inner_mac_address).then(async(data) => {
         BLEPrinter.printImage(
           `https://vellas.net/wp-content/uploads/2024/01/hshlogo3-1.webp`,
           {
@@ -229,8 +229,7 @@ export default function DeliveryOrder({ navigation, route }) {
        ${OFF_CENTER}<D>Site: ${route?.params?.invData.ADDRESS2.replaceAll('\n', " ")}</D>\n
        ${OFF_CENTER}<D>Product: \n </D>`)
 
-       // Loop through products and print their details
-      route?.params?.products.forEach(product => {
+       await route?.params?.products.forEach(product => {
         BLEPrinter.printText(`${OFF_CENTER}<D>${product.DISPLAY_NAME}</D>\n
         ${OFF_CENTER}<D>UOM: ${product.UOM_CODE}</D>\n
         ${OFF_CENTER}<D>QTY: ${BOLD_ON}${product.QTY}${BOLD_OFF}</D>\n
@@ -711,6 +710,14 @@ export default function DeliveryOrder({ navigation, route }) {
   }
 
   const handleGetInputDiesel = (value) => { setDieselValue(value); }
+
+  useEffect(() => {
+    console.log("These are the amounts we recieve: ----->",{
+      "SUBTOTAL": route?.params?.invData.TAXABLE_AMT,
+      "9%Tax": route?.params?.invData.VAT_AMT,
+      "Total": route?.params?.invData.TOTAL_PAYABLE,
+    })
+  }, [])
 
   useEffect(() => {
     getFiles(route?.params?.invData.UID);

@@ -91,7 +91,7 @@ export default function DeliveryOrder({ navigation, route }) {
   };
 
 
-  useEffect(() => {console.log("This is unique object array ---->",uniqueOrdersArray);}, [uniqueOrdersArray])
+  // useEffect(() => {console.log("This is unique object array ---->",uniqueOrdersArray);}, [uniqueOrdersArray])
 
   useEffect(() => {
     getDeliveryOrder(formatDate(new Date()))
@@ -153,7 +153,7 @@ export default function DeliveryOrder({ navigation, route }) {
               AsyncStorage.setItem('JOBDATA', JSON.stringify(json));
             }
             setOrderList(json);
-
+            console.log("Orders ----------------->", json)
             var totalLitres = 0;
             const transformedData = removeDuplicates(json)?.map(item => {
               totalLitres += parseFloat(item?.qty_order);
