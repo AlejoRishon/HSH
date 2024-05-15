@@ -42,7 +42,7 @@ import {
 import DialogComp from './DialogComp'
 const { width } = Dimensions.get('window');
 export default function DeliveryOrder({ navigation, route }) {
-  // console.log("This is the Invoice data ----->===>---->",route?.params?.invData);
+  console.log("This is the Invoice data ----->===>---->",route?.params?.invData.products);
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false)
   const editable = route?.params?.invData.JOB_STATUS_DESC !== 'Pending' && route?.params?.invData.JOB_STATUS_DESC !== 'Delivered' ? false : true;
@@ -202,6 +202,7 @@ export default function DeliveryOrder({ navigation, route }) {
       const OFF_CENTER = COMMANDS.TEXT_FORMAT.TXT_ALIGN_LT;
       const LEFT_MARGIN = COMMANDS.MARGINS.LEFT;
       const setLeftMarginCommand = '\x1b\x6c\x00';
+      const productArray = route?.params?.products
 
       // Set right margin to 0
       const setRightMarginCommand = '\x1b\x51\x00';
@@ -217,7 +218,7 @@ export default function DeliveryOrder({ navigation, route }) {
         //   imageWidth: 300,
         //   imageHeight: 300,
         // });
-        BLEPrinter.printText(`${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<M>Hock Seng Heng Transport & Trading Pte Ltd. </M>${BOLD_OFF}\n
+       await BLEPrinter.printText(`${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<M>Hock Seng Heng Transport & Trading Pte Ltd. </M>${BOLD_OFF}\n
        ${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<D>${route?.params?.PLATE_NO}</D>${BOLD_OFF}\n
        ${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<D>Delivery Order</D>${BOLD_OFF}\n
        ${setLeftMarginCommand}${setRightMarginCommand}<M>9 Jalan Besut Singapore 619563</M>
@@ -229,14 +230,20 @@ export default function DeliveryOrder({ navigation, route }) {
        ${OFF_CENTER}<D>Site: ${route?.params?.invData.ADDRESS2.replaceAll('\n', " ")}</D>\n
        ${OFF_CENTER}<D>Product: \n </D>`)
 
-       route?.params?.products.reverse().forEach(product => {
-        BLEPrinter.printText(`${OFF_CENTER}<D>${product.DISPLAY_NAME}</D>\n
-        ${OFF_CENTER}<D>UOM: ${product.UOM_CODE}</D>\n
-        ${OFF_CENTER}<D>QTY: ${BOLD_ON}${product.QTY}${BOLD_OFF}</D>\n
-        ${OFF_CENTER}<D>UNIT PRICE: $${product.UNIT_AMT}</D>\n`);
-      });
+      //  await route?.params?.products.forEach(product => {
+        // BLEPrinter.printText(`${OFF_CENTER}<D>${product.DISPLAY_NAME}</D>\n
+        // ${OFF_CENTER}<D>UOM: ${product.UOM_CODE}</D>\n
+        // ${OFF_CENTER}<D>QTY: ${BOLD_ON}${product.QTY}${BOLD_OFF}</D>\n
+        // ${OFF_CENTER}<D>UNIT PRICE: $${product.UNIT_AMT}</D>\n`);
+      // });
+      for(let i = 0; i < productArray.length; i++) {
+         BLEPrinter.printText(`${OFF_CENTER}<D>${productArray.DISPLAY_NAME}</D>\n
+        ${OFF_CENTER}<D>UOM: ${productArray.UOM_CODE}</D>\n
+        ${OFF_CENTER}<D>QTY: ${BOLD_ON}${productArray.QTY}${BOLD_OFF}</D>\n
+        ${OFF_CENTER}<D>UNIT PRICE: $${productArray.UNIT_AMT}</D>\n`);
+      }
       
-       BLEPrinter.printText(`${OFF_CENTER}<D>SUB TOTAL: $ ${route?.params?.invData.TAXABLE_AMT}</D>
+      await BLEPrinter.printText(`${OFF_CENTER}<D>SUB TOTAL: $ ${route?.params?.invData.TAXABLE_AMT}</D>
        ${OFF_CENTER}<D>9% GST: $ ${route?.params?.invData.VAT_AMT}</D>
        ${OFF_CENTER}<D>TOTAl: $ ${route?.params?.invData.TOTAL_PAYABLE}</D>\n
        ${OFF_CENTER}<D>Remarks: ${remark == null ? '' : remark.replaceAll('\n', " ")}</D>\n\n\n`);
