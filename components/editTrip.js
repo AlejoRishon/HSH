@@ -202,12 +202,11 @@ export default function DeliveryOrder({ navigation, route }) {
       const OFF_CENTER = COMMANDS.TEXT_FORMAT.TXT_ALIGN_LT;
       const LEFT_MARGIN = COMMANDS.MARGINS.LEFT;
       const setLeftMarginCommand = '\x1b\x6c\x00';
-      const productArray = route?.params?.products
 
       // Set right margin to 0
       const setRightMarginCommand = '\x1b\x51\x00';
       BLEPrinter.connectPrinter(printer.inner_mac_address).then(async(data) => {
-        BLEPrinter.printImage(
+        await BLEPrinter.printImage(
           `https://vellas.net/wp-content/uploads/2024/01/hshlogo3-1.webp`,
           {
             imageWidth: 300,
@@ -215,9 +214,11 @@ export default function DeliveryOrder({ navigation, route }) {
           },
         );
         // BLEPrinter.printImageBase64(logoB, {
-        //   imageWidth: 300,
-        //   imageHeight: 300,
-        // });
+          //   imageWidth: 300,
+          //   imageHeight: 300,
+          // });
+       const productArray = route?.params?.products
+       
        await BLEPrinter.printText(`${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<M>Hock Seng Heng Transport & Trading Pte Ltd. </M>${BOLD_OFF}\n
        ${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<D>${route?.params?.PLATE_NO}</D>${BOLD_OFF}\n
        ${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<D>Delivery Order</D>${BOLD_OFF}\n
