@@ -202,11 +202,32 @@ export default function DeliveryOrder({ navigation, route }) {
       const OFF_CENTER = COMMANDS.TEXT_FORMAT.TXT_ALIGN_LT;
       const LEFT_MARGIN = COMMANDS.MARGINS.LEFT;
       const setLeftMarginCommand = '\x1b\x6c\x00';
-
-      // Set right margin to 0
       const setRightMarginCommand = '\x1b\x51\x00';
-      BLEPrinter.connectPrinter(printer.inner_mac_address).then(async(data) => {
-        await BLEPrinter.printImage(
+
+      const productArray = route?.params?.products
+
+      let printTextData = `${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<M>Hock Seng Heng Transport & Trading Pte Ltd. </M>${BOLD_OFF}\n
+      ${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<D>${route?.params?.PLATE_NO}</D>${BOLD_OFF}\n
+      ${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<D>Delivery Order</D>${BOLD_OFF}\n
+      ${setLeftMarginCommand}${setRightMarginCommand}<M>9 Jalan Besut Singapore 619563</M>
+      ${setLeftMarginCommand}${setRightMarginCommand}<M>Tel: 6261-6101 Fax: 6261-1037</M>
+      ${setLeftMarginCommand}${setRightMarginCommand}<M>${BOLD_ON}Do no: ${route?.params?.invData.INV_NO}${BOLD_OFF}</M>
+      ${setLeftMarginCommand}${setRightMarginCommand}<M>Sales Rep: ${route?.params?.invData.SALES_PERSON_NAME}</M>
+      ${setLeftMarginCommand}${setRightMarginCommand}<M>Date: ${route?.params?.invData.REC_DATE}</M>\n
+      ${setLeftMarginCommand}${setRightMarginCommand}<D>${BOLD_ON}To: ${route?.params?.invData.NAME}${BOLD_OFF}</D>\n
+      ${OFF_CENTER}<D>Site: ${route?.params?.invData.ADDRESS2.replaceAll('\n', " ")}</D>\n
+      ${OFF_CENTER}<D>Product: \n </D>`
+
+      for(let i = 0; i<productArray.length; i++) {
+        printTextData += `${OFF_CENTER}<D>${productArray[i].DISPLAY_NAME}</D>\n
+        ${OFF_CENTER}<D>UOM: ${productArray[i].UOM_CODE}</D>\n
+        ${OFF_CENTER}<D>QTY: ${BOLD_ON}${productArray[i].QTY}${BOLD_OFF}</D>\n
+        ${OFF_CENTER}<D>UNIT PRICE: $${productArray[i].UNIT_AMT}</D>\n`
+      }
+      // console.log("Print Text before -----> ----->", printTextData)
+      // Set right margin to 0
+      BLEPrinter.connectPrinter(printer.inner_mac_address).then((data) => {
+        BLEPrinter.printImage(
           `https://vellas.net/wp-content/uploads/2024/01/hshlogo3-1.webp`,
           {
             imageWidth: 300,
@@ -214,37 +235,12 @@ export default function DeliveryOrder({ navigation, route }) {
           },
         );
         // BLEPrinter.printImageBase64(logoB, {
-          //   imageWidth: 300,
-          //   imageHeight: 300,
-          // });
-       const productArray = route?.params?.products
-       
-       await BLEPrinter.printText(`${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<M>Hock Seng Heng Transport & Trading Pte Ltd. </M>${BOLD_OFF}\n
-       ${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<D>${route?.params?.PLATE_NO}</D>${BOLD_OFF}\n
-       ${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<D>Delivery Order</D>${BOLD_OFF}\n
-       ${setLeftMarginCommand}${setRightMarginCommand}<M>9 Jalan Besut Singapore 619563</M>
-       ${setLeftMarginCommand}${setRightMarginCommand}<M>Tel: 6261-6101 Fax: 6261-1037</M>
-       ${setLeftMarginCommand}${setRightMarginCommand}<M>${BOLD_ON}Do no: ${route?.params?.invData.INV_NO}${BOLD_OFF}</M>
-       ${setLeftMarginCommand}${setRightMarginCommand}<M>Sales Rep: ${route?.params?.invData.SALES_PERSON_NAME}</M>
-       ${setLeftMarginCommand}${setRightMarginCommand}<M>Date: ${route?.params?.invData.REC_DATE}</M>\n
-       ${setLeftMarginCommand}${setRightMarginCommand}<D>${BOLD_ON}To: ${route?.params?.invData.NAME}${BOLD_OFF}</D>\n
-       ${OFF_CENTER}<D>Site: ${route?.params?.invData.ADDRESS2.replaceAll('\n', " ")}</D>\n
-       ${OFF_CENTER}<D>Product: \n </D>`)
+        //   imageWidth: 300,
+        //   imageHeight: 300,
+        // });
+       BLEPrinter.printText(printTextData)
 
-      //  await route?.params?.products.forEach(product => {
-        // BLEPrinter.printText(`${OFF_CENTER}<D>${product.DISPLAY_NAME}</D>\n
-        // ${OFF_CENTER}<D>UOM: ${product.UOM_CODE}</D>\n
-        // ${OFF_CENTER}<D>QTY: ${BOLD_ON}${product.QTY}${BOLD_OFF}</D>\n
-        // ${OFF_CENTER}<D>UNIT PRICE: $${product.UNIT_AMT}</D>\n`);
-      // });
-      for(let i = 0; i < productArray.length; i++) {
-         BLEPrinter.printText(`${OFF_CENTER}<D>${productArray.DISPLAY_NAME}</D>\n
-        ${OFF_CENTER}<D>UOM: ${productArray.UOM_CODE}</D>\n
-        ${OFF_CENTER}<D>QTY: ${BOLD_ON}${productArray.QTY}${BOLD_OFF}</D>\n
-        ${OFF_CENTER}<D>UNIT PRICE: $${productArray.UNIT_AMT}</D>\n`);
-      }
-      
-      await BLEPrinter.printText(`${OFF_CENTER}<D>SUB TOTAL: $ ${route?.params?.invData.TAXABLE_AMT}</D>
+       BLEPrinter.printText(`${OFF_CENTER}<D>SUB TOTAL: $ ${route?.params?.invData.TAXABLE_AMT}</D>
        ${OFF_CENTER}<D>9% GST: $ ${route?.params?.invData.VAT_AMT}</D>
        ${OFF_CENTER}<D>TOTAl: $ ${route?.params?.invData.TOTAL_PAYABLE}</D>\n
        ${OFF_CENTER}<D>Remarks: ${remark == null ? '' : remark.replaceAll('\n', " ")}</D>\n\n\n`);
@@ -260,7 +256,6 @@ export default function DeliveryOrder({ navigation, route }) {
               imageHeight: 100,
             },
           );
-
         }
         BLEPrinter.printText(`${CENTER}${BOLD_ON}<D>${OFF_CENTER}Authorised Name,</D>${BOLD_OFF}
         ${CENTER}${BOLD_ON}<D>${OFF_CENTER}Signature & </D>${BOLD_OFF}
