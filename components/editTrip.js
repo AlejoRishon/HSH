@@ -240,7 +240,7 @@ export default function DeliveryOrder({ navigation, route }) {
         printTextData += `${OFF_CENTER}<D>${productArray[i].DISPLAY_NAME}</D>\n
         ${OFF_CENTER}<D>UOM: ${productArray[i].UOM_CODE}</D>\n
         ${OFF_CENTER}<D>QTY: ${BOLD_ON}${productArray[i].QTY}${BOLD_OFF}</D>\n
-        ${OFF_CENTER}<D>UNIT PRICE: $${productArray[i].UNIT_AMT}</D>\n`
+        ${OFF_CENTER}<D>UNIT PRICE: $${productArray[i].UNIT_AMT}</D>\n\n`
       }
       // console.log("Print Text before -----> ----->", printTextData)
       // Set right margin to 0
