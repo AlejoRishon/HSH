@@ -105,6 +105,11 @@ export default function DeliveryOrder({ navigation, route }) {
   const [visiblePint, setvisiblePint] = useState(false);
   const [printModal, setprintModal] = useState([]);
 
+
+  const DiesalQuantityGettingFromRouteParams = useRef(route?.params?.products[0].QTY)
+  console.log("This is the good one qty of diesal +++++++>",DiesalQuantityGettingFromRouteParams.current)
+  
+
   const printHTML = async () => {
     console.log(route.params);
     try {
@@ -237,10 +242,17 @@ export default function DeliveryOrder({ navigation, route }) {
       ${OFF_CENTER}<D>Product: \n </D>`
 
       for(let i = 0; i<productArray.length; i++) {
-        printTextData += `${OFF_CENTER}<D>${productArray[i].DISPLAY_NAME}</D>\n
-        ${OFF_CENTER}<D>UOM: ${productArray[i].UOM_CODE}</D>\n
-        ${OFF_CENTER}<D>QTY: ${BOLD_ON}${productArray[i].QTY}${BOLD_OFF}</D>\n
-        ${OFF_CENTER}<D>UNIT PRICE: $${productArray[i].UNIT_AMT}</D>\n\n`
+        if(!productArray[i].DISPLAY_NAME.includes("SERVICES")) {
+          printTextData += `${OFF_CENTER}<D>${productArray[i].DISPLAY_NAME}</D>\n
+          ${OFF_CENTER}<D>UOM: ${productArray[i].UOM_CODE}</D>\n
+          ${OFF_CENTER}<D>QTY: ${BOLD_ON}${DiesalQuantityGettingFromRouteParams.current}${BOLD_OFF}</D>\n
+          ${OFF_CENTER}<D>UNIT PRICE: $${productArray[i].UNIT_AMT}</D>\n\n`
+        }else {
+          printTextData += `${OFF_CENTER}<D>${productArray[i].DISPLAY_NAME}</D>\n
+          ${OFF_CENTER}<D>UOM: ${productArray[i].UOM_CODE}</D>\n
+          ${OFF_CENTER}<D>QTY: ${BOLD_ON}${productArray[i].QTY}${BOLD_OFF}</D>\n
+          ${OFF_CENTER}<D>UNIT PRICE: $${productArray[i].UNIT_AMT}</D>\n\n`
+        }
       }
       // console.log("Print Text before -----> ----->", printTextData)
       // Set right margin to 0
@@ -556,6 +568,7 @@ export default function DeliveryOrder({ navigation, route }) {
   const PostJobOrderDelivered = (dieselVal) => {
     setLoading(true);
     dieselValueCopy.current = dieselVal;
+    DiesalQuantityGettingFromRouteParams.current = dieselVal
     const userLog = getlogUser();
     const url = domain + "/PostJObOrderDelivered"
     const data = {
@@ -737,13 +750,13 @@ export default function DeliveryOrder({ navigation, route }) {
 
   const handleGetInputDiesel = (value) => { setDieselValue(value); }
 
-  useEffect(() => {
-    console.log("These are the amounts we recieve: ----->",{
-      "SUBTOTAL": route?.params?.invData.TAXABLE_AMT,
-      "9%Tax": route?.params?.invData.VAT_AMT,
-      "Total": route?.params?.invData.TOTAL_PAYABLE,
-    })
-  }, [])
+  // useEffect(() => {
+  //   console.log("These are the amounts we recieve: ----->",{
+  //     "SUBTOTAL": route?.params?.invData.TAXABLE_AMT,
+  //     "9%Tax": route?.params?.invData.VAT_AMT,
+  //     "Total": route?.params?.invData.TOTAL_PAYABLE,
+  //   })
+  // }, [])
 
   useEffect(() => {
     getFiles(route?.params?.invData.UID);
