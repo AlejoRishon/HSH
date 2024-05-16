@@ -41,8 +41,25 @@ import {
 } from 'react-native-thermal-receipt-printer-image-qr';
 import DialogComp from './DialogComp'
 const { width } = Dimensions.get('window');
+
+function moveServicesToEnd(arr) {
+  // Find the index of the object with "SERIVCES" in the DISPLAY_NAME
+  const index = arr.findIndex(item => item.DISPLAY_NAME.includes("SERIVCES"));
+
+  // If the "SERIVCES" item is found in the array
+  if (index !== -1) {
+      // Remove the "SERIVCES" item from its current position
+      const [servicesItem] = arr.splice(index, 1);
+      // Push the "SERIVCES" item to the end of the array
+      arr.push(servicesItem);
+  }
+
+  return arr;
+}
+
+
 export default function DeliveryOrder({ navigation, route }) {
-  console.log("This is the Invoice data ----->===>---->",route?.params?.invData.products);
+  console.log("This is the Invoice data ----->===>---->",moveServicesToEnd(route?.params?.invData.products));
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false)
   const editable = route?.params?.invData.JOB_STATUS_DESC !== 'Pending' && route?.params?.invData.JOB_STATUS_DESC !== 'Delivered' ? false : true;
@@ -155,6 +172,7 @@ export default function DeliveryOrder({ navigation, route }) {
     }
   }
 
+
   const requestPerm = () => {
     requestMultiple([PERMISSIONS.ANDROID.BLUETOOTH_CONNECT, PERMISSIONS.ANDROID.BLUETOOTH_SCAN, PERMISSIONS.ANDROID.BLUETOOTH, PERMISSIONS.ANDROID.BLUETOOTH_ADMIN]).then((result) => {
       console.log('requested')
@@ -204,7 +222,7 @@ export default function DeliveryOrder({ navigation, route }) {
       const setLeftMarginCommand = '\x1b\x6c\x00';
       const setRightMarginCommand = '\x1b\x51\x00';
 
-      const productArray = route?.params?.products
+      const productArray = moveServicesToEnd(route?.params?.products)
 
       let printTextData = `${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<M>Hock Seng Heng Transport & Trading Pte Ltd. </M>${BOLD_OFF}\n
       ${setLeftMarginCommand}${setRightMarginCommand}${CENTER}${BOLD_ON}<D>${route?.params?.PLATE_NO}</D>${BOLD_OFF}\n
@@ -226,7 +244,7 @@ export default function DeliveryOrder({ navigation, route }) {
       }
       // console.log("Print Text before -----> ----->", printTextData)
       // Set right margin to 0
-      BLEPrinter.connectPrinter(printer.inner_mac_address).then((data) => {
+      BLEPrinter.connectPrinter(printer.inner_mac_address).then(async(data) => {
         BLEPrinter.printImage(
           `https://vellas.net/wp-content/uploads/2024/01/hshlogo3-1.webp`,
           {
@@ -238,16 +256,21 @@ export default function DeliveryOrder({ navigation, route }) {
         //   imageWidth: 300,
         //   imageHeight: 300,
         // });
-       BLEPrinter.printText(printTextData)
-
-       BLEPrinter.printText(`${OFF_CENTER}<D>SUB TOTAL: $ ${route?.params?.invData.TAXABLE_AMT}</D>
-       ${OFF_CENTER}<D>9% GST: $ ${route?.params?.invData.VAT_AMT}</D>
-       ${OFF_CENTER}<D>TOTAl: $ ${route?.params?.invData.TOTAL_PAYABLE}</D>\n
-       ${OFF_CENTER}<D>Remarks: ${remark == null ? '' : remark.replaceAll('\n', " ")}</D>\n\n\n`);
+        printTextData += `${OFF_CENTER}<D>SUB TOTAL: $ ${route?.params?.invData.TAXABLE_AMT}</D>
+        ${OFF_CENTER}<D>9% GST: $ ${route?.params?.invData.VAT_AMT}</D>
+        ${OFF_CENTER}<D>TOTAl: $ ${route?.params?.invData.TOTAL_PAYABLE}</D>\n
+        ${OFF_CENTER}<D>Remarks: ${remark == null ? '' : remark.replaceAll('\n', " ")}</D>\n\n\n`
+        
+        //  BLEPrinter.printText(`${OFF_CENTER}<D>SUB TOTAL: $ ${route?.params?.invData.TAXABLE_AMT}</D>
+        //  ${OFF_CENTER}<D>9% GST: $ ${route?.params?.invData.VAT_AMT}</D>
+        //  ${OFF_CENTER}<D>TOTAl: $ ${route?.params?.invData.TOTAL_PAYABLE}</D>\n
+        //  ${OFF_CENTER}<D>Remarks: ${remark == null ? '' : remark.replaceAll('\n', " ")}</D>\n\n\n`);
         // BLEPrinter.printImageBase64(sign, {
-        //   imageWidth: 300,
-        //   imageHeight: 300,
-        // });
+          //   imageWidth: 300,
+          //   imageHeight: 300,
+          // });
+        BLEPrinter.printText(printTextData)
+
         if (signatureURLCopy.current) {
           BLEPrinter.printImage(
             signatureURLCopy.current,
