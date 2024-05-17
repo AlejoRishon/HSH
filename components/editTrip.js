@@ -245,7 +245,7 @@ export default function DeliveryOrder({ navigation, route }) {
         if(!productArray[i].DISPLAY_NAME.includes("SERVICES")) {
           printTextData += `${OFF_CENTER}<D>${productArray[i].DISPLAY_NAME}</D>\n
           ${OFF_CENTER}<D>UOM: ${productArray[i].UOM_CODE}</D>\n
-          ${OFF_CENTER}<D>QTY: ${BOLD_ON}${DiesalQuantityGettingFromRouteParams.current}${BOLD_OFF}</D>\n
+          ${OFF_CENTER}<D>QTY: ${BOLD_ON}${dieselValue}${BOLD_OFF}</D>\n
           ${OFF_CENTER}<D>UNIT PRICE: $${productArray[i].UNIT_AMT}</D>\n\n`
         }else {
           printTextData += `${OFF_CENTER}<D>${productArray[i].DISPLAY_NAME}</D>\n
@@ -606,7 +606,7 @@ export default function DeliveryOrder({ navigation, route }) {
             //   },
             //   { text: 'OK', onPress: () => navigation.replace('DeliveryOrder') },
             // ]);
-            setshowInput(false);
+            // setshowInput(false);
           })
           .catch(error => {
             setLoading(false);
