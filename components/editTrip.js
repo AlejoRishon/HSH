@@ -242,7 +242,7 @@ export default function DeliveryOrder({ navigation, route }) {
       ${OFF_CENTER}<D>Product: \n </D>`
 
       for(let i = 0; i<productArray.length; i++) {
-        if(!productArray[i].DISPLAY_NAME.includes("SERVICES")) {
+        if(!productArray[i].DISPLAY_NAME.includes("Transport Charges")) {
           printTextData += `${OFF_CENTER}<D>${productArray[i].DISPLAY_NAME}</D>\n
           ${OFF_CENTER}<D>UOM: ${productArray[i].UOM_CODE}</D>\n
           ${OFF_CENTER}<D>QTY: ${BOLD_ON}${dieselValue}${BOLD_OFF}</D>\n
