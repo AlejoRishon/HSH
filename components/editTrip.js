@@ -183,6 +183,22 @@ export default function DeliveryOrder({ navigation, route }) {
     }
   }
 
+  const JobDetailsAfterUpdate = async(invoiceNumber) => {
+    const url  = domain + `/getJOdetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&invno=${invoiceNumber}`
+    // console.log("this job nubmer will update now---------->", invoiceNumber);
+    try{
+      const response = await fetch(url)
+      const json = await response.json()
+      console.log("This is the updated invoice now You can now use the amount in them ---->", json)
+      taxableAmount.current = json[0].TAXABLE_AMT
+      percentTax.current = json[0].VAT_AMT
+      grandTotal.current = json[0].TOTAL_PAYABLE
+      console.log('This is the updated invoice now You can now use the amount in them ---->', taxableAmount.current, percentTax.current, grandTotal.current)
+    }catch(e) {
+      console.log(e)
+    }
+  }
+
 
   const requestPerm = () => {
     requestMultiple([PERMISSIONS.ANDROID.BLUETOOTH_CONNECT, PERMISSIONS.ANDROID.BLUETOOTH_SCAN, PERMISSIONS.ANDROID.BLUETOOTH, PERMISSIONS.ANDROID.BLUETOOTH_ADMIN]).then((result) => {
@@ -594,7 +610,7 @@ export default function DeliveryOrder({ navigation, route }) {
       METER_BEFORE64: previewImageUribefore,
       METER_AFTER64: previewImageUri
     }
-    console.log(url, data);
+    // console.log(url, data);
     NetInfo.fetch().then(async networkState => {
       console.log("Is connected? - ", networkState.isConnected);
       if (networkState.isConnected) {
@@ -608,7 +624,7 @@ export default function DeliveryOrder({ navigation, route }) {
           .then(response => response.json())
           .then(result => {
             setLoading(false);
-            console.log("Job updated", result);
+            // console.log("Job updated", result);
             setvisiblePint(true)
             // Alert.alert('Success', 'Job Successful', [
             //   {
@@ -618,6 +634,8 @@ export default function DeliveryOrder({ navigation, route }) {
             //   { text: 'OK', onPress: () => navigation.replace('DeliveryOrder') },
             // ]);
             // setshowInput(false);
+            // here we will get the fresh values of the job order
+            JobDetailsAfterUpdate(route?.params?.invData.INV_NO)
           })
           .catch(error => {
             setLoading(false);
@@ -668,7 +686,7 @@ export default function DeliveryOrder({ navigation, route }) {
       } else {
         response = await ImagePicker.launchCamera(options);
       }
-      console.log('response photos))))))))))))))))))>', response.assets);
+      // console.log('response photos))))))))))))))))))>', response.assets);
 
       if (section === 'after') {
         setpreviewImageUri("data:" + response.assets[0].type + ";base64," + response.assets[0].base64);
