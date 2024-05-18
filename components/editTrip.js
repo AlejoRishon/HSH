@@ -106,6 +106,12 @@ export default function DeliveryOrder({ navigation, route }) {
   const [printModal, setprintModal] = useState([]);
 
 
+  // states for the amounts that we get from the api can be calulated here
+  const taxableAmount = useRef(route?.params?.invData?.TAXABLE_AMT)
+  const percentTax = useRef(route?.params?.invData?.VAT_AMT)
+  const grandTotal = useRef(route?.params?.invData?.TOTAL_PAYABLE)
+
+
   const DiesalQuantityGettingFromRouteParams = useRef(route?.params?.products[0].QTY)
   console.log("This is the good one qty of diesal +++++++>",DiesalQuantityGettingFromRouteParams.current)
   
@@ -268,9 +274,9 @@ export default function DeliveryOrder({ navigation, route }) {
         //   imageWidth: 300,
         //   imageHeight: 300,
         // });
-        printTextData += `${OFF_CENTER}<D>SUB TOTAL: $ ${route?.params?.invData.TAXABLE_AMT}</D>
-        ${OFF_CENTER}<D>9% GST: $ ${route?.params?.invData.VAT_AMT}</D>
-        ${OFF_CENTER}<D>TOTAl: $ ${route?.params?.invData.TOTAL_PAYABLE}</D>\n
+        printTextData += `${OFF_CENTER}<D>SUB TOTAL: $ ${taxableAmount.current}</D>
+        ${OFF_CENTER}<D>9% GST: $ ${percentTax.current}</D>
+        ${OFF_CENTER}<D>TOTAl: $ ${grandTotal.current}</D>\n
         ${OFF_CENTER}<D>Remarks: ${remark == null ? '' : remark.replaceAll('\n', " ")}</D>\n\n\n`
         
         //  BLEPrinter.printText(`${OFF_CENTER}<D>SUB TOTAL: $ ${route?.params?.invData.TAXABLE_AMT}</D>
@@ -569,6 +575,11 @@ export default function DeliveryOrder({ navigation, route }) {
     setLoading(true);
     dieselValueCopy.current = dieselVal;
     DiesalQuantityGettingFromRouteParams.current = dieselVal
+    // here you can calculate the price based on diesel value.
+    // taxableAmount.current = 'something'
+    // percentTax.current = 'something'
+    // grandTotal.current = 'something'
+
     const userLog = getlogUser();
     const url = domain + "/PostJObOrderDelivered"
     const data = {
@@ -657,7 +668,7 @@ export default function DeliveryOrder({ navigation, route }) {
       } else {
         response = await ImagePicker.launchCamera(options);
       }
-      // console.log('resp', response);
+      console.log('response photos))))))))))))))))))>', response.assets);
 
       if (section === 'after') {
         setpreviewImageUri("data:" + response.assets[0].type + ";base64," + response.assets[0].base64);
@@ -1016,7 +1027,7 @@ export default function DeliveryOrder({ navigation, route }) {
                 size={20}
               /> */}
               <TouchableOpacity disabled={!editable} onPress={() => {
-                setuploadtype('after');
+                setuploadtype('before');
                 setModalVisible(true);
               }} style={{ backgroundColor: '#01315C', padding: 10, borderRadius: 5 }}>
                 <Text style={{ color: 'white', width: 50, textAlign: 'center' }}>Upload</Text>
