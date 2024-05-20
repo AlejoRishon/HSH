@@ -150,9 +150,9 @@ export default function DeliveryOrder({ navigation, route }) {
             // json[1].JOB_STATUS_DESC = 'Pending';
             // json[2].JOB_STATUS_DESC = 'Completed';
             if (sdate == formatDate(new Date())) {
-              AsyncStorage.setItem('JOBDATA', JSON.stringify(json));
+              AsyncStorage.setItem('JOBDATA', JSON.stringify(removeDuplicates(json)));
             }
-            setOrderList(json);
+            setOrderList(removeDuplicates(json));
             // console.log("Orders ----------------->", json)
             var totalLitres = 0;
             const transformedData = removeDuplicates(json)?.map(item => {
@@ -510,8 +510,8 @@ export default function DeliveryOrder({ navigation, route }) {
                     address1: orderList[0]?.ADDRESS2,
                     address2: orderList[0]?.PRINT_ADDRESS,
                     PLATE_NO: parameter.vehicle.VEHICLE_INFO,
-                    invData: uniqueOrdersArray.find((val) => val.INV_NO === rowData[1]), // this will only send the first one // so no issue
-                    products: uniqueOrdersArray.find(val => val.INV_NO === rowData[1]).products
+                    invData: orderList.find((val) => val.INV_NO === rowData[1]), // this will only send the first one // so no issue
+                    products: orderList.find(val => val.INV_NO === rowData[1]).products
                   });
                 }}>
                 <TableWrapper key={index} style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
