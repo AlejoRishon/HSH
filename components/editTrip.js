@@ -264,15 +264,15 @@ export default function DeliveryOrder({ navigation, route }) {
       ${OFF_CENTER}<D>Product: \n </D>`
 
       for(let i = 0; i<productArray.length; i++) {
-        if(!productArray[i].DISPLAY_NAME.includes("Transport Charges")) {
-          printTextData += `${OFF_CENTER}<D>${productArray[i].DISPLAY_NAME}</D>\n
-          ${OFF_CENTER}<D>UOM: ${productArray[i].UOM_CODE}</D>\n
-          ${OFF_CENTER}<D>QTY: ${BOLD_ON}${dieselValue}${BOLD_OFF}</D>\n
-          ${OFF_CENTER}<D>UNIT PRICE: $${productArray[i].UNIT_AMT}</D>\n\n`
-        }else {
+        if(productArray[i].DISPLAY_NAME.includes("Transport Charges") || productArray[i].DISPLAY_NAME.includes("Labour Charges")) {
           printTextData += `${OFF_CENTER}<D>${productArray[i].DISPLAY_NAME}</D>\n
           ${OFF_CENTER}<D>UOM: ${productArray[i].UOM_CODE}</D>\n
           ${OFF_CENTER}<D>QTY: ${BOLD_ON}${productArray[i].QTY}${BOLD_OFF}</D>\n
+          ${OFF_CENTER}<D>UNIT PRICE: $${productArray[i].UNIT_AMT}</D>\n\n`
+        } else {
+          printTextData += `${OFF_CENTER}<D>${productArray[i].DISPLAY_NAME}</D>\n
+          ${OFF_CENTER}<D>UOM: ${productArray[i].UOM_CODE}</D>\n
+          ${OFF_CENTER}<D>QTY: ${BOLD_ON}${dieselValue}${BOLD_OFF}</D>\n
           ${OFF_CENTER}<D>UNIT PRICE: $${productArray[i].UNIT_AMT}</D>\n\n`
         }
       }
