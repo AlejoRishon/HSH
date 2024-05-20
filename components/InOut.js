@@ -90,6 +90,14 @@ export default function InOut({ navigation, route }) {
         return formatted;
     };
 
+    const assignColor = (dieselName) => {
+        // let name = dieselName.toLowerCase()
+        if(dieselName.toLowerCase().includes("ado") || dieselName.toLowerCase().includes("ede")) {
+            return "#dceaf2"
+        }
+        return "#fff"
+    }
+
 
 
     useEffect(() => {
@@ -125,7 +133,7 @@ export default function InOut({ navigation, route }) {
                 const response = await fetch(domain + `/GetDieselMovement?_token=4B3B5C99-57E8-4593-A0AD-3D4EEA3C2F53&dtFrom=${sdate}&dtTo=${sdate}&vehicle=${parameter.vehicle.VEHICLE_INFO}`);
 
                 const json = await response.json();
-                console.log(json);
+                console.log("Response data from api ---->",json);
                 if (json) {
                     // setOrderList(json);
 
@@ -155,7 +163,7 @@ export default function InOut({ navigation, route }) {
                     // setqtyin(total_in);
                     // setqtyout(total_out);
                     // setTotalLitres(totalLitres);
-                    console.log(transformedData)
+                    console.log("This is rowData we are using:----->",transformedData)
                     setdetailData(transformedData)
                 }
                 else {
@@ -315,6 +323,7 @@ export default function InOut({ navigation, route }) {
                         {detailData.length > 0 ? detailData?.map((rowData, index) => (
                             // <View key={index.toString()}>
                             <TouchableOpacity
+                                onPress={() => console.log(`${rowData} is pressed here`)}
                                 key={index.toString()}>
                                 <TableWrapper key={index} style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                                     {rowData?.map((cellData, cellIndex) => (
@@ -322,6 +331,7 @@ export default function InOut({ navigation, route }) {
                                             flex={cellIndex == 0 ? 1 : cellIndex == 1 ? 1 : 0.5}
                                             key={cellIndex}
                                             data={cellData}
+                                            style={{backgroundColor: assignColor(rowData[1])}}
                                             textStyle={
                                                 {
                                                     fontSize: width / 50,
