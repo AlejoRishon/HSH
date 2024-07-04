@@ -630,7 +630,7 @@ export default function AdHocService({ navigation, route }) {
        ${OFF_CENTER}<D>${product}</D>
        ${OFF_CENTER}<D>UOM: Litre</D>\n
        ${OFF_CENTER}<D>QTY: ${BOLD_ON}${diesel}${BOLD_OFF}</D>\n
-       ${OFF_CENTER}<D>UNIT PRICE: $ ${parseFloat(unitcost).toFixed(3)}</D>\n
+       ${OFF_CENTER}<D>UNIT PRICE: $ ${parseFloat(unitcost).toFixed(4)}</D>\n
        ${OFF_CENTER}<D>SUB TOTAL: $ ${(parseFloat(unitcost) * parseFloat(diesel)).toFixed(2)}</D>
        ${OFF_CENTER}<D>9% GST: $ ${(parseFloat(unitcost) * parseFloat(diesel)*0.09).toFixed(2)}</D>
        ${OFF_CENTER}<D>TOTAL: $ ${((parseFloat(unitcost) * parseFloat(diesel)) + (parseFloat(unitcost) * parseFloat(diesel)*0.09)).toFixed(2)}</D>\n
