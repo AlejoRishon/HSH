@@ -562,7 +562,7 @@ export default function DeliveryOrder({ navigation, route }) {
         onConfirm={handleConfirm}
         onCancel={hideDatePicker}
         minimumDate={minDate}
-        maximumDate={new Date()}
+        // maximumDate={new Date()}
       />
     </View>
   );
