@@ -293,6 +293,11 @@ export default function TransferList({ navigation, route }) {
               text,
               { marginTop: verticalScale(18) },
             ]}>{t('Please select a vehicle and driver to proceed.')}</Text>
+            <Text
+            style={[
+              text,
+              { marginTop: verticalScale(18) },
+            ]}>{t(route?.params?.job)}</Text>
 
           {selectedVehicle && (
             <View
