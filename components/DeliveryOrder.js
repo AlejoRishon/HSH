@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Text,
   View,
@@ -135,79 +136,83 @@ export default function DeliveryOrder({ navigation, route }) {
         return uniqueArray
   }
   const getDeliveryOrder = async (sdate) => {
-    setChecked([])
+    setChecked([]);
     setLoading(true);
-    console.log(sdate)
+    console.log(sdate);
+
     NetInfo.fetch().then(async networkState => {
-      console.log("Is connected? - ", domain + `/getJobDetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&PLATE_NO=${parameter.vehicle.VEHICLE_INFO}&date=${sdate}`);
-      if (networkState.isConnected) {
-        try {
-          const response = await fetch(domain + `/getJobDetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&PLATE_NO=${parameter.vehicle.VEHICLE_INFO}&date=${sdate}`);
+        if (networkState.isConnected) {
+            try {
+                const response = await fetch(domain + `/getJobDetail?_token=404BF898-501C-469B-9FB0-C1C1CCDD7E29&PLATE_NO=${parameter.vehicle.VEHICLE_INFO}&date=${sdate}`);
+                const json = await response.json();
+                
+                if (json && json.length > 0) {
+                    const uniqueOrders = removeDuplicates(json);
+                    setOrderList(uniqueOrders); // Update orderList with the unique data
 
-          const json = await response.json();
-          // console.log(json);
-          if (json && json.length > 0) {
-            // json[1].JOB_STATUS_DESC = 'Pending';
-            // json[2].JOB_STATUS_DESC = 'Completed';
-            if (sdate == formatDate(new Date())) {
-              AsyncStorage.setItem('JOBDATA', JSON.stringify(removeDuplicates(json)));
+                    const transformedData = uniqueOrders.map(item => {
+                        return [
+                            'Transfer',
+                            item?.INV_NO,
+                            `${item?.NAME} \n ${item?.PRINT_ADDRESS}`,
+                            item?.qty_order,
+                            item?.JOB_STATUS_DESC,
+                        ];
+                    });
+                    setTotalLitres(transformedData.reduce((acc, item) => acc + parseFloat(item[3]), 0));
+                    setdetailData(transformedData);
+                } else {
+                    setOrderList([]);
+                    setdetailData([]);
+                }
+                setLoading(false);
+            } catch (error) {
+                setLoading(false);
+                console.error(error);
             }
-            setOrderList(removeDuplicates(json));
-            // console.log("Orders ----------------->", json)
-            var totalLitres = 0;
-            const transformedData = removeDuplicates(json)?.map(item => {
-              totalLitres += parseFloat(item?.qty_order);
-              return [
-                'Transfer',
-                item?.INV_NO,
-                `${item?.NAME} \n ${item?.PRINT_ADDRESS}`,
-                item?.qty_order,
-                item?.JOB_STATUS_DESC,
-              ]
-            })
-            setTotalLitres(totalLitres);
-            setdetailData(transformedData)
-          }
-          else {
-            setOrderList([]);
-            setdetailData([])
-          }
-          setLoading(false)
-        } catch (error) {
-          // console.error(error);
-          setLoading(false)
-        }
-      }
-      else {
-        var localDeliveryData = await AsyncStorage.getItem('JOBDATA');
-        if (localDeliveryData && sdate === formatDate(new Date())) {
-          setLoading(false)
-          Alert.alert('Offline mode', 'Data in offline mode can be outdated');
-          let jsDelivery = JSON.parse(localDeliveryData)
-          setOrderList(jsDelivery);
+        } else {
+            // Handle offline scenario
+            const localDeliveryData = await AsyncStorage.getItem('JOBDATA');
+            if (localDeliveryData && sdate === formatDate(new Date())) {
+                setLoading(false);
+                Alert.alert('Offline mode', 'Data in offline mode can be outdated');
+                const jsDelivery = JSON.parse(localDeliveryData);
+                setOrderList(jsDelivery);
 
-          const transformedData = jsDelivery?.map(item => [
-            'Transfer',
-            item?.INV_NO,
-            `${item?.NAME} \n ${item?.PRINT_ADDRESS}`,
-            item?.qty_order,
-            item?.JOB_STATUS_DESC,
-
-          ])
-          setdetailData(transformedData)
+                const transformedData = jsDelivery.map(item => [
+                    'Transfer',
+                    item?.INV_NO,
+                    `${item?.NAME} \n ${item?.PRINT_ADDRESS}`,
+                    item?.qty_order,
+                    item?.JOB_STATUS_DESC,
+                ]);
+                setdetailData(transformedData);
+            } else {
+                Alert.alert('You are offline');
+                setOrderList([]);
+                setdetailData([]);
+                setLoading(false);
+            }
         }
-        else {
-          Alert.alert('You are offline');
-          setOrderList([]);
-          setdetailData([])
-          setLoading(false)
-
-        }
-      }
     });
-  }
-  
-  
+};
+
+// Ensure the Transfer button uses data from sorted detailData
+const handleTransfer = () => {
+    if (checked.length > 0) {
+        const selectedIndex = checked[0];
+        const selectedOrder = orderList.find(order => order.INV_NO === sortedData[selectedIndex][1]);
+        
+        if (selectedOrder) {
+            navigation.replace('TransferList', {
+                info: route?.params,
+                job: selectedOrder.INV_NO
+            });
+            setOrderList([]);
+            setdetailData([]);
+        }
+    }
+};
 
   const statusColor = {
     Pending: { text: '#EA631D', button: 'rgba(255, 181, 114, 0.47)' },
@@ -441,16 +446,19 @@ export default function DeliveryOrder({ navigation, route }) {
                 padding: 10,
                 opacity: checked.length > 0 ? 1 : 0.4
               }}
-              onPress={() => {
-                console.log(orderList[checked[0]]);
+              onPress={
+              //   () => {
+              //   console.log(orderList[checked[0]]);
 
-                navigation.replace('TransferList', {
-                  info: route?.params,
-                  job: orderList[checked[0]].INV_NO
-                });
-                setOrderList([]);
-                setdetailData([])
-              }}>
+              //   navigation.replace('TransferList', {
+              //     info: route?.params,
+              //     job: orderList[checked[0]].INV_NO
+              //   });
+              //   setOrderList([]);
+              //   setdetailData([])
+              // }
+              handleTransfer
+              }>
               <Icon name="exchange" color="#01315C" size={20} />
 
               <Text style={[text, { marginLeft: 10 }]}>Transfer</Text>

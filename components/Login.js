@@ -203,7 +203,7 @@ export default function Login({ navigation }) {
               }}>
               <View
                 style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   onPress={() => {
                     i18n.changeLanguage('en');
                     setlang('en');
@@ -244,10 +244,10 @@ export default function Login({ navigation }) {
                     ]}>
                     Chinese
                   </Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
               <View>
-                <Text style={{ fontSize: moderateScale(10), color: "black", marginBottom: 10 }}>Version 13</Text>
+                <Text style={{ fontSize: moderateScale(10), color: "black", marginBottom: 10 }}>Version 15</Text>
                 <TouchableOpacity
                   style={[button, {
                     width: horizontalScale(50),

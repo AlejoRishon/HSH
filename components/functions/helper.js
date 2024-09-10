@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 var global = {};
 export const setVehicle = vehicle => {
   console.log(vehicle);

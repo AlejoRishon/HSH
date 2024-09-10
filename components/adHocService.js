@@ -186,8 +186,10 @@ export default function AdHocService({ navigation, route }) {
     formdata.append("REMARKS", remark);
     formdata.append("UNIT_COST", parseFloat(unitcost));
     formdata.append("SIGNATURE64", signature);
-    formdata.append("METER_BEFORE64", previewImageUri);
-    formdata.append("METER_AFTER64", previewImageUribefore);
+    // formdata.append("METER_BEFORE64", previewImageUri);
+    // formdata.append("METER_AFTER64", previewImageUribefore);
+    formdata.append("METER_BEFORE64", previewImageUribefore);
+    formdata.append("METER_AFTER64", previewImageUri);
     console.log(formdata);
     fetch(url, {
       method: "POST",

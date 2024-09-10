@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   StyleSheet,
   Text,
@@ -44,6 +45,15 @@ export default function Main({ navigation, route }) {
     navigation.replace('Login');
     setonLogOut(false);
   }
+
+  const [lang, setlang] = useState('en');
+  useState(() => {
+    console.log(lang);
+    // setLoading(false)
+  }, [lang]);
+  // const [loading, setLoading] = useState(false);
+  
+
 
   return (
     <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'white' }}>
@@ -182,6 +192,58 @@ export default function Main({ navigation, route }) {
           justifyContent: 'space-between',
         }}>
         <View style={{ marginTop: verticalScale(40) }}>
+        {/* <Modal
+          animationType='none'
+          transparent={true}
+          visible={loading}
+        >
+          <ActivityIndicator animating={true} color={MD2Colors.red800} style={{ marginTop: '25%' }} size='large' />
+        </Modal> */}
+        <View
+                style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom:30, marginTop: -20 }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    i18n.changeLanguage('en');
+                    setlang('en');
+                  }}>
+                  <Text
+                    style={[
+                      lang === 'en' && {
+                        borderBottomWidth: 3,
+                        borderColor: 'black',
+                      },
+                      {
+                        color: '#000',
+                        fontSize: moderateScale(12),
+                        padding: moderateScale(8),
+                        fontWeight: 'bold',
+                      },
+                    ]}>
+                    English
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    i18n.changeLanguage('ch');
+                    setlang('ch');
+                  }}>
+                  <Text
+                    style={[
+                      lang === 'ch' && {
+                        borderBottomWidth: 3,
+                        borderColor: 'black',
+                      },
+                      {
+                        color: '#000',
+                        fontSize: moderateScale(12),
+                        padding: moderateScale(8),
+                        fontWeight: 'bold',
+                      },
+                    ]}>
+                    Chinese
+                  </Text>
+                </TouchableOpacity>
+              </View>
           <Text style={text}>{`Welcome back,`}</Text>
           <View
             style={{
